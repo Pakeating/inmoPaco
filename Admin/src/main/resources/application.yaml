@@ -1,0 +1,17 @@
+spring:
+  application:
+    name: Admin
+  config:
+    # Importa la configuración desde el Config Service usando su nombre en Docker/Eureka
+    import: "optional:configserver:http://config-service:8888"
+  # para que Admin se vea a sí mismo
+  boot:
+    admin:
+      context-path: /admin
+      ui:
+        public-url: http://localhost:9090/admin
+      client:
+        # DEBE terminar en /admin si esa es la base del server
+        url: "http://admin-server:9090/admin"
+server:
+  port: 9090

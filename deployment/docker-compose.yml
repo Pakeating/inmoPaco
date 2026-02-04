@@ -1,0 +1,123 @@
+services:
+
+#  # --- Eureka ---
+#  eureka-server:
+#    build:
+#      context: ../EurekaServer
+#    container_name: eureka-server
+#    ports:
+#      - "8761:8761"
+#    healthcheck:
+#      test: [ "CMD", "curl", "-f", "http://localhost:8761/actuator/health" ]
+#      interval: 10s
+#      timeout: 5s
+#      retries: 5
+
+  # --- CONFIG SERVICE ---
+  config-service:
+    build:
+      context: ../ConfigService
+    container_name: config-service
+    ports:
+      - "8888:8888"
+#    depends_on:
+#      eureka-server:
+#        condition: service_healthy
+    volumes:
+      # archivos locales en el config
+#      - ./configs:/app/resources/configurations
+      # archivos en deployment/config
+      - ./configurations:/app/config-repo
+    environment:
+      - SPRING_PROFILES_ACTIVE=native
+#      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+      # Eureka desactivado
+      - EUREKA_CLIENT_ENABLED=false
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8888/actuator/health" ]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    networks:
+      - microservices-network
+
+  # --- API GATEWAY ---
+  api-gateway:
+    build:
+      context: ../APIGateway
+    container_name: api-gateway
+    ports:
+      - "8080:8080"
+    depends_on:
+      - config-service
+    environment:
+      - SPRING_CONFIG_IMPORT=optional:configserver:http://config-service:8888
+      - SPRING_CLOUD_CONFIG_FAIL_FAST=false     #failfast y reintentos forzados para que reconecte si esta inestable
+      - SPRING_CLOUD_CONFIG_RETRY_MAX_ATTEMPTS=20
+      - SPRING_CLOUD_CONFIG_RETRY_INITIAL_INTERVAL=2000
+      - SPRING_CLOUD_CONFIG_RETRY_MULTIPLIER=1.5
+#      Desactivado EUREKA
+#      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+      - EUREKA_CLIENT_ENABLED=false
+      - SPRING_CLOUD_DISCOVERY_ENABLED=false
+    networks:
+      - microservices-network
+  # --- ADMIN ---
+  admin-server:
+    build:
+      context: ../Admin
+    container_name: admin-server
+    ports:
+      - "9090:9090"
+    depends_on:
+      - config-service
+    environment:
+      - SPRING_BOOT_ADMIN_CONTEXT_PATH=/admin
+      - SPRING_CONFIG_IMPORT=configserver:http://config-service:8888
+      - SPRING_CLOUD_CONFIG_FAIL_FAST=false
+      - SPRING_CLOUD_CONFIG_RETRY_MAX_ATTEMPTS=20
+      - SPRING_CLOUD_CONFIG_RETRY_INITIAL_INTERVAL=2000
+      - SPRING_CLOUD_CONFIG_RETRY_MULTIPLIER=1.5
+      # EUREKA DESACTIVADO
+      - EUREKA_CLIENT_ENABLED=false
+      - SPRING_CLOUD_DISCOVERY_ENABLED=false
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+    networks:
+      - microservices-network
+
+
+  #  # --- MICROSERVICIOS DE NEGOCIO ---
+  #  usuarios-ms:
+  #    build:
+  #      context: ../usuarios-ms
+  #    container_name: usuarios-ms
+  #    depends_on:
+  #      config-service:
+  #        condition: service_healthy
+  #      rabbitmq:
+  #        condition: service_healthy
+  #    environment:
+  #      - SPRING_CONFIG_IMPORT=optional:configserver:http://config-service:8888
+  #      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+  #      - SPRING_RABBITMQ_HOST=rabbitmq
+  #    # Para que Spring Boot Admin pueda leer los logs, el micro debe escribir en un archivo
+  #    volumes:
+  #      - ./logs/usuarios-ms:/app/logs
+  #
+
+  # --- ACTUALIZADOR AUTOMÁTICO ---
+  watchtower:
+    image: containrrr/watchtower
+    container_name: watchtower
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      # Forzamos la versión exacta que soporta tu Server Engine
+      - DOCKER_API_VERSION=1.52
+    command: --interval 30 --cleanup
+    networks:
+      - microservices-network
+
+networks:
+   microservices-network:
+     driver: bridge
