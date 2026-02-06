@@ -9,7 +9,7 @@ RUN ./mvnw dependency:go-offline
 
 # Copiar código y compilar a nativo
 COPY src ./src
-RUN ./mvnw native:compile -Pnative -DskipTests
+RUN ./mvnw native:compile -Pnative -DskipTests -DskipITs -DskipNativeTests -Dmaven.test.skip=true
 
 # Fase 2: Ejecución
 # para desarrollo, incluye ssh, etc

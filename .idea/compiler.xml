@@ -11,6 +11,7 @@
         <module name="APIGateway" />
         <module name="ConfigService" />
         <module name="Admin" />
+        <module name="APIGatewayV3" />
       </profile>
       <profile name="Annotation profile for AuctionService" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
@@ -33,6 +34,7 @@
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="APIGateway" options="-parameters" />
+      <module name="APIGatewayV3" options="-parameters" />
       <module name="Admin" options="-parameters" />
       <module name="AuctionService" options="-parameters" />
       <module name="ConfigService" options="-parameters" />

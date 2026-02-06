@@ -9,8 +9,15 @@ RUN ./mvnw dependency:go-offline
 
 # Copiar código y compilar a nativo
 COPY src ./src
-RUN ./mvnw native:compile -Pnative -DskipTests
-
+ENV SPRING_CLOUD_CONFIG_ENABLED=false
+ENV SPRING_CLOUD_CONFIG_IMPORT_CHECK=false
+RUN ./mvnw native:compile  \
+    -Pnative  \
+    -DskipTests  \
+    -DskipITs  \
+    -DskipNativeTests  \
+    -Dmaven.test.skip=true \
+    -Dspring.profiles.active=build
 # Fase 2: Ejecución
 # para desarrollo, incluye ssh, etc
 FROM debian:bookworm-slim

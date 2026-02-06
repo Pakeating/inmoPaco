@@ -9,6 +9,7 @@
         <option value="$PROJECT_DIR$/EurekaServer/pom.xml" />
         <option value="$PROJECT_DIR$/Admin/pom.xml" />
         <option value="$PROJECT_DIR$/AuctionService/pom.xml" />
+        <option value="$PROJECT_DIR$/APIGatewayV3/pom.xml" />
       </list>
     </option>
   </component>

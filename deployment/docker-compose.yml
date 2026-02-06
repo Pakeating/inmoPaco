@@ -1,17 +1,20 @@
 services:
 
-#  # --- Eureka ---
-#  eureka-server:
-#    build:
-#      context: ../EurekaServer
-#    container_name: eureka-server
-#    ports:
-#      - "8761:8761"
-#    healthcheck:
-#      test: [ "CMD", "curl", "-f", "http://localhost:8761/actuator/health" ]
-#      interval: 10s
-#      timeout: 5s
-#      retries: 5
+# SERVICIOS DE INFRAESTRUCTURA:
+
+
+  #  # --- Eureka --- Desactivado temporalmente
+  #  eureka-server:
+  #    build:
+  #      context: ../EurekaServer
+  #    container_name: eureka-server
+  #    ports:
+  #      - "8761:8761"
+  #    healthcheck:
+  #      test: [ "CMD", "curl", "-f", "http://localhost:8761/actuator/health" ]
+  #      interval: 10s
+  #      timeout: 5s
+  #      retries: 5
 
   # --- CONFIG SERVICE ---
   config-service:
@@ -20,17 +23,17 @@ services:
     container_name: config-service
     ports:
       - "8888:8888"
-#    depends_on:
-#      eureka-server:
-#        condition: service_healthy
+    #    depends_on:
+    #      eureka-server:
+    #        condition: service_healthy
     volumes:
       # archivos locales en el config
-#      - ./configs:/app/resources/configurations
+      #      - ./configs:/app/resources/configurations
       # archivos en deployment/config
       - ./configurations:/app/config-repo
     environment:
       - SPRING_PROFILES_ACTIVE=native
-#      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+      #      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
       # Eureka desactivado
       - EUREKA_CLIENT_ENABLED=false
     healthcheck:
@@ -43,6 +46,8 @@ services:
 
   # --- API GATEWAY ---
   api-gateway:
+    profiles:
+      - donotrun  # evita que se levante el servicio
     build:
       context: ../APIGateway
     container_name: api-gateway
@@ -56,12 +61,35 @@ services:
       - SPRING_CLOUD_CONFIG_RETRY_MAX_ATTEMPTS=20
       - SPRING_CLOUD_CONFIG_RETRY_INITIAL_INTERVAL=2000
       - SPRING_CLOUD_CONFIG_RETRY_MULTIPLIER=1.5
-#      Desactivado EUREKA
-#      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+      #      Desactivado EUREKA
+      #      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
       - EUREKA_CLIENT_ENABLED=false
       - SPRING_CLOUD_DISCOVERY_ENABLED=false
     networks:
       - microservices-network
+
+  # --- API GATEWAY V3 ---
+  api-gateway-v3:
+    build:
+      context: ../APIGatewayV3
+    container_name: api-gateway-v3
+    ports:
+      - "8080:8080"
+    depends_on:
+      - config-service
+    environment:
+      - SPRING_CONFIG_IMPORT=optional:configserver:http://config-service:8888
+      - SPRING_CLOUD_CONFIG_FAIL_FAST=false     #failfast y reintentos forzados para que reconecte si esta inestable
+      - SPRING_CLOUD_CONFIG_RETRY_MAX_ATTEMPTS=20
+      - SPRING_CLOUD_CONFIG_RETRY_INITIAL_INTERVAL=2000
+      - SPRING_CLOUD_CONFIG_RETRY_MULTIPLIER=1.5
+      #      Desactivado EUREKA
+      #      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+      - EUREKA_CLIENT_ENABLED=false
+      - SPRING_CLOUD_DISCOVERY_ENABLED=false
+    networks:
+      - microservices-network
+
   # --- ADMIN ---
   admin-server:
     build:
@@ -86,25 +114,6 @@ services:
       - microservices-network
 
 
-  #  # --- MICROSERVICIOS DE NEGOCIO ---
-  #  usuarios-ms:
-  #    build:
-  #      context: ../usuarios-ms
-  #    container_name: usuarios-ms
-  #    depends_on:
-  #      config-service:
-  #        condition: service_healthy
-  #      rabbitmq:
-  #        condition: service_healthy
-  #    environment:
-  #      - SPRING_CONFIG_IMPORT=optional:configserver:http://config-service:8888
-  #      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
-  #      - SPRING_RABBITMQ_HOST=rabbitmq
-  #    # Para que Spring Boot Admin pueda leer los logs, el micro debe escribir en un archivo
-  #    volumes:
-  #      - ./logs/usuarios-ms:/app/logs
-  #
-
   # --- ACTUALIZADOR AUTOMÁTICO ---
   watchtower:
     image: containrrr/watchtower
@@ -118,6 +127,42 @@ services:
     networks:
       - microservices-network
 
+
+  # Instancia de DynamoDB Local: Solo para Desarrollo
+  dynamodb-local:
+    image: amazon/dynamodb-local
+    container_name: dynamodb-local
+    ports:
+      - "8000:8000"
+    # El comando -sharedDb permite que todos los clientes vean los mismos datos
+    command: "-jar DynamoDBLocal.jar -sharedDb -dbPath ./data"
+    volumes:
+      - "./docker/dynamodb:/home/dynamodblocal/data"
+    working_dir: /home/dynamodblocal
+    networks:
+      - microservices-network
+
+#    SERVICIOS DE NEGOCIO
+
+    # --- AUCTION SERVICE ---
+  auction-service:
+    build:
+      context: ../AuctionService
+    container_name: auction-service
+    ports:
+      - "8081:8081"
+    depends_on:
+      - config-service
+    environment:
+      - SPRING_CONFIG_IMPORT=optional:configserver:http://config-service:8888
+      - SPRING_CLOUD_CONFIG_FAIL_FAST=false
+      - SPRING_CLOUD_CONFIG_RETRY_MAX_ATTEMPTS=20
+      - SPRING_CLOUD_CONFIG_RETRY_INITIAL_INTERVAL=2000
+      - SPRING_CLOUD_CONFIG_RETRY_MULTIPLIER=1.5
+    volumes:
+      - ./logs/usuarios-ms:/app/logs
+
+
 networks:
-   microservices-network:
-     driver: bridge
+  microservices-network:
+    driver: bridge
