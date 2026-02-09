@@ -1,0 +1,29 @@
+spring:
+  boot:
+    admin:
+      client:
+        # DEBE terminar en /admin si esa es la base del server
+        url: "http://admin-server:9090/admin"
+
+  application:
+    name: api-gateway-v3
+  config:
+    # Importa la configuración desde el Config Service usando su nombre en Docker/Eureka
+    import: "optional:configserver:http://config-service:8888"
+  cloud:
+    refresh:
+      enabled: false # Desactiva la infraestructura de Refresh que falla en AOT
+
+management:
+  otlp:
+    metrics:
+      export:
+        enabled: false
+# Esta configuración mínima es necesaria para que el Gateway sepa
+# dónde está Eureka antes de bajar el resto de configs
+eureka:
+  client:
+    service-url:
+      defaultZone: http://eureka-server:8761/eureka/
+    enabled: false # Desactiva específicamente el proxy de Eureka
+
