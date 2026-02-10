@@ -1,6 +1,6 @@
 package com.inmopaco.AuctionService.infrastructure.scraper.providers.jsoup.chain.nodes;
 
-import com.inmopaco.AuctionService.infrastructure.scraper.dto.ScraperAuctionSummaryDTO;
+import com.inmopaco.AuctionService.application.dto.AuctionSummaryDTO;
 import com.inmopaco.AuctionService.infrastructure.scraper.providers.jsoup.chain.JsoupScraperChainNode;
 import com.inmopaco.AuctionService.infrastructure.scraper.providers.jsoup.chain.dto.JsoupChainContextDTO;
 import com.inmopaco.AuctionService.infrastructure.scraper.providers.jsoup.common.JsoupAuctionScraperClient;
@@ -30,7 +30,7 @@ public class JsoupAuctionDetailsNodeVer5ChainNode extends AbstractJsoupAuctionDe
         return parse(document, context);
     }
 
-    private Document fetchAuctionDetails(ScraperAuctionSummaryDTO summary) {
+    private Document fetchAuctionDetails(AuctionSummaryDTO summary) {
 
         if (summary.getDetailUrl() == null || summary.getDetailUrl().isBlank()) {
             throw new IllegalArgumentException("The auction detail URL is missing for ID: " + summary.getBoeIdentifier());

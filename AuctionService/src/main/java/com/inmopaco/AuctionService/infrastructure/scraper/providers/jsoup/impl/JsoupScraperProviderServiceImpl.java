@@ -1,10 +1,11 @@
 package com.inmopaco.AuctionService.infrastructure.scraper.providers.jsoup.impl;
 
-import com.inmopaco.AuctionService.infrastructure.scraper.dto.ScraperAuctionSummaryDTO;
-import com.inmopaco.AuctionService.infrastructure.scraper.providers.jsoup.chain.nodes.*;
-import com.inmopaco.AuctionService.infrastructure.scraper.providers.jsoup.common.JsoupAuctionScraperClient;
+import com.inmopaco.AuctionService.application.dto.AuctionDetailsDTO;
+import com.inmopaco.AuctionService.application.dto.AuctionSummaryDTO;
 import com.inmopaco.AuctionService.infrastructure.scraper.providers.jsoup.JsoupScraperProviderService;
 import com.inmopaco.AuctionService.infrastructure.scraper.providers.jsoup.chain.JsoupScraperChainService;
+import com.inmopaco.AuctionService.infrastructure.scraper.providers.jsoup.chain.nodes.*;
+import com.inmopaco.AuctionService.infrastructure.scraper.providers.jsoup.common.JsoupAuctionScraperClient;
 import lombok.extern.log4j.Log4j2;
 import org.jsoup.Connection;
 import org.jsoup.nodes.Document;
@@ -32,7 +33,7 @@ public class JsoupScraperProviderServiceImpl implements JsoupScraperProviderServ
     private static final Connection.Method METHOD = Connection.Method.POST;
 
     @Override
-    public void fetchSearchResults() {
+    public List<AuctionDetailsDTO> fetchSearchResults() {
         try {
             // TODO: Hay que montar form-data dinamicamente, cambiar por el hardcodeado.
             Map<String, String> formData = new HashMap<>();
@@ -102,15 +103,16 @@ public class JsoupScraperProviderServiceImpl implements JsoupScraperProviderServ
             //TODO: temporal, de prueba
             log.info("Detailed Auctions Fetched: {}", detailedAuctionList.size());
             detailedAuctionList.forEach(log::info);
-
+            return detailedAuctionList;
         } catch (IOException e) {
             System.err.println("Error connecting to BOE: " + e.getMessage());
+            throw new RuntimeException("Error connecting to BOE: " + e.getMessage(), e);
         }
     }
 
     //TODO: No me mola el resultado, refactorizar
-    private List<ScraperAuctionSummaryDTO> parseResults(Document doc) {
-        List<ScraperAuctionSummaryDTO> results = new ArrayList<>();
+    private List<AuctionSummaryDTO> parseResults(Document doc) {
+        List<AuctionSummaryDTO> results = new ArrayList<>();
 
         // Seleccionamos cada bloque de subasta
         Elements auctionBlocks = doc.select("li.resultado-busqueda");
@@ -149,7 +151,7 @@ public class JsoupScraperProviderServiceImpl implements JsoupScraperProviderServ
             }
 
             // Construcción del objeto usando el Builder de Lombok
-            ScraperAuctionSummaryDTO dto = ScraperAuctionSummaryDTO.builder()
+            AuctionSummaryDTO dto = AuctionSummaryDTO.builder()
                     .boeIdentifier(id)
                     .courtName(court)
                     .expediente(exp)

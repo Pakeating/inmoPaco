@@ -1,13 +1,13 @@
 package com.inmopaco.AuctionService.infrastructure.scraper.providers.jsoup.chain;
 
-import com.inmopaco.AuctionService.infrastructure.scraper.dto.ScraperAuctionDetailsDTO;
-import com.inmopaco.AuctionService.infrastructure.scraper.dto.ScraperAuctionSummaryDTO;
+import com.inmopaco.AuctionService.application.dto.AuctionDetailsDTO;
+import com.inmopaco.AuctionService.application.dto.AuctionSummaryDTO;
 
 public interface JsoupScraperChainService {
 
-    ScraperAuctionDetailsDTO execute();
+    AuctionDetailsDTO execute();
 
     JsoupScraperChainService add(JsoupScraperChainNode node);
 
-    JsoupScraperChainService create(ScraperAuctionSummaryDTO summary);
+    JsoupScraperChainService create(AuctionSummaryDTO summary);
 }

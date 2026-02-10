@@ -1,18 +1,18 @@
 package com.inmopaco.AuctionService.infrastructure.persistence.service;
 
-import com.inmopaco.AuctionService.application.dto.AuctionDTO;
+import com.inmopaco.AuctionService.application.dto.AuctionDetailsDTO;
 
 import java.util.List;
 
 public interface AuctionPersistenceService {
 
-    void saveAuction(AuctionDTO auctionDTO);
+    void saveAuction(AuctionDetailsDTO auctionDTO);
 
-    void saveAllAuctions(List<AuctionDTO> auctionList);
+    void saveAllAuctions(List<AuctionDetailsDTO> auctionList);
 
-    long saveOrUpdateAuctions(List<AuctionDTO> auctionList);
+    long saveOrUpdateAuctions(List<AuctionDetailsDTO> auctionList);
 
-    List<AuctionDTO> listAllAuctions();
+    List<AuctionDetailsDTO> listAllAuctions();
 
     List<String> listAuctionIdentifiersByStatus(String status);
 }

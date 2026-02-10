@@ -1,16 +1,17 @@
 package com.inmopaco.AuctionService.infrastructure.scraper.providers.jsoup.chain.impl;
 
-import com.inmopaco.AuctionService.infrastructure.scraper.dto.ScraperAuctionDetailsDTO;
-import com.inmopaco.AuctionService.infrastructure.scraper.dto.ScraperAuctionSummaryDTO;
-import com.inmopaco.AuctionService.infrastructure.scraper.providers.jsoup.chain.dto.JsoupChainContextDTO;
+import com.inmopaco.AuctionService.application.dto.AuctionDetailsDTO;
+import com.inmopaco.AuctionService.application.dto.AuctionSummaryDTO;
 import com.inmopaco.AuctionService.infrastructure.scraper.providers.jsoup.chain.JsoupScraperChainNode;
 import com.inmopaco.AuctionService.infrastructure.scraper.providers.jsoup.chain.JsoupScraperChainService;
+import com.inmopaco.AuctionService.infrastructure.scraper.providers.jsoup.chain.dto.JsoupChainContextDTO;
 import com.inmopaco.AuctionService.infrastructure.scraper.providers.jsoup.chain.nodes.JsoupAuctionDetailsNodeVer1ChainNode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.Deque;
+import java.util.LinkedList;
 
 
 @Service
@@ -23,15 +24,15 @@ public class JsoupScraperChainServiceImpl implements JsoupScraperChainService {
     @Autowired
     public static JsoupAuctionDetailsNodeVer1ChainNode ver1Node;
 
-    private JsoupScraperChainServiceImpl(ScraperAuctionSummaryDTO summary){
+    private JsoupScraperChainServiceImpl(AuctionSummaryDTO summary){
         this.context = new JsoupChainContextDTO(
                 summary,
-                ScraperAuctionDetailsDTO.builder()
+                AuctionDetailsDTO.builder()
         );
     }
 
     @Override
-    public ScraperAuctionDetailsDTO execute() {
+    public AuctionDetailsDTO execute() {
         while (!nodeList.isEmpty()) {
             JsoupScraperChainNode node = nodeList.pollFirst();
             node.execute(context);
@@ -46,7 +47,7 @@ public class JsoupScraperChainServiceImpl implements JsoupScraperChainService {
     }
 
     @Override
-    public JsoupScraperChainService create(ScraperAuctionSummaryDTO summary) {
+    public JsoupScraperChainService create(AuctionSummaryDTO summary) {
         var instance = new JsoupScraperChainServiceImpl(summary);
         instance.nodeList.clear();
         return instance;

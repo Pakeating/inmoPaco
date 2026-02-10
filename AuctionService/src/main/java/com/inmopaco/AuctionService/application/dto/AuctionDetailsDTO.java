@@ -1,4 +1,4 @@
-package com.inmopaco.AuctionService.infrastructure.scraper.dto;
+package com.inmopaco.AuctionService.application.dto;
 
 import lombok.Builder;
 import lombok.Data;
@@ -7,7 +7,7 @@ import java.util.List;
 
 @Data
 @Builder
-public class ScraperAuctionDetailsDTO {
+public class AuctionDetailsDTO {
     private String auctionId;        // Identificador
     private String type;             // Tipo de subasta
     private String countingAccount;  // Cuenta expediente
@@ -43,5 +43,9 @@ public class ScraperAuctionDetailsDTO {
     private String creditorNif;       // NIF del Acreedor
     private String creditorAddress;   // Dirección del Acreedor
     private boolean hasBids; // ¿Ha recibido pujas?
-    private List<ScraperLotDTO> lots; // Lotes de la subasta
+    private List<LotDTO> lots; // Lotes de la subasta
+
+    private String courtName;//ESTOS TRES PROVIENEN DE SUMMARY
+    private String expediente;
+    private String status;
 }

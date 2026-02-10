@@ -17,7 +17,6 @@ spring:
   boot:
     admin:
       client:
-        # DEBE terminar en /admin si esa es la base del server
         url: "http://admin-server:9090/admin"
 
 

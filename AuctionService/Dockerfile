@@ -9,7 +9,7 @@ RUN mvn dependency:go-offline -B
 
 # Copiamos el código fuente y compilamos el .jar
 COPY src ./src
-RUN mvn clean package -DskipNativeBuild=true -DskipTests
+RUN mvn clean package -DskipNativeBuild=true -DskipTests -Dproc:full
 
 # --- Etapa 2: Run ---
 # Usamos una imagen JRE (Runtime) mucho más pequeña para la ejecución

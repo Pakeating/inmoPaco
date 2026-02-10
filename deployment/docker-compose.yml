@@ -128,6 +128,7 @@ services:
       - microservices-network
 
 
+  # --- DYNAMODB ---
   # Instancia de DynamoDB Local: Solo para Desarrollo
   dynamodb-local:
     image: amazon/dynamodb-local
@@ -141,6 +142,21 @@ services:
     working_dir: /home/dynamodblocal
     networks:
       - microservices-network
+
+  dynamodb-admin:
+    image: aaronshaf/dynamodb-admin
+    container_name: dynamodb-admin
+    ports:
+      - "8001:8001"
+    environment:
+      - DYNAMO_ENDPOINT=http://dynamodb-local:8000
+      - AWS_REGION=us-east-1
+      - AWS_ACCESS_KEY_ID=local
+      - AWS_SECRET_ACCESS_KEY=local
+    networks:
+      - microservices-network
+    depends_on:
+      - dynamodb-local
 
 #    SERVICIOS DE NEGOCIO
 
@@ -161,7 +177,8 @@ services:
       - SPRING_CLOUD_CONFIG_RETRY_MULTIPLIER=1.5
     volumes:
       - ./logs/usuarios-ms:/app/logs
-
+    networks:
+      - microservices-network
 
 networks:
   microservices-network:

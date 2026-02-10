@@ -1,7 +1,16 @@
 spring:
+  boot:
+    admin:
+      client:
+        url: "http://admin-server:9090/admin"
   application:
     name: auction-service
   config:
     import: "optional:configserver:http://config-service:8888"
+#management:
+#  endpoints:
+#    web:
+#      exposure:
+#        include: "*"
 server:
   port: 8081

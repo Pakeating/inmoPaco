@@ -1,6 +1,6 @@
 package com.inmopaco.AuctionService.infrastructure.persistence.service.impl;
 
-import com.inmopaco.AuctionService.application.dto.AuctionDTO;
+import com.inmopaco.AuctionService.application.dto.AuctionDetailsDTO;
 import com.inmopaco.AuctionService.infrastructure.persistence.entity.AuctionEntity;
 import com.inmopaco.AuctionService.infrastructure.persistence.mapper.AuctionRepositoryMapper;
 import com.inmopaco.AuctionService.infrastructure.persistence.repository.AuctionRepository;
@@ -24,12 +24,12 @@ public class AuctionPersistenceServiceImpl implements AuctionPersistenceService 
     private AuctionRepositoryMapper mapper;
 
     @Override
-    public void saveAuction(AuctionDTO auctionDTO) {
+    public void saveAuction(AuctionDetailsDTO auctionDTO) {
         repository.save(mapper.toEntity(auctionDTO));
     }
 
     @Override
-    public void saveAllAuctions(List<AuctionDTO> auctionList) {
+    public void saveAllAuctions(List<AuctionDetailsDTO> auctionList) {
         List<AuctionEntity> entities = auctionList.stream()
                 .map(dto -> mapper.toEntity(dto))
                 .toList();
@@ -38,11 +38,11 @@ public class AuctionPersistenceServiceImpl implements AuctionPersistenceService 
 
     @Override
     //returns the number of new auctions created
-    public long saveOrUpdateAuctions(List<AuctionDTO> auctionList) {
+    public long saveOrUpdateAuctions(List<AuctionDetailsDTO> auctionList) {
 
         //Smart-saving: check existing by boeIdentifier and update, else create new
         List<String> identifiers = auctionList.stream()
-                .map(AuctionDTO::getBoeIdentifier)
+                .map(AuctionDetailsDTO::getAuctionId)
                 .toList();
 
         Map<String, AuctionEntity> entityMap = repository.findAllByBoeIdentifier(identifiers)
@@ -50,7 +50,7 @@ public class AuctionPersistenceServiceImpl implements AuctionPersistenceService 
                 .collect(Collectors.toMap(AuctionEntity::getBoeIdentifier, entity -> entity));
 
         List <AuctionEntity> auctionEntities = auctionList.stream().map(dto -> {
-            AuctionEntity entity = entityMap.get(dto.getBoeIdentifier());
+            AuctionEntity entity = entityMap.get(dto.getAuctionId());
             if (entity != null) {
                 // Update existing entity without losing its ID
                 mapper.updateEntityFromDTO(dto, entity);
@@ -70,7 +70,7 @@ public class AuctionPersistenceServiceImpl implements AuctionPersistenceService 
     }
 
     @Override
-    public List<AuctionDTO> listAllAuctions() {
+    public List<AuctionDetailsDTO> listAllAuctions() {
         return repository.findAll().parallelStream().map(mapper::toDTO).toList();
     }
 

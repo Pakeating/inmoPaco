@@ -1,16 +1,28 @@
 package com.inmopaco.AuctionService.application.dto;
 
+import lombok.Builder;
 import lombok.Data;
 
-import java.util.Map;
-
 @Data
+@Builder
 public class LotDTO {
-    private Long lotId;
-    private Long lotBoeNumber;
-    private String description;
-    private Double auctionValue;
-    private Double currentBid;
+
+    private String lotId;
+    private String lotTitle;
+
+    private String auctionValue;
+    private String bidSteps;
+    private String depositAmount;
+
+    private String goodsDescription;
     private String cadastralReference;
-    private Map<String, String> cadastralData;
+    private String propertyAddress;
+    private String city;
+    private String province;
+    private String possessionStatus;
+
+    private String postalCode;
+    private String isHabitualResidence;
+    private String isVisitable;
+
 }

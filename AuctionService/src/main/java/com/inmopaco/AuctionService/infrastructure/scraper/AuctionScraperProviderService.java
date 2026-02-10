@@ -1,10 +1,9 @@
 package com.inmopaco.AuctionService.infrastructure.scraper;
-
-import com.inmopaco.AuctionService.application.dto.AuctionDTO;
+import com.inmopaco.AuctionService.application.dto.AuctionDetailsDTO;
 
 import java.util.List;
 
 public interface AuctionScraperProviderService {
-    public void fetchSearchResults();
+    public List<AuctionDetailsDTO> fetchSearchResults();
 
 }

@@ -1,7 +1,7 @@
 package com.inmopaco.AuctionService.infrastructure.scraper.providers.jsoup.chain.nodes;
 
-import com.inmopaco.AuctionService.infrastructure.scraper.dto.ScraperAuctionSummaryDTO;
-import com.inmopaco.AuctionService.infrastructure.scraper.dto.ScraperLotDTO;
+import com.inmopaco.AuctionService.application.dto.AuctionSummaryDTO;
+import com.inmopaco.AuctionService.application.dto.LotDTO;
 import com.inmopaco.AuctionService.infrastructure.scraper.providers.jsoup.chain.JsoupScraperChainNode;
 import com.inmopaco.AuctionService.infrastructure.scraper.providers.jsoup.chain.dto.JsoupChainContextDTO;
 import com.inmopaco.AuctionService.infrastructure.scraper.providers.jsoup.common.JsoupAuctionScraperClient;
@@ -34,7 +34,7 @@ public class JsoupAuctionDetailsNodeVer3ChainNode extends AbstractJsoupAuctionDe
         return parse(document, context);
     }
 
-    private Document fetchAuctionDetails(ScraperAuctionSummaryDTO summary) {
+    private Document fetchAuctionDetails(AuctionSummaryDTO summary) {
 
         if (summary.getDetailUrl() == null || summary.getDetailUrl().isBlank()) {
             throw new IllegalArgumentException("The auction detail URL is missing for ID: " + summary.getBoeIdentifier());
@@ -74,14 +74,14 @@ public class JsoupAuctionDetailsNodeVer3ChainNode extends AbstractJsoupAuctionDe
 
     private void multiLotParsing(Document doc, JsoupChainContextDTO context) {
 
-        List<ScraperLotDTO> lotList = new ArrayList<>();
+        List<LotDTO> lotList = new ArrayList<>();
         Elements lotTabs = doc.select("ul.navlistver li a");
 
         lotTabs.stream()
                 .map(a -> "https://subastas.boe.es/".concat(a.attr("href").replaceFirst("\\.", "")))
                 .forEach(url -> {
                     Document document = fetchLot(url, context);
-                    ScraperLotDTO lot = parseLot(document, context);
+                    LotDTO lot = parseLot(document, context);
                     lotList.add(lot);
                 });
         context.getBuilder().lots(lotList);
@@ -131,12 +131,12 @@ public class JsoupAuctionDetailsNodeVer3ChainNode extends AbstractJsoupAuctionDe
         }
     }
 
-    private ScraperLotDTO parseLot(Document doc, JsoupChainContextDTO context) {
+    private LotDTO parseLot(Document doc, JsoupChainContextDTO context) {
 
         Element currentTab = doc.selectFirst("ul.navlistver li a.current");
         Element mainBlock = doc.selectFirst("#idBloqueDatos3");
 
-        var lot = ScraperLotDTO.builder();
+        var lot = LotDTO.builder();
 
         if (mainBlock != null && currentTab != null) {
             Element economicTable = mainBlock.select("h3:contains(Datos relacionados) + table").first();
