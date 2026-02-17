@@ -9,8 +9,10 @@ import java.util.List;
 @Repository
 public interface AuctionRepository extends JpaRepository<AuctionEntity, String> {
 
-    List<AuctionEntity> findAllByCurrentStatus(String currentStatus);
+    List<AuctionEntity> findAllByStatus(String currentStatus);
 
-    List<AuctionEntity> findAllByBoeIdentifier(List<String> identifiers);
+    List<AuctionEntity> findAllByAuctionIdIn(List<String> auctionId);
+
+    List<AuctionEntity> findByCityIgnoreCase(String city);
 
 }

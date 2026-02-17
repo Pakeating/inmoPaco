@@ -9,10 +9,10 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.inmopaco</groupId>
-	<artifactId>Admin</artifactId>
+	<artifactId>ConfigServiceV3</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>Admin</name>
-	<description>Demo project for Spring Boot</description>
+	<name>ConfigServiceV3</name>
+	<description>ConfigService using SpringBoot3</description>
 	<url/>
 	<licenses>
 		<license/>
@@ -28,33 +28,28 @@
 	</scm>
 	<properties>
 		<java.version>21</java.version>
-		<spring-boot-admin.version>3.5.6</spring-boot-admin.version>
+		<spring-boot-admin.version>3.5.7</spring-boot-admin.version>
 		<spring-cloud.version>2025.0.1</spring-cloud.version>
 	</properties>
 	<dependencies>
 		<dependency>
-			<groupId>de.codecentric</groupId>
-			<artifactId>spring-boot-admin-starter-server</artifactId>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-actuator</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>de.codecentric</groupId>
 			<artifactId>spring-boot-admin-starter-client</artifactId>
-			<version>3.2.3</version>
 		</dependency>
-<!--		TEMPLATES-->
 		<dependency>
-			<groupId>de.codecentric</groupId>
-			<artifactId>spring-boot-admin-server-ui</artifactId>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-config-server</artifactId>
 		</dependency>
-<!--		DESHABILITADO EL CONFIG-->
-<!--		<dependency>-->
-<!--			<groupId>org.springframework.cloud</groupId>-->
-<!--			<artifactId>spring-cloud-starter-config</artifactId>-->
-<!--		</dependency>-->
-<!--		Importante, sino arranca con netty en lugar de tomcat y no funciona bien-->
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-web</artifactId>
+			<artifactId>spring-boot-devtools</artifactId>
+			<scope>runtime</scope>
+			<optional>true</optional>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -65,16 +60,16 @@
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
-				<groupId>de.codecentric</groupId>
-				<artifactId>spring-boot-admin-dependencies</artifactId>
-				<version>${spring-boot-admin.version}</version>
+				<groupId>org.springframework.cloud</groupId>
+				<artifactId>spring-cloud-dependencies</artifactId>
+				<version>${spring-cloud.version}</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
 			<dependency>
-				<groupId>org.springframework.cloud</groupId>
-				<artifactId>spring-cloud-dependencies</artifactId>
-				<version>${spring-cloud.version}</version>
+				<groupId>de.codecentric</groupId>
+				<artifactId>spring-boot-admin-dependencies</artifactId>
+				<version>${spring-boot-admin.version}</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
@@ -86,6 +81,19 @@
 			<plugin>
 				<groupId>org.graalvm.buildtools</groupId>
 				<artifactId>native-maven-plugin</artifactId>
+				<configuration>
+					<!-- Todos estos buildArgs son importantes para que funcione el AOT -->
+					<buildArgs>
+						<buildArg>-H:-AddAllFileSystemProviders</buildArg>
+						<buildArg>--strict-image-heap</buildArg>
+						<buildArg>--initialize-at-build-time=org.bouncycastle</buildArg>
+						<buildArg>--initialize-at-build-time=net.i2p.crypto.eddsa.EdDSASecurityProvider</buildArg>
+						<buildArg>--initialize-at-run-time=org.bouncycastle.jcajce.provider.drbg.DRBG$Default</buildArg>
+						<buildArg>--initialize-at-run-time=org.bouncycastle.jcajce.provider.drbg.DRBG$NonceAndIV</buildArg>
+						<buildArg>--initialize-at-build-time=org.slf4j,ch.qos.logback</buildArg>
+						<buildArg>--add-exports=java.base/sun.security.x509=ALL-UNNAMED</buildArg>
+					</buildArgs>
+				</configuration>
 			</plugin>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>

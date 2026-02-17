@@ -23,7 +23,7 @@ RUN apt-get update && apt-get install -y zlib1g curl && rm -rf /var/lib/apt/list
 
 # Copiar el binario desde la fase de build
 # NOTA: Asegúrate de que el nombre coincida con el artifactId de tu pom.xml
-COPY --from=build /app/target/Admin ./app-bin
+COPY --from=build /app/target/ConfigServiceV3 ./app-bin
 
-EXPOSE 9090
+EXPOSE 8080
 ENTRYPOINT ["./app-bin"]

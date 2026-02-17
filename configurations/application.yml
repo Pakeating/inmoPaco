@@ -1,19 +1,16 @@
 # Este archivo lo lee el Config Service y se lo da a TODOS
 management:
-  tracing:
-    sampling:
-      probability: 1.0
   endpoints:
     web:
       exposure:
         include: "*"
+  info:
+    env:
+      enabled: true
   endpoint:
     health:
       show-details: always
-eureka:
-  client:
-    enabled: false
-spring:
-  cloud:
-    discovery:
-      enabled: false
+    env:
+      show-values: always
+      post:
+        enabled: true

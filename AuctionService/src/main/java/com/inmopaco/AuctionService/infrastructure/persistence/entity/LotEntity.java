@@ -1,32 +1,61 @@
 package com.inmopaco.AuctionService.infrastructure.persistence.entity;
 
 import jakarta.persistence.*;
-
-import java.util.Map;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
+@Table(name = "auction_lots")
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class LotEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "lot_id")
-    private Long lotId;
+    private String lotId; // Usamos el lotId como PK si es único, si no, podrías usar un Long @GeneratedValue
 
-    @Column(name = "lot_boe_number")
-    private Long lotBoeNumber;
-
-    @Column(name = "description")
-    private String description;
+    @Column(name = "lot_title", columnDefinition = "TEXT")
+    private String lotTitle;
 
     @Column(name = "auction_value")
-    private Double auctionValue;
+    private String auctionValue;
 
-    @Column(name = "current_bid")
-    private Double currentBid;
+    @Column(name = "bid_steps")
+    private String bidSteps;
+
+    @Column(name = "deposit_amount")
+    private String depositAmount;
+
+    @Column(name = "goods_description", columnDefinition = "TEXT")
+    private String goodsDescription;
 
     @Column(name = "cadastral_reference")
     private String cadastralReference;
 
-    @Column(name = "cadastral_data")
-    private Map<String, String> cadastralData;
+    @Column(name = "property_address", columnDefinition = "TEXT")
+    private String propertyAddress;
+
+    private String city;
+    private String province;
+
+    @Column(name = "possession_status")
+    private String possessionStatus;
+
+    @Column(name = "postal_code")
+    private String postalCode;
+
+    @Column(name = "is_habitual_residence")
+    private String isHabitualResidence;
+
+    @Column(name = "is_visitable")
+    private String isVisitable;
+
+    // Relación con la subasta padre
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "fk_auction_id")
+    private AuctionEntity auction;
 }

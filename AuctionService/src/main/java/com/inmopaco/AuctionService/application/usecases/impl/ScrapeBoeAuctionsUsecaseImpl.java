@@ -29,8 +29,8 @@ public class ScrapeBoeAuctionsUsecaseImpl implements ScrapeBoeAuctionsUsecase {
 
         List<AuctionDetailsDTO> auctionList = scraperService.fetchSearchResults();
 
-//        long created = persistenceService.saveOrUpdateAuctions(auctionList);
-//
+        long created = persistenceService.saveOrUpdateAuctions(auctionList);
+
         log.info("[ScrapeBoeAuctionsUsecase] END Auction scraping");
 //        TODO: enviar notificacion de nuevas subastas?
     }

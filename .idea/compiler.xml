@@ -8,9 +8,8 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="EurekaServer" />
-        <module name="APIGateway" />
-        <module name="ConfigService" />
         <module name="Admin" />
+        <module name="ConfigServiceV3" />
         <module name="APIGatewayV3" />
       </profile>
       <profile name="Annotation profile for AuctionService" enabled="true">
@@ -26,6 +25,10 @@
         <module name="AuctionService" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="APIGateway" target="23" />
+      <module name="ConfigService" target="23" />
+    </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
@@ -34,6 +37,7 @@
       <module name="Admin" options="-parameters" />
       <module name="AuctionService" options="-parameters" />
       <module name="ConfigService" options="-parameters" />
+      <module name="ConfigServiceV3" options="-parameters" />
       <module name="EurekaServer" options="-parameters" />
     </option>
   </component>

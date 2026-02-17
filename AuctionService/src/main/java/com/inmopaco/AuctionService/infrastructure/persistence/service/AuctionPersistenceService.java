@@ -14,5 +14,5 @@ public interface AuctionPersistenceService {
 
     List<AuctionDetailsDTO> listAllAuctions();
 
-    List<String> listAuctionIdentifiersByStatus(String status);
+    List<String> listAuctionIdsByStatus(String status);
 }

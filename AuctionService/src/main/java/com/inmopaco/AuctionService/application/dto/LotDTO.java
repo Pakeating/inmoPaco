@@ -24,5 +24,6 @@ public class LotDTO {
     private String postalCode;
     private String isHabitualResidence;
     private String isVisitable;
+    private String auctionId; // Relación con la subasta principal
 
 }

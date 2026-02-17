@@ -1,31 +1,20 @@
+
+networks:
+  microservices-network:
+    driver: bridge
+
 services:
 
 # SERVICIOS DE INFRAESTRUCTURA:
 
-
-  #  # --- Eureka --- Desactivado temporalmente
-  #  eureka-server:
-  #    build:
-  #      context: ../EurekaServer
-  #    container_name: eureka-server
-  #    ports:
-  #      - "8761:8761"
-  #    healthcheck:
-  #      test: [ "CMD", "curl", "-f", "http://localhost:8761/actuator/health" ]
-  #      interval: 10s
-  #      timeout: 5s
-  #      retries: 5
-
-  # --- CONFIG SERVICE ---
-  config-service:
+  # --- CONFIG SERVICE V3---
+  config-service-v3:
     build:
-      context: ../ConfigService
-    container_name: config-service
+      context: ../ConfigServiceV3
+    container_name: config-service-v3
+    hostname: config-service-v3
     ports:
       - "8888:8888"
-    #    depends_on:
-    #      eureka-server:
-    #        condition: service_healthy
     volumes:
       # archivos locales en el config
       #      - ./configs:/app/resources/configurations
@@ -33,38 +22,14 @@ services:
       - ./configurations:/app/config-repo
     environment:
       - SPRING_PROFILES_ACTIVE=native
-      #      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
-      # Eureka desactivado
-      - EUREKA_CLIENT_ENABLED=false
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:8888/actuator/health" ]
       interval: 5s
       timeout: 3s
       retries: 10
-    networks:
-      - microservices-network
-
-  # --- API GATEWAY ---
-  api-gateway:
-    profiles:
-      - donotrun  # evita que se levante el servicio
-    build:
-      context: ../APIGateway
-    container_name: api-gateway
-    ports:
-      - "8080:8080"
     depends_on:
-      - config-service
-    environment:
-      - SPRING_CONFIG_IMPORT=optional:configserver:http://config-service:8888
-      - SPRING_CLOUD_CONFIG_FAIL_FAST=false     #failfast y reintentos forzados para que reconecte si esta inestable
-      - SPRING_CLOUD_CONFIG_RETRY_MAX_ATTEMPTS=20
-      - SPRING_CLOUD_CONFIG_RETRY_INITIAL_INTERVAL=2000
-      - SPRING_CLOUD_CONFIG_RETRY_MULTIPLIER=1.5
-      #      Desactivado EUREKA
-      #      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
-      - EUREKA_CLIENT_ENABLED=false
-      - SPRING_CLOUD_DISCOVERY_ENABLED=false
+      admin-server:
+        condition: service_healthy
     networks:
       - microservices-network
 
@@ -76,9 +41,10 @@ services:
     ports:
       - "8080:8080"
     depends_on:
-      - config-service
+      config-service-v3:
+        condition: service_healthy
     environment:
-      - SPRING_CONFIG_IMPORT=optional:configserver:http://config-service:8888
+      - SPRING_CONFIG_IMPORT=optional:configserver:http://config-service-v3:8888
       - SPRING_CLOUD_CONFIG_FAIL_FAST=false     #failfast y reintentos forzados para que reconecte si esta inestable
       - SPRING_CLOUD_CONFIG_RETRY_MAX_ATTEMPTS=20
       - SPRING_CLOUD_CONFIG_RETRY_INITIAL_INTERVAL=2000
@@ -97,19 +63,13 @@ services:
     container_name: admin-server
     ports:
       - "9090:9090"
-    depends_on:
-      - config-service
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:9090/actuator/health" ]
+      interval: 5s
+      retries: 10
+      start_period: 5s
     environment:
       - SPRING_BOOT_ADMIN_CONTEXT_PATH=/admin
-      - SPRING_CONFIG_IMPORT=configserver:http://config-service:8888
-      - SPRING_CLOUD_CONFIG_FAIL_FAST=false
-      - SPRING_CLOUD_CONFIG_RETRY_MAX_ATTEMPTS=20
-      - SPRING_CLOUD_CONFIG_RETRY_INITIAL_INTERVAL=2000
-      - SPRING_CLOUD_CONFIG_RETRY_MULTIPLIER=1.5
-      # EUREKA DESACTIVADO
-      - EUREKA_CLIENT_ENABLED=false
-      - SPRING_CLOUD_DISCOVERY_ENABLED=false
-      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
     networks:
       - microservices-network
 
@@ -127,36 +87,73 @@ services:
     networks:
       - microservices-network
 
-
-  # --- DYNAMODB ---
-  # Instancia de DynamoDB Local: Solo para Desarrollo
-  dynamodb-local:
-    image: amazon/dynamodb-local
-    container_name: dynamodb-local
+  # --- COLAS MENSAJERIA ---
+  nats-server:
+    image: nats:2.10-alpine
+    container_name: nats-server
     ports:
-      - "8000:8000"
-    # El comando -sharedDb permite que todos los clientes vean los mismos datos
-    command: "-jar DynamoDBLocal.jar -sharedDb -dbPath ./data"
+      - "4222:4222" # Puerto para clientes
+      - "8222:8222" # Puerto de monitoreo HTTP (Métricas)
+    command: [
+      "-js",                 # JetStream (Persistencia)
+      "-m", "8222",          # servidor de monitoreo HTTP
+      "--sd", "/data"        # directorio donde se guardarán los mensajes persistentes
+    ]
     volumes:
-      - "./docker/dynamodb:/home/dynamodblocal/data"
-    working_dir: /home/dynamodblocal
+      - ./nats_data:/data    # persistencia
+    networks:
+      - microservices-network
+    deploy:
+      resources:
+        limits:
+          memory: 64M        #deberia ser suficiente...
+
+  # --- NATS DASHBOARD ---
+  nats-dashboard:
+    image: mdawar/nats-dashboard:latest
+    container_name: nats-dashboard
+    ports:
+      - "8282:80" # Mapeamos el 8080 interno al 8282 para no chocar con el Gateway
+    environment:
+      - REVERSE_PROXY_UPSTREAM=nats-server:8222
+    depends_on:
+      - nats-server
     networks:
       - microservices-network
 
-  dynamodb-admin:
-    image: aaronshaf/dynamodb-admin
-    container_name: dynamodb-admin
-    ports:
-      - "8001:8001"
+  # --- DATABASES ---
+  mariadb:
+    image: mariadb:10.11
+    container_name: mariadb
+    restart: always
+    # Para minimizar la huella de memoria, si escala habra que subirlo:
+    command: [
+      "mysqld",
+      "--performance-schema=OFF",
+      "--innodb-buffer-pool-size=64M",
+      "--innodb-log-buffer-size=8M",
+      "--max-connections=20",
+      "--key-buffer-size=16M",
+      "--query-cache-size=0",
+      "--query-cache-type=0",
+      "--skip-name-resolve"
+    ]
     environment:
-      - DYNAMO_ENDPOINT=http://dynamodb-local:8000
-      - AWS_REGION=us-east-1
-      - AWS_ACCESS_KEY_ID=local
-      - AWS_SECRET_ACCESS_KEY=local
+      - MYSQL_ROOT_PASSWORD=root_pass #TODO: CAMBIAR POR VARIABLE DE ENTORNO
+      - MYSQL_DATABASE=app_db
+      - MYSQL_USER=admin_user         #TODO: CAMBIAR POR VARIABLE DE ENTORNO
+      - MYSQL_PASSWORD=pass           #TODO: CAMBIAR POR VARIABLE DE ENTORNO
+    ports:
+      - "3306:3306"
+    volumes:
+      # PERSISTENCIA: Se guarda en el sistema de archivos en lugar del contenedor
+      - ./mariadb_data:/var/lib/mysql
     networks:
       - microservices-network
-    depends_on:
-      - dynamodb-local
+    deploy:
+      resources:
+        limits:
+          memory: 150M # RAM maxima por ahora
 
 #    SERVICIOS DE NEGOCIO
 
@@ -168,9 +165,10 @@ services:
     ports:
       - "8081:8081"
     depends_on:
-      - config-service
+      config-service-v3:
+        condition: service_healthy
     environment:
-      - SPRING_CONFIG_IMPORT=optional:configserver:http://config-service:8888
+      - SPRING_CONFIG_IMPORT=optional:configserver:http://config-service-v3:8888
       - SPRING_CLOUD_CONFIG_FAIL_FAST=false
       - SPRING_CLOUD_CONFIG_RETRY_MAX_ATTEMPTS=20
       - SPRING_CLOUD_CONFIG_RETRY_INITIAL_INTERVAL=2000
@@ -179,7 +177,3 @@ services:
       - ./logs/usuarios-ms:/app/logs
     networks:
       - microservices-network
-
-networks:
-  microservices-network:
-    driver: bridge

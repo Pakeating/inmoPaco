@@ -13,27 +13,29 @@ echo ======================================================
 :: OPCIONES DE BUILD:
 ::--no-cache
 
-echo Compilando Config Service...
-call docker-compose -f docker-compose.yml build  config-service|| (echo Error en Config Service && pause && exit /b)
-
 echo Compilando Admin...
-call docker-compose -f docker-compose.yml build  admin-server|| (echo Error en Admin && pause && exit /b)
+call docker-compose -f docker-compose.yml build admin-server|| (echo Error en Admin && pause && exit /b)
 
-::echo Compilando API Gateway...
-::call docker-compose -f docker-compose.yml build --no-cache api-gateway|| (echo Error en API Gateway && pause && exit /b)
+echo Compilando Config Service V3...
+call docker-compose -f docker-compose.yml build  config-service-v3|| (echo Error en Config Service V3 && pause && exit /b)
 
 echo Compilando API Gateway V3...
 call docker-compose -f docker-compose.yml build  api-gateway-v3|| (echo Error en API Gateway && pause && exit /b)
 
 echo Compilando Auction Service...
-call docker-compose -f docker-compose.yml build  auction-service|| (echo Error en Auction Service && pause && exit /b)
+call docker-compose -f docker-compose.yml build --no-cache auction-service|| (echo Error en Auction Service && pause && exit /b)
 
+::Limpiar tambien volumenes, etc, por si fuese necesario
+::echo "Limpiando infraestructura anterior..."
+::docker-compose down
+
+::--force-recreate obliga a tumbar los contenedores que ya esten creados de antes, se puede quitar mas adelante...
 echo Levantando infraestructura completa...
-call docker-compose -f docker-compose.yml up -d
+call docker-compose -f docker-compose.yml up -d --force-recreate
 
 echo ======================================================
 echo   Despliegue finalizado
-::echo   Eureka: http://localhost:8761
-echo   Admin: http://localhost:9090/admin
-echo   API Gateway: http://localhost:8080
+echo   Admin:           http://localhost:9090/admin
+echo   Queue Dashboard: http://localhost:8282
+echo   API Gateway:     http://localhost:8080
 echo ======================================================
