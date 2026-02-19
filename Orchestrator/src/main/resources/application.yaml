@@ -1,0 +1,20 @@
+spring:
+  application:
+    name: Orchestrator
+  boot:
+    admin:
+
+      client:
+        url: "localhost:9090/admin"
+  config:
+    import: "optional:configserver:http://config-service-v3:8888"
+#  cloud:
+#    stream:
+#      nats:
+#        binder:
+#          server: nats://localhost:4222 # URL de tu servidor NATS
+#      bindings:
+#        auctions: # Nombre del binding
+#          destination: auction.events # "Subject" en NATS
+server:
+  port: 8082

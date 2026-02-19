@@ -11,6 +11,8 @@
         <option value="$PROJECT_DIR$/AuctionService/pom.xml" />
         <option value="$PROJECT_DIR$/APIGatewayV3/pom.xml" />
         <option value="$PROJECT_DIR$/ConfigServiceV3/pom.xml" />
+        <option value="$PROJECT_DIR$/Orchestrator/pom.xml" />
+        <option value="$PROJECT_DIR$/BFF/pom.xml" />
       </list>
     </option>
     <option name="ignoredFiles">
