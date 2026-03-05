@@ -49,10 +49,10 @@
 			<artifactId>spring-boot-admin-starter-client</artifactId>
 			<version>3.4.1</version>
 		</dependency>
-		<dependency>
-			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
-		</dependency>
+<!--		<dependency>-->
+<!--			<groupId>org.springframework.cloud</groupId>-->
+<!--			<artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>-->
+<!--		</dependency>-->
 
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -87,7 +87,7 @@
 						<buildArg>-Dio.netty.allocator.type=unpooled</buildArg>
 
 						<buildArg>--initialize-at-build-time=org.slf4j,ch.qos.logback</buildArg>
-						<buildArg>--initialize-at-run-time=com.netflix.discovery,com.netflix.util,io.netty</buildArg>
+<!--						<buildArg>&#45;&#45;initialize-at-run-time=com.netflix.discovery,com.netflix.util,io.netty</buildArg>-->
 						<buildArg>--enable-preview</buildArg>
 					</buildArgs>
 				</configuration>

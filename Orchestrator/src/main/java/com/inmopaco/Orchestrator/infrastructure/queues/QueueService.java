@@ -1,6 +1,7 @@
 package com.inmopaco.Orchestrator.infrastructure.queues;
 
-import com.inmopaco.Orchestrator.domain.events.GenericEventMsg;
+
+import com.inmopaco.shared.events.GenericEventMsg;
 
 import java.util.function.Consumer;
 

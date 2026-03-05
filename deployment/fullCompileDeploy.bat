@@ -14,16 +14,25 @@ echo ======================================================
 ::--no-cache
 
 echo Compilando Admin...
-call docker-compose -f docker-compose.yml build admin-server|| (echo Error en Admin && pause && exit /b)
+::call docker-compose -f docker-compose.yml build admin-server|| (echo Error en Admin && pause && exit /b)
 
-echo Compilando Config Service V3...
-call docker-compose -f docker-compose.yml build  config-service-v3|| (echo Error en Config Service V3 && pause && exit /b)
+echo Compilando Config Service...
+::call docker-compose -f docker-compose.yml build --no-cache config-service-v3|| (echo Error en Config Service && pause && exit /b)
 
-echo Compilando API Gateway V3...
-call docker-compose -f docker-compose.yml build  api-gateway-v3|| (echo Error en API Gateway && pause && exit /b)
+echo Compilando API Gateway...
+::call docker-compose -f docker-compose.yml build  api-gateway-v3|| (echo Error en API Gateway && pause && exit /b)
+
+echo Compilando Orchestrator...
+call docker-compose -f docker-compose.yml build  orchestrator || (echo Error en Orchestrator && pause && exit /b)
 
 echo Compilando Auction Service...
-call docker-compose -f docker-compose.yml build --no-cache auction-service|| (echo Error en Auction Service && pause && exit /b)
+call docker-compose -f docker-compose.yml build  auction-service|| (echo Error en Auction Service && pause && exit /b)
+
+echo Compilando Property Service...
+call docker-compose -f docker-compose.yml build  property-service|| (echo Error en Property Service && pause && exit /b)
+
+echo Compilando BFF...
+::call docker-compose -f docker-compose.yml build  bff|| (echo Error en BFF && pause && exit /b)
 
 ::Limpiar tambien volumenes, etc, por si fuese necesario
 ::echo "Limpiando infraestructura anterior..."
@@ -37,5 +46,6 @@ echo ======================================================
 echo   Despliegue finalizado
 echo   Admin:           http://localhost:9090/admin
 echo   Queue Dashboard: http://localhost:8282
+echo   BFF Swagger:    http://localhost:8083/swagger-ui/index.html
 echo   API Gateway:     http://localhost:8080
 echo ======================================================

@@ -1,8 +1,8 @@
 package com.inmopaco.Orchestrator.infrastructure.queues.impl;
 
-import com.inmopaco.Orchestrator.domain.events.GenericEventMsg;
 import com.inmopaco.Orchestrator.infrastructure.queues.QueueService;
 import com.inmopaco.Orchestrator.infrastructure.queues.provider.GenericQueueProviderServiceImpl;
+import com.inmopaco.shared.events.GenericEventMsg;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

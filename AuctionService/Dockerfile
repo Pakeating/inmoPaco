@@ -5,12 +5,14 @@
 FROM maven:3.9.5-eclipse-temurin-21-alpine AS build
 WORKDIR /app
 
-# Copiamos el pom.xml y descargamos dependencias (esto optimiza el cache de Docker)
-COPY pom.xml .
-RUN mvn dependency:go-offline -B
+# 1. Copiamos la librería común y la instalamos en el repo local de Maven del contenedor
+COPY EventSourcingCommons ./EventSourcingCommons
+RUN mvn -f ./EventSourcingCommons/pom.xml clean install -DskipTests
 
-# Copiamos el código fuente y compilamos el .jar
-COPY src ./src
+# 2. Ahora preparamos el microservicio
+COPY AuctionService ./AuctionService
+WORKDIR /app/AuctionService
+
 RUN mvn clean package -DskipNativeBuild=true -DskipTests -Dproc:full
 
 # --- Etapa 2: Run ---
@@ -23,7 +25,7 @@ RUN addgroup -S spring && adduser -S spring -G spring
 USER spring
 
 # Copiamos el archivo JAR generado en la etapa anterior
-COPY --from=build /app/target/*.jar app.jar
+COPY --from=build /app/AuctionService/target/*.jar app.jar
 
 EXPOSE 8081
 ENTRYPOINT ["java", "-jar", "app.jar"]

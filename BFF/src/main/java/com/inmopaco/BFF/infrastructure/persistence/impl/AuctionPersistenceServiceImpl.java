@@ -1,0 +1,42 @@
+package com.inmopaco.BFF.infrastructure.persistence.impl;
+
+import com.inmopaco.BFF.application.dto.AuctionDetailsDTO;
+import com.inmopaco.BFF.application.dto.AuctionQueryDTO;
+import com.inmopaco.BFF.infrastructure.persistence.AuctionPersistenceService;
+import com.inmopaco.BFF.infrastructure.persistence.entity.AuctionEntity;
+import com.inmopaco.BFF.infrastructure.persistence.mapper.AuctionRepositoryMapper;
+import com.inmopaco.BFF.infrastructure.persistence.repository.AuctionRepository;
+import com.inmopaco.BFF.infrastructure.persistence.specification.AuctionSpecification;
+import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+
+@Log4j2
+@Service
+public class AuctionPersistenceServiceImpl implements AuctionPersistenceService {
+
+    @Autowired
+    private AuctionRepository repository;
+
+    @Autowired
+    private AuctionRepositoryMapper mapper;
+
+    @Override
+    public List<AuctionDetailsDTO> listAllAuctions() {
+        return repository.findAll().parallelStream().map(mapper::toDTO).toList();
+    }
+
+    @Override
+    public Page<AuctionDetailsDTO> findAuctions(AuctionQueryDTO querySpecs, Pageable pageable) {
+
+        Specification<AuctionEntity> spec = AuctionSpecification.getSpecification(querySpecs);
+        return repository.findAll(spec, pageable).map(mapper::toDTO);
+    }
+
+}

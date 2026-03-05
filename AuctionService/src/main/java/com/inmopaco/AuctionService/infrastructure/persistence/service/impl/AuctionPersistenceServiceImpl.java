@@ -52,26 +52,24 @@ public class AuctionPersistenceServiceImpl implements AuctionPersistenceService 
                 .stream()
                 .collect(Collectors.toMap(AuctionEntity::getAuctionId, entity -> entity));
 
-        List <AuctionEntity> auctionEntities = auctionList.stream().map(dto -> {
-            AuctionEntity entity = entityMap.get(dto.getAuctionId());
-            if (entity != null) {
-                // Update existing entity without losing its ID
-                mapper.updateEntityFromDTO(dto, entity);
-                return entity;
+        List<AuctionEntity> entitiesToSave = auctionList.stream().map(dto -> {
+            AuctionEntity existingEntity = entityMap.get(dto.getAuctionId());
+            if (existingEntity != null) {
+                // MapStruct actualizará los campos de 'existingEntity'
+                //TODO: Revisar que el mapper no haga setLots(new ArrayList)
+                mapper.updateEntityFromDTO(dto, existingEntity);
+                return existingEntity;
             } else {
-                // New entity
                 return mapper.toEntity(dto);
             }
         }).toList();
 
-        List<AuctionEntity> entities = auctionList.stream()
-                .map(dto -> mapper.toEntity(dto))
-                .toList();
-        log.info("Saving {} auctions", auctionList.size());
+        log.info("Saving {} auctions", entitiesToSave.size());
         log.debug("Auction IDs: {}", auctionList.stream().map(AuctionDetailsDTO::getAuctionId).toList());
-        repository.saveAll(entities);
 
-        return auctionList.size()-entityMap.size();
+        repository.saveAll(entitiesToSave);
+
+        return auctionList.size() - entityMap.size();
     }
 
     @Override

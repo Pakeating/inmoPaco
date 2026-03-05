@@ -1,7 +1,7 @@
 package com.inmopaco.Orchestrator.infrastructure.queues.provider;
 
-import com.inmopaco.Orchestrator.domain.events.GenericEventMsg;
-import com.inmopaco.Orchestrator.infrastructure.queues.provider.nats.impl.NatsProviderService;
+import com.inmopaco.Orchestrator.infrastructure.queues.provider.nats.NatsProviderService;
+import com.inmopaco.shared.events.GenericEventMsg;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

@@ -8,6 +8,7 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="EurekaServer" />
+        <module name="EventSourcingCommons" />
         <module name="Admin" />
         <module name="ConfigServiceV3" />
         <module name="Orchestrator" />
@@ -25,18 +26,24 @@
         </processorPath>
         <module name="AuctionService" />
       </profile>
-      <profile name="Annotation profile for BFF" enabled="true">
+      <profile name="Annotation profile for PropertyService" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="false">
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/unknown/lombok-unknown.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/unknown/lombok-unknown.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/mapstruct/mapstruct-processor/1.6.3/mapstruct-processor-1.6.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/mapstruct/mapstruct/1.6.3/mapstruct-1.6.3.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok-mapstruct-binding/0.2.0/lombok-mapstruct-binding-0.2.0.jar" />
         </processorPath>
+        <module name="PropertyService" />
         <module name="BFF" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="APIGateway" target="23" />
+      <module name="ApiGateway" target="21" />
       <module name="ConfigService" target="23" />
     </bytecodeTargetLevel>
   </component>
@@ -45,12 +52,14 @@
       <module name="APIGateway" options="-parameters" />
       <module name="APIGatewayV3" options="-parameters" />
       <module name="Admin" options="-parameters" />
+      <module name="ApiGateway" options="-parameters" />
       <module name="AuctionService" options="-parameters" />
       <module name="BFF" options="-parameters" />
       <module name="ConfigService" options="-parameters" />
       <module name="ConfigServiceV3" options="-parameters" />
       <module name="EurekaServer" options="-parameters" />
       <module name="Orchestrator" options="-parameters" />
+      <module name="PropertyService" options="-parameters" />
     </option>
   </component>
 </project>

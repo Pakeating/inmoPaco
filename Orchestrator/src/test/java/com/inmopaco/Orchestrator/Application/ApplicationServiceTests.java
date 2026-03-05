@@ -15,7 +15,7 @@ public class ApplicationServiceTests {
 
     @Test
     void sendAuctionsMsg(){
-        auctionsUsecaseService.GetAuctions();
+        auctionsUsecaseService.getAuctions();
     }
 
 }

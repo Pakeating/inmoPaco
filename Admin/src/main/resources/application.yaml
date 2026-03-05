@@ -1,12 +1,8 @@
 spring:
   application:
-    name: Admin
-
-    # ELIMINADO PARA QUE NO DEPENDA DEL CONFIG
-  cloud:
-     config:
-       enabled: false
-
+    name: admin-server
+  config:
+    import: "optional:configserver:http://config-service-v3:8888"
   # para que Admin se vea a sí mismo
   boot:
     admin:
@@ -16,22 +12,6 @@ spring:
       client:
         # DEBE terminar en /admin
         url: "http://admin-server:9090/admin"
+
 server:
   port: 9090
-
-management:
-  endpoints:
-    web:
-      exposure:
-        include: "*"
-  info:
-    env:
-      enabled: true
-
-  endpoint:
-    health:
-      show-details: always
-    env:
-      show-values: always
-      post:
-        enabled: true

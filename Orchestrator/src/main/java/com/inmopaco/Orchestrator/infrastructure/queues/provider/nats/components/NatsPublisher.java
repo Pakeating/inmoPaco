@@ -1,7 +1,7 @@
 package com.inmopaco.Orchestrator.infrastructure.queues.provider.nats.components;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.inmopaco.Orchestrator.domain.events.GenericEventMsg;
+import com.inmopaco.shared.events.GenericEventMsg;
 import io.nats.client.Connection;
 import io.nats.client.JetStream;
 import io.nats.client.Message;

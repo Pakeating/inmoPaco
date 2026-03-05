@@ -1,7 +1,7 @@
 package com.inmopaco.Orchestrator.Infrastructure.queues;
 
-import com.inmopaco.Orchestrator.domain.events.GetAuctionsEvent;
 import com.inmopaco.Orchestrator.infrastructure.queues.QueueService;
+import com.inmopaco.shared.events.AuctionsEvent;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,11 +17,11 @@ public class QueueServiceTests {
     void publishMsgTest() {
         queueService.subscribe("auctions.subject",
                 "auctions.queueGroup",
-                GetAuctionsEvent.class,
+                AuctionsEvent.class,
                 eventMsg -> log.info("Received event: {}", eventMsg.getEventId())
         );
 
-        var eventMsg = GetAuctionsEvent.createEventMsg();
+        var eventMsg = AuctionsEvent.createEventMsg();
         eventMsg.changePersistence(false);
         queueService.publish("auctions.subject", eventMsg);
     }
@@ -31,11 +31,11 @@ public class QueueServiceTests {
         queueService.subscribePersistent("auctions.subject",
                 "durableName",
                 "auctions.queueGroup",
-                GetAuctionsEvent.class,
+                AuctionsEvent.class,
                 eventMsg -> log.info("Received persistent event: {}", eventMsg.getEventId())
         );
 
-        var eventMsg = GetAuctionsEvent.createEventMsg();
+        var eventMsg = AuctionsEvent.createEventMsg();
         eventMsg.changePersistence(true);
         queueService.publish("auctions.subject", eventMsg);
     }

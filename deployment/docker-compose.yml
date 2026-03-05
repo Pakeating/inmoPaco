@@ -157,10 +157,33 @@ services:
 
 #    SERVICIOS DE NEGOCIO
 
+  orchestrator:
+    build:
+      context: ..
+      dockerfile: Orchestrator/Dockerfile
+    container_name: orchestrator
+    ports:
+      - "8082:8082"
+    depends_on:
+      config-service-v3:
+        condition: service_healthy
+    environment:
+      - SPRING_CONFIG_IMPORT=optional:configserver:http://config-service-v3:8888
+      - SPRING_CLOUD_CONFIG_FAIL_FAST=false
+      - SPRING_CLOUD_CONFIG_RETRY_MAX_ATTEMPTS=20
+      - SPRING_CLOUD_CONFIG_RETRY_INITIAL_INTERVAL=2000
+      - SPRING_CLOUD_CONFIG_RETRY_MULTIPLIER=1.5
+      - NATS_URL=nats://nats-server:4222
+    volumes:
+      - ./logs/usuarios-ms:/app/logs
+    networks:
+      - microservices-network
+
     # --- AUCTION SERVICE ---
   auction-service:
     build:
-      context: ../AuctionService
+      context: ..
+      dockerfile: AuctionService/Dockerfile
     container_name: auction-service
     ports:
       - "8081:8081"
@@ -173,6 +196,53 @@ services:
       - SPRING_CLOUD_CONFIG_RETRY_MAX_ATTEMPTS=20
       - SPRING_CLOUD_CONFIG_RETRY_INITIAL_INTERVAL=2000
       - SPRING_CLOUD_CONFIG_RETRY_MULTIPLIER=1.5
+      - NATS_URL=nats://nats-server:4222
+    volumes:
+      - ./logs/usuarios-ms:/app/logs
+    networks:
+      - microservices-network
+
+    # --- BFF ---
+  bff:
+    build:
+      context: ..
+      dockerfile: BFF/Dockerfile
+    container_name: bff
+    ports:
+      - "8083:8083"
+    depends_on:
+      config-service-v3:
+        condition: service_healthy
+    environment:
+      - SPRING_CONFIG_IMPORT=optional:configserver:http://config-service-v3:8888
+      - SPRING_CLOUD_CONFIG_FAIL_FAST=false
+      - SPRING_CLOUD_CONFIG_RETRY_MAX_ATTEMPTS=20
+      - SPRING_CLOUD_CONFIG_RETRY_INITIAL_INTERVAL=2000
+      - SPRING_CLOUD_CONFIG_RETRY_MULTIPLIER=1.5
+      - NATS_URL=nats://nats-server:4222
+    volumes:
+      - ./logs/usuarios-ms:/app/logs
+    networks:
+      - microservices-network
+
+    # --- BFF ---
+  property-service:
+    build:
+      context: ..
+      dockerfile: PropertyService/Dockerfile
+    container_name: property-service
+    ports:
+      - "8084:8084"
+    depends_on:
+      config-service-v3:
+        condition: service_healthy
+    environment:
+      - SPRING_CONFIG_IMPORT=optional:configserver:http://config-service-v3:8888
+      - SPRING_CLOUD_CONFIG_FAIL_FAST=false
+      - SPRING_CLOUD_CONFIG_RETRY_MAX_ATTEMPTS=20
+      - SPRING_CLOUD_CONFIG_RETRY_INITIAL_INTERVAL=2000
+      - SPRING_CLOUD_CONFIG_RETRY_MULTIPLIER=1.5
+      - NATS_URL=nats://nats-server:4222
     volumes:
       - ./logs/usuarios-ms:/app/logs
     networks:

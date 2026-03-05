@@ -8,8 +8,23 @@ spring:
   application:
     name: api-gateway-v3
   config:
-    # Importa la configuración desde el Config Service usando su nombre en Docker/Eureka
     import: "optional:configserver:http://config-service-v3:8888"
   cloud:
     refresh:
       enabled: false # Desactiva la infraestructura de Refresh que falla en AOT
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  info:
+    env:
+      enabled: true
+  endpoint:
+    health:
+      show-details: always
+    env:
+      show-values: always
+      post:
+        enabled: true

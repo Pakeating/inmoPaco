@@ -22,7 +22,7 @@ public class AuctionEntity {
 
     private String type;
 
-    @Column(name = "counting_account")
+    @Column(name = "counting_account", columnDefinition = "TEXT")
     private String countingAccount;
 
     @Column(name = "date_of_start")
@@ -37,7 +37,7 @@ public class AuctionEntity {
     @Column(name = "lots_number")
     private String lotsNumber;
 
-    @Column(name = "boe_announcement")
+    @Column(name = "boe_announcement", columnDefinition = "TEXT")
     private String boeAnnouncement;
 
     @Column(name = "auction_value")
@@ -59,28 +59,28 @@ public class AuctionEntity {
     @Column(name = "document_url")
     private List<String> documentUrls;
 
-    @Column(name = "authority_code")
+    @Column(name = "authority_code", columnDefinition = "TEXT")
     private String authorityCode;
 
     @Column(name = "authority_description", columnDefinition = "TEXT")
     private String authorityDescription;
 
-    @Column(name = "authority_address")
+    @Column(name = "authority_address", columnDefinition = "TEXT")
     private String authorityAddress;
 
-    @Column(name = "authority_phone")
+    @Column(name = "authority_phone", columnDefinition = "TEXT")
     private String authorityPhone;
 
-    @Column(name = "authority_fax")
+    @Column(name = "authority_fax", columnDefinition = "TEXT")
     private String authorityFax;
 
-    @Column(name = "authority_email")
+    @Column(name = "authority_email", columnDefinition = "TEXT")
     private String authorityEmail;
 
     @Column(name = "goods_description", columnDefinition = "TEXT")
     private String goodsDescription;
 
-    @Column(name = "cadastral_reference")
+    @Column(name = "cadastral_reference", columnDefinition = "TEXT")
     private String cadastralReference;
 
     @Column(name = "property_address", columnDefinition = "TEXT")
@@ -94,25 +94,25 @@ public class AuctionEntity {
     private String city;
     private String province;
 
-    @Column(name = "is_habitual_residence")
+    @Column(name = "is_habitual_residence", columnDefinition = "TEXT")
     private String isHabitualResidence;
 
-    @Column(name = "is_visitable")
+    @Column(name = "is_visitable", columnDefinition = "TEXT")
     private String isVisitable;
 
-    @Column(name = "postal_code")
+    @Column(name = "postal_code", columnDefinition = "TEXT")
     private String postalCode;
 
-    @Column(name = "possession_status")
+    @Column(name = "possession_status", columnDefinition = "TEXT")
     private String possessionStatus;
 
-    @Column(name = "creditor_name")
+    @Column(name = "creditor_name", columnDefinition = "TEXT")
     private String creditorName;
 
-    @Column(name = "creditor_nif")
+    @Column(name = "creditor_nif", columnDefinition = "TEXT")
     private String creditorNif;
 
-    @Column(name = "creditor_address")
+    @Column(name = "creditor_address", columnDefinition = "TEXT")
     private String creditorAddress;
 
     @Column(name = "has_bids")
@@ -122,7 +122,7 @@ public class AuctionEntity {
     @OneToMany(mappedBy = "auction", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<LotEntity> lots;
 
-    @Column(name = "court_name")
+    @Column(name = "court_name", columnDefinition = "TEXT")
     private String courtName;
 
     private String expediente;

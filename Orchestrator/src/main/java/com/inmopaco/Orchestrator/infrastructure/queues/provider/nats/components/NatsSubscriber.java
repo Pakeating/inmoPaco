@@ -1,7 +1,7 @@
 package com.inmopaco.Orchestrator.infrastructure.queues.provider.nats.components;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.inmopaco.Orchestrator.domain.events.GenericEventMsg;
+import com.inmopaco.shared.events.GenericEventMsg;
 import io.nats.client.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -41,11 +41,14 @@ public class NatsSubscriber {
             MessageHandler msgHandler = msg -> {
                 try {
                     EventMsg event = objectMapper.readValue(msg.getData(), targetClass);
+                    msg.ack(); // Confirmación manual. Antes del handler para hacerlo asincrono, sino puede caducar el ack y entrar en bucle.
                     handler.accept(event);
-                    msg.ack(); // Confirmación manual
                 } catch (Exception e) {
-                    log.error("Error procesando mensaje persistente: {}", e.getMessage());
-                    // Al no hacer ack(), NATS lo reintentará según la política del stream
+                    log.error("Error processing persistent msg: {}", e.getMessage());
+                    msg.term();
+                    log.error("Event Discarded");
+                    // Sin ack(), NATS lo reintentará según la política del stream, lo que me genera un bucle infinito, term() lo elimina.
+                    //TODO: Deberia preparar reintentos configurables.
                 }
             };
 

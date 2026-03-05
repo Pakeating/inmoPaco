@@ -13,6 +13,8 @@
         <option value="$PROJECT_DIR$/ConfigServiceV3/pom.xml" />
         <option value="$PROJECT_DIR$/Orchestrator/pom.xml" />
         <option value="$PROJECT_DIR$/BFF/pom.xml" />
+        <option value="$PROJECT_DIR$/EventSourcingCommons/pom.xml" />
+        <option value="$PROJECT_DIR$/PropertyService/pom.xml" />
       </list>
     </option>
     <option name="ignoredFiles">
