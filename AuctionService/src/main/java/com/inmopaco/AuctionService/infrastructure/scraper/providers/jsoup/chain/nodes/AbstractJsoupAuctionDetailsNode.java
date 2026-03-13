@@ -2,10 +2,16 @@ package com.inmopaco.AuctionService.infrastructure.scraper.providers.jsoup.chain
 
 import lombok.extern.log4j.Log4j2;
 import org.jsoup.nodes.Element;
+import org.springframework.beans.factory.annotation.Value;
 
 @Log4j2
 public abstract class AbstractJsoupAuctionDetailsNode {
     private static final String REFERER_HEADER = "";
+
+    @Value("${auction.scraper.delay.min:200}")
+    private int minDelay;
+    @Value("${auction.scraper.delay.max:500}")
+    private int maxDelay;
 
 //    TODO: Refactor
     protected String buildUrlForSection(String originalUrl, int sectionNumber) {
@@ -31,8 +37,7 @@ public abstract class AbstractJsoupAuctionDetailsNode {
     }
 
     protected void randomDelay() throws InterruptedException {
-        // Introduce un retraso aleatorio entre 1 y 3 segundos
-        int delay = 500 + (int)(Math.random() * 1000);
+        int delay = minDelay + (int)(Math.random() * maxDelay);
         Thread.sleep(delay);
     }
 }

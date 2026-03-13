@@ -24,7 +24,6 @@ public class JsoupAuctionDetailsNodeVer4ChainNode extends AbstractJsoupAuctionDe
 
     @Override
     public JsoupChainContextDTO execute(JsoupChainContextDTO context) {
-        log.info("Executing JsoupAuctionDetailsNodeVer4ChainNode for auction ID: " + context.getSummary().getBoeIdentifier());
         url = buildUrlForSection(context.getSummary().getDetailUrl(), SECTION_NUMBER);
         Document document = fetchAuctionDetails(context.getSummary());
         return parse(document, context);

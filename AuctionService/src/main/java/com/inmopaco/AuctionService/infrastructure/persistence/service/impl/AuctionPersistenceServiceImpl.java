@@ -55,9 +55,11 @@ public class AuctionPersistenceServiceImpl implements AuctionPersistenceService 
         List<AuctionEntity> entitiesToSave = auctionList.stream().map(dto -> {
             AuctionEntity existingEntity = entityMap.get(dto.getAuctionId());
             if (existingEntity != null) {
+
                 // MapStruct actualizará los campos de 'existingEntity'
-                //TODO: Revisar que el mapper no haga setLots(new ArrayList)
+                //TODO: Revisar que el mapper no haga setLots(new ArrayList). ESTOY CAMBIANDO ENTITY POR SET PARA HACERLO DIRECTAMENTE EN EL MAPPER
                 mapper.updateEntityFromDTO(dto, existingEntity);
+
                 return existingEntity;
             } else {
                 return mapper.toEntity(dto);

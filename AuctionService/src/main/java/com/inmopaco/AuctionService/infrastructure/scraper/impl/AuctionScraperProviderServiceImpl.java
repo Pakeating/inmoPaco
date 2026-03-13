@@ -14,8 +14,8 @@ public class AuctionScraperProviderServiceImpl implements AuctionScraperProvider
     @Autowired
     private JsoupScraperProviderService jsoupProvider;
     @Override
-    public List<AuctionDetailsDTO> fetchSearchResults(){
-        return jsoupProvider.fetchSearchResults();
+    public List<AuctionDetailsDTO> fetchSearchResults(String province) {
+        return jsoupProvider.fetchSearchResults(province);
     }
 
 }

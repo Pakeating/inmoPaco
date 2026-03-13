@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "auctions")
@@ -120,7 +121,7 @@ public class AuctionEntity {
 
     // Relación con Lotes
     @OneToMany(mappedBy = "auction", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<LotEntity> lots;
+    private Set<LotEntity> lots;
 
     @Column(name = "court_name", columnDefinition = "TEXT")
     private String courtName;

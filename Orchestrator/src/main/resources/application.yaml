@@ -17,5 +17,9 @@ logging:
   file:
     name: logs/orchestrator.log
 
+nats:
+  consumer:
+    durable-name: OrchestratorService
+
 server:
   port: 8082

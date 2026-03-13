@@ -35,6 +35,7 @@ management:
 
 nats:
   url: nats://localhost:4222
+  durable-name: OrchestratorService
 
 logging:
   file:

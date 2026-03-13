@@ -3,6 +3,7 @@ package com.inmopaco.Orchestrator.infrastructure.queues.provider.nats.components
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.inmopaco.shared.events.GenericEventMsg;
 import io.nats.client.*;
+import io.nats.client.api.ConsumerConfiguration;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Component;
@@ -33,7 +34,13 @@ public class NatsSubscriber {
     }
 
     //TODO: REVISAR ESTO, no hay nada probado respecto a la mensajeria
-    public <EventMsg extends GenericEventMsg> void subscribePersistent(String subject, String durableName, String queueGroup, Class<EventMsg> targetClass, Consumer<EventMsg> handler) {
+    public <EventMsg extends GenericEventMsg> void subscribePersistent(
+            String subject,
+            String durableName,
+            String queueGroup,
+            Class<EventMsg> targetClass,
+            Consumer<EventMsg> handler
+    ) {
         try {
             JetStream js = natsConnection.jetStream();
 
@@ -54,15 +61,20 @@ public class NatsSubscriber {
 
             Dispatcher dispatcher = natsConnection.createDispatcher(m -> {});
 
-            PushSubscribeOptions options = PushSubscribeOptions.builder()
+            ConsumerConfiguration consumerConfig = ConsumerConfiguration.builder()
                     .durable(durableName)
                     .deliverGroup(queueGroup)
+                    .filterSubject(subject) // MUST match the subject used in js.subscribe(...)
+                    .build();
+
+            PushSubscribeOptions options = PushSubscribeOptions.builder()
+                    .configuration(consumerConfig)
                     .build();
 
             //subscribe(subject, queueGroup, dispatcher, handler, autoAck, options)
             js.subscribe(subject, queueGroup, dispatcher, msgHandler, false, options);
 
-            log.info("Suscripción persistente activada: {} con durable {}", subject, durableName);
+            log.info("Suscripción persistente activada: {} con durable name: {}", subject, durableName);
 
         } catch (Exception e) {
             throw new RuntimeException("Error en suscripción persistente a JetStream", e);

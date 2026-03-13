@@ -28,7 +28,6 @@ public class JsoupAuctionDetailsNodeVer3ChainNode extends AbstractJsoupAuctionDe
 
     @Override
     public JsoupChainContextDTO execute(JsoupChainContextDTO context) {
-        log.info("Executing JsoupAuctionDetailsNodeVer3ChainNode for auction ID: " + context.getSummary().getBoeIdentifier());
         url = buildUrlForSection(context.getSummary().getDetailUrl(), SECTION_NUMBER);
         Document document = fetchAuctionDetails(context.getSummary());
         return parse(document, context);
@@ -84,6 +83,7 @@ public class JsoupAuctionDetailsNodeVer3ChainNode extends AbstractJsoupAuctionDe
                     LotDTO lot = parseLot(document, context);
                     lotList.add(lot);
                 });
+        log.info("Total lots parsed for multi-lot auction {}: {}", context.getSummary().getBoeIdentifier(), lotList.size());
         context.getBuilder().lots(lotList);
     }
 

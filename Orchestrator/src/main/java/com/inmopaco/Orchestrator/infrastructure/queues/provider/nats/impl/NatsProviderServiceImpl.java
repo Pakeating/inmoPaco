@@ -22,14 +22,14 @@ public class NatsProviderServiceImpl implements NatsProviderService {
 
     @Override
     public <EventMsg extends GenericEventMsg> void publish(String subject, EventMsg message) {
-        natsPublisher.publishEvent(subject, message);
         log.info("Publicando a NATS - Subject: {}, MessageId: {}", subject, message.getEventId());
+        natsPublisher.publishEvent(subject, message);
     }
 
     @Override
     public <EventMsg extends GenericEventMsg> void publishPersistent(String subject, EventMsg message) {
-        natsPublisher.publishPersistentEvent(subject, message);
         log.info("Publicando con persistencia a NATS - Subject: {}, MessageId: {}", subject, message.getEventId());
+        natsPublisher.publishPersistentEvent(subject, message);
     }
 
 

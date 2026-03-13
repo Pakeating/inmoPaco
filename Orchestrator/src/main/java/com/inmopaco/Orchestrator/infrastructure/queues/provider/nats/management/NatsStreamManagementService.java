@@ -8,4 +8,6 @@ public interface NatsStreamManagementService {
     void purgeStream(Connection natsConnection, String streamName) throws Exception;
 
     void purgeAllStreams() throws Exception;
+
+    void deleteConsumer(String stream, String subject);
 }

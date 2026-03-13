@@ -1,12 +1,24 @@
 package com.inmopaco.shared.events;
 
-public class AuctionsEvent extends GenericEventMsg {
+import com.inmopaco.shared.events.enums.AuctionsActions;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
-    private AuctionsEvent() {
-        super();
+import java.util.UUID;
+
+@Getter
+@NoArgsConstructor
+public class AuctionsEvent extends GenericEventMsg {
+    private AuctionsActions action;
+    private String payload;
+
+    private AuctionsEvent(UUID eventId, AuctionsActions action, String payload) {
+        super(eventId);
+        this.action = action;
+        this.payload = payload;
     }
 
-    public static AuctionsEvent createEventMsg() {
-        return new AuctionsEvent();
+    public static AuctionsEvent createEventMsg(AuctionsActions action, String payload) {
+        return new AuctionsEvent(UUID.randomUUID(), action, payload);
     }
 }

@@ -1,10 +1,7 @@
 package com.inmopaco.AuctionService.infrastructure.persistence.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
 @Table(name = "auction_lots")
@@ -16,6 +13,7 @@ public class LotEntity {
 
     @Id
     @Column(name = "lot_id")
+    @EqualsAndHashCode.Include
     private String lotId; // Usamos el lotId como PK si es único, si no, podrías usar un Long @GeneratedValue
 
     @Column(name = "lot_title", columnDefinition = "TEXT")

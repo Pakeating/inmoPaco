@@ -2,10 +2,14 @@ package com.inmopaco.AuctionService.application.usecases.impl;
 
 import com.inmopaco.AuctionService.application.dto.AuctionDetailsDTO;
 import com.inmopaco.AuctionService.application.usecases.ScrapeBoeAuctionsUsecase;
+import com.inmopaco.AuctionService.infrastructure.messaging.queues.QueueService;
 import com.inmopaco.AuctionService.infrastructure.persistence.service.AuctionPersistenceService;
 import com.inmopaco.AuctionService.infrastructure.scraper.AuctionScraperProviderService;
+import com.inmopaco.shared.events.AuctionsEvent;
+import com.inmopaco.shared.events.enums.AuctionsActions;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,21 +22,29 @@ public class ScrapeBoeAuctionsUsecaseImpl implements ScrapeBoeAuctionsUsecase {
     private AuctionScraperProviderService scraperService;
 
     @Autowired
+    @Lazy
+    private QueueService queueService;
+
+    @Autowired
     private AuctionPersistenceService persistenceService;
 
     @Override
-    public void scrapeAllBoeAuctions() {
+    public void scrapeBoeAuctions(AuctionsEvent event) {
 
-        // TODO: ESTO TENDRIA QUE SER UN ENUM DE DOMINIO CON TODAS LAS PROVINCIAS
+        log.info("[ScrapeBoeAuctionsUsecase] START Auction scraping for event {} and code {}", event.getEventId(), event.getPayload());
 
-        log.info("[ScrapeBoeAuctionsUsecase] START Auction scraping...");
+        List<AuctionDetailsDTO> auctionList = scraperService.fetchSearchResults(event.getPayload());
 
-        List<AuctionDetailsDTO> auctionList = scraperService.fetchSearchResults();
+        log.info("[ScrapeBoeAuctionsUsecase] Saving Auctions for event {}", event.getEventId());
 
         long created = persistenceService.saveOrUpdateAuctions(auctionList);
 
-        log.info("[ScrapeBoeAuctionsUsecase] END Auction scraping");
-//        TODO: enviar notificacion de nuevas subastas?
+        var responseEvent = AuctionsEvent.createEventMsg(AuctionsActions.RETRIEVED_AUCTIONS, event.getPayload());
+        responseEvent.setParentEventId(event.getEventId());
+
+        queueService.publish("auctions.response", responseEvent);
+
+        log.info("[ScrapeBoeAuctionsUsecase] END Auction scraping for event {} and code {}", event.getEventId(), event.getPayload());
     }
 }
 

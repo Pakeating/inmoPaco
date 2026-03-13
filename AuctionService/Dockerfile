@@ -13,7 +13,7 @@ RUN mvn -f ./EventSourcingCommons/pom.xml clean install -DskipTests
 COPY AuctionService ./AuctionService
 WORKDIR /app/AuctionService
 
-RUN mvn clean package -DskipNativeBuild=true -DskipTests -Dproc:full
+RUN mvn clean package -DskipNativeBuild=true -DskipTests
 
 # --- Etapa 2: Run ---
 # Usamos una imagen JRE (Runtime) mucho más pequeña para la ejecución

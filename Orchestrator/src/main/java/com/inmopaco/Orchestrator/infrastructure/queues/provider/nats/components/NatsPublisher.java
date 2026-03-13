@@ -12,6 +12,8 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
+
 @Component
 @RequiredArgsConstructor
 @Log4j2
@@ -26,6 +28,7 @@ public class NatsPublisher {
             // Obtenemos el contexto de JetStream
             JetStream js = natsConnection.jetStream();
 
+            event.published(LocalDateTime.now());
             byte[] payload = objectMapper.writeValueAsBytes(event);
 
             // Creamos el mensaje con el payload
@@ -41,17 +44,20 @@ public class NatsPublisher {
                 log.info("Mensaje duplicado detectado por JetStream");
             }
         } catch (Exception e) {
-            throw new RuntimeException("Error publicando en JetStream", e);
+            event.error();
+            throw new RuntimeException("Error publicando " + event.getEventId() + " en JetStream", e);
         }
     }
 
     public <EventMsg extends GenericEventMsg> void publishEvent(String subject, EventMsg event) {
 
         try {
+            event.published(LocalDateTime.now());
             byte[] payload = objectMapper.writeValueAsBytes(event);
             natsConnection.publish(subject, payload);
         } catch (Exception e) {
-            throw new RuntimeException("Error serializando evento para NATS", e);
+            event.error();
+            throw new RuntimeException("Error serializando evento " + event.getEventId() + " para NATS", e);
         }
     }
 }

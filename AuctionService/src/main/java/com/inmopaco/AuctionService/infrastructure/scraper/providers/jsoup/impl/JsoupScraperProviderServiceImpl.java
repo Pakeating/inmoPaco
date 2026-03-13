@@ -33,9 +33,9 @@ public class JsoupScraperProviderServiceImpl implements JsoupScraperProviderServ
     private static final Connection.Method METHOD = Connection.Method.POST;
 
     @Override
-    public List<AuctionDetailsDTO> fetchSearchResults() {
+    public List<AuctionDetailsDTO> fetchSearchResults(String province) {
         try {
-            // TODO: Hay que montar form-data dinamicamente, cambiar por el hardcodeado.
+            // TODO: Hay que montar form-data dinamicamente, ahora mismo solo metemos el cod provincia
             Map<String, String> formData = new HashMap<>();
             formData.put("campo[0]", "SUBASTA.ORIGEN");
             formData.put("dato[0]", "");
@@ -44,7 +44,7 @@ public class JsoupScraperProviderServiceImpl implements JsoupScraperProviderServ
             formData.put("campo[2]", "SUBASTA.ESTADO.CODIGO");
             formData.put("dato[2]", "EJ"); // En ejecución
             formData.put("campo[3]", "BIEN.TIPO");
-            formData.put("dato[3]", "");
+            formData.put("dato[3]", "I");
             formData.put("dato[4]", "");
             formData.put("campo[5]", "BIEN.DIRECCION");
             formData.put("dato[5]", "");
@@ -53,7 +53,7 @@ public class JsoupScraperProviderServiceImpl implements JsoupScraperProviderServ
             formData.put("campo[7]", "BIEN.LOCALIDAD");
             formData.put("dato[7]", "");
             formData.put("campo[8]", "BIEN.COD_PROVINCIA");
-            formData.put("dato[8]", "47"); // Valladolid (ejemplo)
+            formData.put("dato[8]", province); // Valladolid (ejemplo)
             formData.put("campo[9]", "SUBASTA.POSTURA_MINIMA_MINIMA_LOTES");
             formData.put("dato[9]", "");
             formData.put("campo[10]", "SUBASTA.NUM_CUENTA_EXPEDIENTE_1");
@@ -74,7 +74,7 @@ public class JsoupScraperProviderServiceImpl implements JsoupScraperProviderServ
             formData.put("campo[17][1]", ""); // Fecha fin hasta
             formData.put("campo[18][0]", ""); // Fecha inicio desde
             formData.put("campo[18][1]", ""); // Fecha inicio hasta
-            formData.put("page_hits", "50");
+            formData.put("page_hits", "500");
             formData.put("sort_field[0]", "SUBASTA.FECHA_FIN");
             formData.put("sort_order[0]", "asc");
             formData.put("accion", "Buscar");
@@ -100,9 +100,12 @@ public class JsoupScraperProviderServiceImpl implements JsoupScraperProviderServ
                             .execute())
                     .toList();
 
-            //TODO: temporal, de prueba
             log.info("Detailed Auctions Fetched: {}", detailedAuctionList.size());
-            detailedAuctionList.forEach(log::info);
+            detailedAuctionList.stream()
+                    .map(AuctionDetailsDTO::getAuctionId)
+                    .reduce((a,b)-> a + ", " + b)
+                    .ifPresent(ids -> log.info("Auctions fully retrieved: {}", ids));
+
             return detailedAuctionList;
         } catch (IOException e) {
             System.err.println("Error connecting to BOE: " + e.getMessage());
@@ -110,7 +113,7 @@ public class JsoupScraperProviderServiceImpl implements JsoupScraperProviderServ
         }
     }
 
-    //TODO: No me mola el resultado, refactorizar
+    //TODO: No me mola como me ha quedado el codigo, refactorizar
     private List<AuctionSummaryDTO> parseResults(Document doc) {
         List<AuctionSummaryDTO> results = new ArrayList<>();
 
@@ -150,7 +153,6 @@ public class JsoupScraperProviderServiceImpl implements JsoupScraperProviderServ
                 }
             }
 
-            // Construcción del objeto usando el Builder de Lombok
             AuctionSummaryDTO dto = AuctionSummaryDTO.builder()
                     .boeIdentifier(id)
                     .courtName(court)

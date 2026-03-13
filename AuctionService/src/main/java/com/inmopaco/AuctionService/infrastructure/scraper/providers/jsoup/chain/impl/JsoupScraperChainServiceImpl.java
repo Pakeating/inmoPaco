@@ -6,6 +6,7 @@ import com.inmopaco.AuctionService.infrastructure.scraper.providers.jsoup.chain.
 import com.inmopaco.AuctionService.infrastructure.scraper.providers.jsoup.chain.JsoupScraperChainService;
 import com.inmopaco.AuctionService.infrastructure.scraper.providers.jsoup.chain.dto.JsoupChainContextDTO;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 
 import java.util.Deque;
@@ -14,6 +15,7 @@ import java.util.LinkedList;
 
 @Service
 @RequiredArgsConstructor
+@Log4j2
 public class JsoupScraperChainServiceImpl implements JsoupScraperChainService {
     private final Deque<JsoupScraperChainNode> nodeList = new LinkedList<>();
     private JsoupChainContextDTO context;
@@ -31,6 +33,7 @@ public class JsoupScraperChainServiceImpl implements JsoupScraperChainService {
 
     @Override
     public AuctionDetailsDTO execute() {
+        log.info("Executing JsoupScraperChain with {} nodes for {}", nodeList.size(), context.getSummary().getBoeIdentifier());
         while (!nodeList.isEmpty()) {
             JsoupScraperChainNode node = nodeList.pollFirst();
             node.execute(context);

@@ -49,6 +49,11 @@ management:
         enabled: true
 nats:
   url: nats://localhost:4222
+auction:
+  scraper:
+    delay:
+      min: 200
+      max: 400
 server:
   port: 7081
 

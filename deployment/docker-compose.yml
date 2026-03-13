@@ -2,7 +2,8 @@
 networks:
   microservices-network:
     driver: bridge
-
+  public-tunnel-network:
+    driver: bridge
 services:
 
 # SERVICIOS DE INFRAESTRUCTURA:
@@ -55,6 +56,7 @@ services:
       - SPRING_CLOUD_DISCOVERY_ENABLED=false
     networks:
       - microservices-network
+      - public-tunnel-network
 
   # --- ADMIN ---
   admin-server:
@@ -86,6 +88,19 @@ services:
     command: --interval 30 --cleanup
     networks:
       - microservices-network
+
+  # --- CONECTOR DE CLOUDFLARE TUNNELS ---
+#  cloudflared:
+#    image: cloudflare/cloudflared:latest
+#    container_name: cloudflare-tunnel
+#    restart: unless-stopped
+#    networks:
+#      - public-tunnel-network
+#    environment:
+#      - TUNNEL_TOKEN=123 #${CLOUDFLARE_TUNNEL_TOKEN} #VARIABLE DE ENTORNO PARA EL TOKEN
+#    command: tunnel --no-autoupdate run
+#    depends_on:
+#      - gateway
 
   # --- COLAS MENSAJERIA ---
   nats-server:

@@ -5,5 +5,5 @@ import com.inmopaco.AuctionService.application.dto.AuctionDetailsDTO;
 import java.util.List;
 
 public interface JsoupScraperProviderService {
-    List<AuctionDetailsDTO> fetchSearchResults();
+    List<AuctionDetailsDTO> fetchSearchResults(String province);
 }

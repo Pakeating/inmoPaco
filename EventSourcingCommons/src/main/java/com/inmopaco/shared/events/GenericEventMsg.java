@@ -1,6 +1,8 @@
 package com.inmopaco.shared.events;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
 
 import java.io.Serializable;
@@ -9,19 +11,22 @@ import java.util.UUID;
 
 @Log4j2
 @Getter
+@NoArgsConstructor
 public abstract class GenericEventMsg implements Serializable {
 
-    private final UUID eventId;
-    protected final LocalDateTime createdAt;
+    private UUID eventId;
+    protected LocalDateTime createdAt;
     protected LocalDateTime publishedAt;
     protected LocalDateTime consumedAt;
     protected String producedBy;
     protected String consumedBy;
     protected EventStatus status;
     protected boolean isPersistent;
+    @Setter
+    protected UUID parentEventId;
 
-    protected GenericEventMsg() {
-        this.eventId = UUID.randomUUID();
+    protected GenericEventMsg(UUID eventId) {
+        this.eventId = eventId;
         this.createdAt = LocalDateTime.now();
         this.isPersistent = true;
         this.changeStatus(EventStatus.CREATED);

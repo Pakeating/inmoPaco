@@ -7,18 +7,24 @@ import com.inmopaco.shared.events.AuctionsEvent;
 import com.inmopaco.shared.events.GenericEventMsg;
 import jakarta.annotation.PostConstruct;
 import lombok.AllArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.function.Consumer;
 
 @Service
+@Log4j2
 @AllArgsConstructor
 public class QueueServiceImpl implements QueueService {
 
     @Autowired
     private final GenericQueueProviderServiceImpl queueProvider;
+
     @Autowired
+    @Lazy
     private ScrapeBoeAuctionsUsecase scrapeBoeAuctionsUsecase;
 
     @Override
@@ -40,8 +46,27 @@ public class QueueServiceImpl implements QueueService {
         queueProvider.subscribePersistent(subject, durableName, queueGroup, targetClass, handler);
     }
 
+    //TODO: Las colas no deberian estar hardcodeadas
     @PostConstruct
     public void subscribeToQueues(){
-        subscribePersistent("auctions.get", "auctionsService", "get", AuctionsEvent.class, (event) -> scrapeBoeAuctionsUsecase.scrapeAllBoeAuctions() );
+        subscribePersistent("auctions.get",
+                "AuctionsService",
+                "get",
+                AuctionsEvent.class,
+                this::eventHandler
+        );
+    }
+
+    private void eventHandler (AuctionsEvent event) {
+        log.info("Received event {} with action {}", event.getEventId(), event.getAction());
+        event.consumed(LocalDateTime.now());
+
+        switch (event.getAction()) {
+            case GET_AUCTIONS -> scrapeBoeAuctionsUsecase.scrapeBoeAuctions(event);
+
+            case PROCESS_AUCTIONS -> throw new UnsupportedOperationException("Action not implemented yet: " + event.getAction());
+
+            default -> throw new UnsupportedOperationException("Action not implemented: " + event.getAction());
+        }
     }
 }
