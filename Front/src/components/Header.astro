@@ -1,0 +1,55 @@
+---
+const { title = "InmoPaco" } = Astro.props;
+---
+
+<header class="site-header">
+  <div class="container">
+    <a href="/" class="logo">{title}<span>.</span></a>
+    <nav>
+      <ul>
+        <li><a href="/">Inicio</a></li>
+        <li><a href="/properties">Propiedades</a></li>
+        <li><a href="/auctions">Subastas</a></li>
+        <li><a href="/contact">Contacto</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<style>
+  .site-header {
+    background-color: var(--color-bg-card);
+    padding: var(--spacing-base) 0;
+    border-bottom: 1px solid var(--border-color);
+    box-shadow: var(--shadow-sm);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .logo {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--color-primary);
+    text-decoration: none;
+  }
+  .logo span {
+    color: var(--color-accent);
+  }
+  nav ul {
+    list-style: none;
+    display: flex;
+    gap: 1.5rem;
+  }
+  nav a {
+    color: var(--color-text-muted);
+    font-weight: 500;
+  }
+  nav a:hover, nav a.active {
+    color: var(--color-primary);
+  }
+</style>

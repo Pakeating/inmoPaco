@@ -1,0 +1,80 @@
+---
+/**
+ * Lógica de búsqueda de subastas
+ * Se encarga de leer los parámetros de la URL y obtener los datos del servidor.
+ */
+---
+
+<div id="auction-search-logic" class="hidden"></div>
+
+<script>
+  const performSearch = async () => {
+    const params = new URLSearchParams(window.location.search);
+    const filters = {
+      auctionIds: params.get('auctionIds') ? params.get('auctionIds').split(',').map(s => s.trim()).filter(Boolean) : [],
+      type: params.get('type'),
+      dateOfEnd: params.get('dateOfEnd'),
+      city: params.get('city'),
+      province: params.get('province'),
+      isVisitable: params.get('isVisitable'),
+      hasBids: params.has('hasBids') ? params.get('hasBids') === 'true' : null,
+      status: params.get('status')
+    };
+
+    const page = params.get('page') || '0';
+    const size = params.get('size') || '10';
+    const sortBy = params.get('sortBy') || '+dateOfEnd';
+
+    console.log('[AuctionSearch] Fetching from API with filters:', filters, { page, size, sortBy });
+
+    try {
+      const query = new URLSearchParams({ page, size, sortBy }).toString();
+      const response = await fetch(`/api/auctions?${query}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(filters)
+      });
+      if (!response.ok) throw new Error('Network response was not ok');
+      
+      const data = await response.json();
+      console.log('[AuctionSearch] API Response Data:', data);
+      
+      // los resultados están en el campo 'content'
+      const results = data.content || [];
+
+      // Extraer info de paginación
+      const p = data.page || data;
+      const pagination = {
+        page: Number(p.number ?? 0),
+        size: Number(p.size ?? 10),
+        totalPages: Number(p.totalPages ?? 1),
+        totalElements: Number(p.totalElements ?? 0),
+        isLast: Boolean(p.last),
+        isFirst: Boolean(p.first)
+      };
+
+      // lanzamos el evento
+      const event = new CustomEvent('auctions:fetched', {
+        detail: { 
+          results, 
+          filters,
+          pagination
+        },
+        bubbles: true
+      });
+      
+      document.dispatchEvent(event);
+    } catch (error) {
+      console.error('[AuctionSearch] Error fetching auctions:', error);
+    }
+  };
+
+  // Ejecutar búsqueda cuando el DOM esté listo
+  document.addEventListener('DOMContentLoaded', performSearch);
+</script>
+
+<style>
+  .hidden { display: none; }
+</style>

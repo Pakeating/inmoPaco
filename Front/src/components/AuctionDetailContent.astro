@@ -1,0 +1,592 @@
+---
+/**
+ * Contenido detallado de la subasta
+ * Renderiza todos los campos de información de una subasta específica.
+ */
+---
+
+<div id="auction-detail-wrapper">
+  <div id="loading-detail" class="loading-state">Obteniendo todos los detalles de la subasta...</div>
+  
+  <div id="auction-detail-content" class="hidden">
+    <div class="detail-container">
+      <div class="detail-main">
+        <header class="detail-header">
+          <div class="header-top">
+            <span class="property-type"></span>
+            <div class="status-badge" data-status=""></div>
+          </div>
+          <h1 class="property-address"></h1>
+          <p class="location"><span class="icon">📍</span> <span class="location-text"></span></p>
+        </header>
+
+        <section class="detail-section">
+          <h2>Información Económica</h2>
+          <div class="highlight-grid">
+            <div class="highlight-item">
+              <span class="label">Valor de Subasta</span>
+              <span class="value auction-value"></span>
+            </div>
+            <div class="highlight-item">
+              <span class="label">Depósito Requerido (5%)</span>
+              <span class="value deposit-amount"></span>
+            </div>
+            <div class="highlight-item">
+              <span class="label">Tasación</span>
+              <span class="value appraisal"></span>
+            </div>
+            <div class="highlight-item">
+              <span class="label">Puja Mínima</span>
+              <span class="value minimum-bid"></span>
+            </div>
+          </div>
+          <div class="data-grid mt-4">
+            <div class="data-item">
+              <span class="label">Tramos entre pujas:</span>
+              <span class="value bid-increments"></span>
+            </div>
+            <div class="data-item">
+              <span class="label">Importe reclamado:</span>
+              <span class="value claimed-amount"></span>
+            </div>
+          </div>
+        </section>
+        
+        <section class="detail-section">
+          <h2>Descripción de los bienes</h2>
+          <p class="value goods-description"></p>
+        </section>
+
+        <section class="detail-section">
+          <h2>Ubicación y Referencias</h2>
+          <div class="data-grid">
+            <div class="data-item">
+              <span class="label">Referencia Catastral:</span>
+              <span class="value cadastral-reference"></span>
+            </div>
+            <div class="data-item">
+              <span class="label">Código Postal:</span>
+              <span class="value postal-code"></span>
+            </div>
+            <div class="data-item">
+              <span class="label">Provincia:</span>
+              <span class="value province-text"></span>
+            </div>
+            <div class="data-item">
+              <span class="label">Ciudad:</span>
+              <span class="value city-text"></span>
+            </div>
+            <div class="data-item">
+              <span class="label">CRU:</span>
+              <span class="value cru-text"></span>
+            </div>
+            <div class="data-item">
+              <span class="label">Datos Registrales:</span>
+              <span class="value registry-data"></span>
+            </div>
+          </div>
+        </section>
+
+        <section class="detail-section">
+          <h2>Información de la Autoridad</h2>
+          <div class="data-grid">
+            <div class="data-item">
+              <span class="label">Código Autoridad:</span>
+              <span class="value authority-code"></span>
+            </div>
+            <div class="data-item">
+              <span class="label">Descripción:</span>
+              <span class="value authority-description"></span>
+            </div>
+            <div class="data-item">
+              <span class="label">Dirección:</span>
+              <span class="value authority-address"></span>
+            </div>
+            <div class="data-item">
+              <span class="label">Teléfono:</span>
+              <span class="value authority-phone"></span>
+            </div>
+            <div class="data-item">
+              <span class="label">Email:</span>
+              <span class="value authority-email"></span>
+            </div>
+            <div class="data-item">
+              <span class="label">Fax:</span>
+              <span class="value authority-fax"></span>
+            </div>
+          </div>
+        </section>
+
+        <section class="detail-section">
+          <h2>Detalles Legales y Estado</h2>
+          <div class="data-grid">
+            <div class="data-item">
+              <span class="label">ID Subasta:</span>
+              <span class="value auction-id"></span>
+            </div>
+            <div class="data-item">
+              <span class="label">Nº de Expediente:</span>
+              <span class="value expediente"></span>
+            </div>
+            <div class="data-item">
+              <span class="label">Nombre del Juzgado:</span>
+              <span class="value court-name"></span>
+            </div>
+            <div class="data-item">
+              <span class="label">Anuncio BOE:</span>
+              <span class="value boe-announcement"></span>
+            </div>
+            <div class="data-item">
+              <span class="label">Fecha Inicio:</span>
+              <span class="value date-start"></span>
+            </div>
+            <div class="data-item">
+              <span class="label">Fecha Fin:</span>
+              <span class="value date-end"></span>
+            </div>
+            <div class="data-item">
+              <span class="label">Vivienda Habitual:</span>
+              <span class="value is-habitual-residence"></span>
+            </div>
+            <div class="data-item">
+              <span class="label">Visitable:</span>
+              <span class="value is-visitable"></span>
+            </div>
+            <div class="data-item">
+              <span class="label">Estado Posesión:</span>
+              <span class="value possession-status"></span>
+            </div>
+            <div class="data-item">
+              <span class="label">Tiene Pujas:</span>
+              <span class="value has-bids"></span>
+            </div>
+          </div>
+        </section>
+
+        <section class="detail-section">
+          <h2>Información del Acreedor</h2>
+          <div class="data-grid">
+            <div class="data-item">
+              <span class="label">Nombre Acreedor:</span>
+              <span class="value creditor-name"></span>
+            </div>
+            <div class="data-item">
+              <span class="label">NIF Acreedor:</span>
+              <span class="value creditor-nif"></span>
+            </div>
+            <div class="data-item">
+              <span class="label">Dirección Acreedor:</span>
+              <span class="value creditor-address"></span>
+            </div>
+          </div>
+        </section>
+
+        <section id="lots-section" class="detail-section hidden">
+          <h2>Lotes (<span id="lots-count">0</span>)</h2>
+          <div id="lots-container" class="lots-grid">
+            <!-- Los lotes se inyectarán aquí -->
+          </div>
+        </section>
+
+        <section id="docs-section" class="detail-section hidden">
+          <h2>Documentos Adjuntos</h2>
+          <ul id="docs-list" class="docs-list">
+            <!-- Las URLs de los documentos se inyectarán aquí -->
+          </ul>
+        </section>
+      </div>
+      
+      <aside class="detail-sidebar">
+        <div class="sidebar-info">
+          <h3>Resumen Rápido</h3>
+          <div class="data-item-simple">
+            <span class="label">Estado:</span>
+            <span class="value detail-status"></span>
+          </div>
+          <div class="data-item-simple">
+            <span class="label">Tiene Pujas:</span>
+            <span class="value sidebar-has-bids"></span>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <div id="not-found-detail" class="no-results hidden">
+    <p>Lo sentimos, no pudimos encontrar los detalles de esta subasta.</p>
+    <a href="/auctionsList" class="btn-accent">Volver al Listado</a>
+  </div>
+</div>
+
+<script>
+  const wrapper = document.getElementById('auction-detail-content');
+  const loading = document.getElementById('loading-detail');
+  const notFound = document.getElementById('not-found-detail');
+
+  // Escuchar el evento cuando se obtienen los datos de la subasta
+  document.addEventListener('auctions:fetched', (event) => {
+    // @ts-ignore
+    const { results } = event.detail;
+    
+    loading.classList.add('hidden');
+
+    if (!results || results.length === 0) {
+      notFound.classList.remove('hidden');
+      wrapper.classList.add('hidden');
+      return;
+    }
+
+    const auction = results[0]; 
+    notFound.classList.add('hidden');
+    wrapper.classList.remove('hidden');
+
+
+    const setT = (selector, value) => {
+      if (!wrapper) return;
+      const el = wrapper.querySelector(selector);
+      if (el) el.textContent = value || 'No disponible';
+    };
+
+    // rellenar header
+    const badge = wrapper.querySelector('.status-badge') as HTMLElement;
+    if (badge) {
+      badge.textContent = auction.status;
+      badge.dataset.status = auction.status;
+    }
+    
+    setT('.property-type', auction.type);
+    setT('.property-address', auction.propertyAddress);
+    setT('.location-text', `${auction.city}, ${auction.province}`);
+
+    // rellenar info económica
+    setT('.auction-value', auction.auctionValue);
+    setT('.deposit-amount', auction.depositAmount);
+    setT('.appraisal', auction.appraisal);
+    setT('.minimum-bid', auction.minimumBid);
+    setT('.bid-increments', auction.bidIncrements);
+    setT('.claimed-amount', auction.claimedAmount);
+
+    // descripción y ubicación
+    setT('.goods-description', auction.goodsDescription);
+    setT('.cadastral-reference', auction.cadastralReference);
+    setT('.postal-code', auction.postalCode);
+    setT('.province-text', auction.province);
+    setT('.city-text', auction.city);
+    setT('.cru-text', auction.cru);
+    setT('.registry-data', auction.registryData);
+
+    // autoridad
+    setT('.authority-code', auction.authorityCode);
+    setT('.authority-description', auction.authorityDescription);
+    setT('.authority-address', auction.authorityAddress);
+    setT('.authority-phone', auction.authorityPhone);
+    setT('.authority-email', auction.authorityEmail);
+    setT('.authority-fax', auction.authorityFax);
+
+    // información legal
+    setT('.auction-id', auction.auctionId);
+    setT('.expediente', auction.expediente);
+    setT('.court-name', auction.courtName);
+    setT('.boe-announcement', auction.boeAnnouncement);
+    setT('.date-start', auction.dateOfStart);
+    setT('.date-end', auction.dateOfEnd);
+    setT('.is-habitual-residence', auction.isHabitualResidence);
+    setT('.is-visitable', auction.isVisitable);
+    setT('.possession-status', auction.possessionStatus);
+    setT('.has-bids', auction.hasBids ? 'Sí' : 'No');
+
+    // acreedor
+    setT('.creditor-name', auction.creditorName);
+    setT('.creditor-nif', auction.creditorNif);
+    setT('.creditor-address', auction.creditorAddress);
+
+    // barra lateral
+    setT('.detail-status', auction.status);
+    setT('.sidebar-has-bids', auction.hasBids ? 'Sí' : 'No');
+    setT('.lots-number', auction.lotsNumber);
+    setT('.counting-account', auction.countingAccount);
+
+    // documentos
+    const docsSection = document.getElementById('docs-section');
+    const docsList = document.getElementById('docs-list');
+    if (docsSection && docsList && auction.documentUrls && auction.documentUrls.length > 0) {
+      docsSection.classList.remove('hidden');
+      docsList.innerHTML = '';
+      auction.documentUrls.forEach(url => {
+        const li = document.createElement('li');
+        const a = document.createElement('a');
+        a.href = url;
+        a.target = '_blank';
+        a.textContent = 'Ver documento adjunto';
+        li.appendChild(a);
+        docsList.appendChild(li);
+      });
+    }
+
+    // Lotes
+    const lotsSection = document.getElementById('lots-section');
+    const lotsContainer = document.getElementById('lots-container');
+    const lotsCountEl = document.getElementById('lots-count');
+    if (auction.lots && auction.lots.length > 0) {
+      lotsSection.classList.remove('hidden');
+      lotsCountEl.textContent = auction.lots.length;
+      lotsContainer.innerHTML = '';
+      auction.lots.forEach(lot => {
+        const lotCard = document.createElement('div');
+        lotCard.className = 'lot-card';
+        lotCard.innerHTML = `
+          <h4>${lot.lotTitle || 'Lote sin título'}</h4>
+          <p class="lot-id">ID: ${lot.lotId}</p>
+          <div class="lot-data">
+            <p><strong>Valor:</strong> ${lot.auctionValue || 'N/D'}</p>
+            <p><strong>Puja Mín:</strong> ${lot.bidSteps || 'N/D'}</p>
+            <p><strong>Depósito:</strong> ${lot.depositAmount || 'N/D'}</p>
+          </div>
+          <p class="lot-desc">${lot.goodsDescription || ''}</p>
+        `;
+        lotsContainer.appendChild(lotCard);
+      });
+    }
+  });
+</script>
+
+<style>
+  .detail-container {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 3rem;
+    align-items: start;
+    margin-top: 2rem;
+  }
+
+  @media (max-width: 900px) {
+    .detail-container {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .detail-main {
+    background: var(--color-bg-card);
+    padding: 3rem;
+    border-radius: 1.5rem;
+    box-shadow: var(--shadow-sm);
+    border-top: 6px solid var(--color-primary);
+  }
+
+  .header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+
+  .property-type {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--color-accent);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  h1 {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    line-height: 1.2;
+  }
+
+  .location {
+    font-size: 1.1rem;
+    color: var(--color-text-muted);
+    margin-bottom: 2rem;
+  }
+
+  .detail-section {
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--border-color);
+  }
+
+  h2 {
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+    color: var(--color-primary);
+  }
+
+  .highlight-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .highlight-item {
+    display: flex;
+    flex-direction: column;
+    padding: 1.5rem;
+    background: rgba(var(--color-primary-rgb, 43, 67, 137), 0.05);
+    border-radius: 1rem;
+    border: 1px solid rgba(var(--color-primary-rgb, 43, 67, 137), 0.1);
+  }
+
+  .data-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .data-item {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .label {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+    margin-bottom: 0.25rem;
+    font-weight: 600;
+  }
+
+  .value {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--color-text-main);
+  }
+
+  .highlight-item .value {
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: var(--color-primary);
+  }
+
+  .goods-description {
+    font-weight: 400;
+    line-height: 1.7;
+    white-space: pre-wrap;
+  }
+
+  .text-content p {
+    line-height: 1.6;
+    color: var(--color-text-main);
+  }
+
+  .mt-4 { margin-top: 1rem; }
+  .mb-4 { margin-bottom: 1rem; }
+
+  /* Lots */
+  .lots-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+  }
+  .lot-card {
+    padding: 1.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: 1rem;
+    background: white;
+  }
+  .lot-card h4 {
+    margin-bottom: 0.5rem;
+    color: var(--color-primary);
+  }
+  .lot-id {
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+    margin-bottom: 1rem;
+  }
+  .lot-data {
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+  }
+  .lot-desc {
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+    line-height: 1.4;
+  }
+
+  /* Docs */
+  .docs-list {
+    list-style: none;
+    padding: 0;
+  }
+  .docs-list li {
+    margin-bottom: 0.75rem;
+  }
+  .docs-list a {
+    color: var(--color-primary);
+    text-decoration: underline;
+    font-weight: 600;
+  }
+
+  .detail-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    position: sticky;
+    top: 2rem;
+  }
+
+  .sidebar-info {
+    background: white;
+    padding: 2rem;
+    border-radius: 1.5rem;
+    border: 1px solid var(--border-color);
+  }
+
+  .sidebar-info h3 {
+    font-size: 1.25rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .data-item-simple {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px dotted var(--border-color);
+  }
+
+  .status-badge {
+		padding: 0.4rem 1rem;
+		border-radius: 2rem;
+		font-size: 0.8rem;
+		font-weight: 700;
+		text-transform: uppercase;
+	}
+	.status-badge[data-status="En curso"] {
+		background-color: #22c55e;
+		color: white;
+	}
+	.status-badge[data-status="Próximamente"] {
+		background-color: #f59e0b;
+		color: white;
+	}
+	.status-badge[data-status="Finalizada"] {
+		background-color: #ef4444;
+		color: white;
+	}
+
+  .btn-primary-white {
+    background: white;
+    color: var(--color-primary);
+    padding: 0.8rem 1.5rem;
+    border-radius: 0.5rem;
+    font-weight: 700;
+    transition: all 0.2s;
+  }
+  .btn-primary-white:hover {
+    background: rgba(255, 255, 255, 0.9);
+    transform: translateY(-2px);
+  }
+
+  .loading-state {
+    text-align: center;
+    padding: 5rem;
+    font-size: 1.25rem;
+    color: var(--color-text-muted);
+    font-style: italic;
+  }
+
+  .hidden { display: none; }
+
+  .block { display: block; text-align: center; width: 100%; }
+</style>
