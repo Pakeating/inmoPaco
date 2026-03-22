@@ -1,8 +1,10 @@
 export const prerender = false;
 
+const BACKEND_BASE_URL = 'https://backend.inmopaco.com';
+
 /**
  * Endpoint de la API: /api/auctions
- * actúa como un proxy para reenviar las peticiones de búsqueda al backend Java.
+ * Actúa como un proxy para reenviar las peticiones de búsqueda al backend de Java.
  */
 export async function POST ({ request }) {
   let body;
@@ -20,7 +22,9 @@ export async function POST ({ request }) {
 
   const url = new URL(request.url);
   const queryParams = url.searchParams.toString();
-  const backendUrl = `http://localhost:8083/search${queryParams ? '?' + queryParams : ''}`;
+  
+  // construimos la URL del backend usando la base configurada
+  const backendUrl = `${BACKEND_BASE_URL}/search${queryParams ? '?' + queryParams : ''}`;
 
   try {
     const response = await fetch(backendUrl, {
