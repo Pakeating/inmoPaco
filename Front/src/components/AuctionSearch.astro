@@ -9,6 +9,9 @@
 
 <script>
   const performSearch = async () => {
+    // Notificar que la carga ha comenzado
+    document.dispatchEvent(new CustomEvent('auctions:loading', { bubbles: true }));
+
     const params = new URLSearchParams(window.location.search);
     const filters = {
       auctionIds: params.get('auctionIds') ? params.get('auctionIds').split(',').map(s => s.trim()).filter(Boolean) : [],
@@ -36,7 +39,10 @@
         },
         body: JSON.stringify(filters)
       });
-      if (!response.ok) throw new Error('Network response was not ok');
+
+      if (!response.ok) {
+        throw new Error(`Error en la respuesta: ${response.status}`);
+      }
       
       const data = await response.json();
       console.log('[AuctionSearch] API Response Data:', data);
@@ -55,24 +61,31 @@
         isFirst: Boolean(p.first)
       };
 
-      // lanzamos el evento
-      const event = new CustomEvent('auctions:fetched', {
+      // lanzamos el evento con los resultados
+      document.dispatchEvent(new CustomEvent('auctions:fetched', {
         detail: { 
           results, 
           filters,
           pagination
         },
         bubbles: true
-      });
+      }));
       
-      document.dispatchEvent(event);
     } catch (error) {
       console.error('[AuctionSearch] Error fetching auctions:', error);
+      // Notificar que ha ocurrido un error
+      document.dispatchEvent(new CustomEvent('auctions:error', {
+        detail: { message: 'Ha ocurrido un error al obtener los datos' },
+        bubbles: true
+      }));
     }
   };
 
   // Ejecutar búsqueda cuando el DOM esté listo
-  document.addEventListener('DOMContentLoaded', performSearch);
+  document.addEventListener('DOMContentLoaded', () => {
+    // Pequeño delay para asegurar que los listeners de otros componentes estén registrados
+    setTimeout(performSearch, 50);
+  });
 </script>
 
 <style>

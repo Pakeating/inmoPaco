@@ -3,17 +3,22 @@
  * Lista de subastas
  * Recibe el evento de búsqueda y renderiza las tarjetas de subasta.
  */
+import LoadingState from './LoadingState.astro';
+import ErrorState from './ErrorState.astro';
 ---
 
 <div id="auction-results-wrapper">
-  <div id="auction-results-container" class="auction-list">
+	
+  <LoadingState id="loading-view" hidden={false} />
+  <ErrorState id="error-view" />
+
+  <div id="auction-results-container" class="auction-list hidden">
     <!-- cards -->
-    <div class="loading-state">Cargando subastas...</div>
   </div>
 
   <div id="no-results-view" class="no-results hidden">
     <p>No se encontraron subastas que coincidan con tus criterios.</p>
-    <a href="/auctionsFilter" class="btn-accent">Volver al Buscador</a>
+    <a href="/auctions" class="btn-accent">Volver al Buscador</a>
   </div>
 </div>
 
@@ -46,33 +51,56 @@
 
 <script>
   const container = document.getElementById('auction-results-container');
+  const loadingView = document.getElementById('loading-view');
+  const errorView = document.getElementById('error-view');
+  const errorMessage = document.getElementById('error-message');
   const noResultsView = document.getElementById('no-results-view');
   // @ts-ignore
   const template = document.getElementById('auction-card-template');
+
+  // Función para resetear vistas
+  const resetViews = () => {
+    container.classList.add('hidden');
+    loadingView.classList.add('hidden');
+    errorView.classList.add('hidden');
+    noResultsView.classList.add('hidden');
+  };
+
+  // Escuchar cuando la carga comienza
+  document.addEventListener('auctions:loading', () => {
+    resetViews();
+    loadingView.classList.remove('hidden');
+  });
+
+  // Escuchar cuando ocurre un error
+  document.addEventListener('auctions:error', (event) => {
+    resetViews();
+    // @ts-ignore
+    errorMessage.textContent = event.detail.message || 'Ha ocurrido un error al obtener los datos.';
+    errorView.classList.remove('hidden');
+  });
 
   // Escuchar el evento cuando se obtienen nuevas subastas
   document.addEventListener('auctions:fetched', (event) => {
     // @ts-ignore
     const { results } = event.detail;
     
-    // Limpiar resultados anteriores o estado de carga
-    container.innerHTML = '';
+    resetViews();
 
     if (results.length === 0) {
-      container.classList.add('hidden');
       noResultsView.classList.remove('hidden');
       return;
     }
 
+    // Limpiar resultados anteriores
+    container.innerHTML = '';
     container.classList.remove('hidden');
-    noResultsView.classList.add('hidden');
 
     results.forEach(auction => {
       // @ts-ignore
       const templateContent = template.content;
       const clone = templateContent.cloneNode(true);
       
-      // Rellenar datos en el clon de la plantilla
       const badge = clone.querySelector('.status-badge');
       badge.textContent = auction.status;
       badge.dataset.status = auction.status;
@@ -187,7 +215,7 @@
 		text-align: center;
 		width: 100%;
 	}
-	.no-results {
+  .no-results {
 		text-align: center;
 		padding: 4rem 2rem;
 		background: var(--color-bg-card);
@@ -203,13 +231,6 @@
 	.hidden {
 		display: none;
 	}
-  .loading-state {
-    grid-column: 1 / -1;
-    text-align: center;
-    padding: 3rem;
-    color: var(--color-text-muted);
-    font-style: italic;
-  }
 
   .page-info .total {
     color: var(--color-text-muted);

@@ -1,6 +1,6 @@
 export const prerender = false;
 
-const BACKEND_BASE_URL = 'https://backend.inmopaco.com';
+const BACKEND_BASE_URL = 'http://localhost:8080';
 
 /**
  * Endpoint de la API: /api/auctions

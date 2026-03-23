@@ -1,0 +1,52 @@
+---
+/**
+ * Componente de estado de error reutilizable
+ */
+interface Props {
+  message?: string;
+  id?: string;
+  messageId?: string;
+  hidden?: boolean;
+}
+
+const {
+  message = "Ha ocurrido un error al obtener los datos.",
+  id = "error-view",
+  messageId = "error-message",
+  hidden = true
+} = Astro.props;
+---
+
+<div id={id} class={`error-container ${hidden ? 'hidden' : ''}`}>
+  <div class="error-icon">⚠️</div>
+  <p id={messageId}>{message}</p>
+  <button onclick="window.location.reload()" class="btn-primary">Reintentar</button>
+</div>
+
+<style>
+  .error-container {
+    text-align: center;
+    padding: 5rem 2rem;
+    background: var(--color-bg-card);
+    border-radius: 1rem;
+    border: 1px solid var(--border-color);
+    margin: 2rem 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+  }
+
+  .error-container p {
+    color: var(--color-text-muted);
+    font-size: 1.1rem;
+  }
+
+  .error-icon {
+    font-size: 3rem;
+  }
+
+  .hidden {
+    display: none;
+  }
+</style>
