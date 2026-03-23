@@ -24,7 +24,7 @@ export async function POST ({ request }) {
   const queryParams = url.searchParams.toString();
   
   // construimos la URL del backend usando la base configurada
-  const backendUrl = `${BACKEND_BASE_URL}/search${queryParams ? '?' + queryParams : ''}`;
+  const backendUrl = `${BACKEND_BASE_URL}/bff/auctions/search${queryParams ? '?' + queryParams : ''}`;
 
   try {
     const response = await fetch(backendUrl, {
