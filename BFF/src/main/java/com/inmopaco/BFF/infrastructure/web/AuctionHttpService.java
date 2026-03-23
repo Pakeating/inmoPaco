@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @Log4j2
+@RequestMapping("/bff/auctions")
 public class AuctionHttpService {
 
     @Autowired

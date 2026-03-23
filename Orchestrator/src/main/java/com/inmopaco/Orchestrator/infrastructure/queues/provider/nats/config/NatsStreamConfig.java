@@ -12,15 +12,23 @@ import org.springframework.stereotype.Component;
 public class NatsStreamConfig {
 
     private final Connection natsConnection;
-
+    @Autowired
+    private NatsConfig natsConfig;
     @Autowired
     private NatsStreamManagementService natsStreamManagementService;
 
     //Configuracion para crear streams de NATS para persistencia de msg
-    //TODO: se hace solo uno, pero tiene que conectarse a todos los que haya en un fichero de configuracion o algo
     @PostConstruct
     public void createStream() throws Exception {
-        natsStreamManagementService.createStream(natsConnection, "AUCTIONS_STREAM", "auctions.>");
-        natsStreamManagementService.createStream(natsConnection, "PROPERTIES_STREAM", "properties.>");
+        natsConfig.getStreams().keySet().forEach((k) -> {
+            try {
+                natsStreamManagementService.createStream(natsConnection,
+                        natsConfig.getStreams().get(k),
+                        natsConfig.getSubjects().getWildcards().get(k)
+                );
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
     }
 }

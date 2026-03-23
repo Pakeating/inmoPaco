@@ -7,8 +7,9 @@ spring:
   boot:
     admin:
       context-path: /admin
-      ui:
-        public-url: http://localhost:9090/admin
+#      DESACTIVADO PARA QUE FUNCIONE TAMBIEN DESDE GATEWAY, revisar
+#      ui:
+#        public-url: http://localhost:9090/admin
       client:
         # DEBE terminar en /admin
         url: "http://admin-server:9090/admin"

@@ -23,9 +23,15 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.MariaDBDialect
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+
 logging:
   file:
-    name: logs/bff.log
+    name: logs/BFF.log
 
 nats:
   url: nats://localhost:4222

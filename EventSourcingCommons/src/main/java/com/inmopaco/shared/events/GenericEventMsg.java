@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.aot.hint.annotation.RegisterReflectionForBinding;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -12,6 +13,7 @@ import java.util.UUID;
 @Log4j2
 @Getter
 @NoArgsConstructor
+@RegisterReflectionForBinding
 public abstract class GenericEventMsg implements Serializable {
 
     private UUID eventId;

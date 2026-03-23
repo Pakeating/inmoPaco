@@ -1,5 +1,7 @@
 # Fase 1: Compilación
 FROM ghcr.io/graalvm/native-image-community:21 AS build
+ENV LANG=C.UTF-8
+ENV LC_ALL=C.UTF-8
 WORKDIR /app
 
 # Copiar archivos de Maven
@@ -14,7 +16,8 @@ RUN ./mvnw native:compile  \
     -DskipTests  \
     -DskipITs  \
     -DskipNativeTests  \
-    -Dmaven.test.skip=true
+    -Dmaven.test.skip=true \
+    -Dnative.buildArgs="-Ob"
 # Fase 2: Ejecución
 # para desarrollo, incluye ssh, etc
 FROM debian:bookworm-slim

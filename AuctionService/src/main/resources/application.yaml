@@ -23,17 +23,23 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.MariaDBDialect
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+
 logging:
   file:
     name: logs/auctions.log
 
 nats:
   url: nats://nats-server:4222
-auction:
+auction:        #Ojo, parece tener un rate limiter...
   scraper:
     delay:
-      min: 200
-      max: 400
+      min: 500
+      max: 1000
 server:
   port: 8081
 

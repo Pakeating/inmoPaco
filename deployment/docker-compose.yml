@@ -89,16 +89,16 @@ services:
     networks:
       - microservices-network
 
-  # --- CONECTOR DE CLOUDFLARE TUNNELS ---
-#  cloudflared:
-#    image: cloudflare/cloudflared:latest
-#    container_name: cloudflare-tunnel
-#    restart: unless-stopped
-#    networks:
-#      - public-tunnel-network
-#    environment:
-#      - TUNNEL_TOKEN=123 #${CLOUDFLARE_TUNNEL_TOKEN} #VARIABLE DE ENTORNO PARA EL TOKEN
-#    command: tunnel --no-autoupdate run
+#   --- CONECTOR DE CLOUDFLARE TUNNELS ---
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflare-tunnel
+    restart: unless-stopped
+    networks:
+      - public-tunnel-network
+    environment: ## TODO: CAMBIAR POR VARIABLE DE ENTORNO, NO PUEDE ESTAR EN EL REPOSITORIO
+      - TUNNEL_TOKEN=eyJhIjoiYmJhMDUzZWI0OTI5YzU1NTMzY2I0MjFjZjk3YzA3NjciLCJ0IjoiMTU1NDI0MzktODEzMy00YWI5LWI3YjUtNWQ1ZDc4MGMzZmIxIiwicyI6IlpXUXpNekkwWVdVdFpUQXhPQzAwWXpkbExXSTJNVGt0TlRFeVpqZzJaREUwTlRJMCJ9 #${CLOUDFLARE_TUNNEL_TOKEN} #VARIABLE DE ENTORNO PARA EL TOKEN
+    command: tunnel --no-autoupdate run
 #    depends_on:
 #      - gateway
 
@@ -235,12 +235,15 @@ services:
       - SPRING_CLOUD_CONFIG_RETRY_INITIAL_INTERVAL=2000
       - SPRING_CLOUD_CONFIG_RETRY_MULTIPLIER=1.5
       - NATS_URL=nats://nats-server:4222
+#      - SPRING_DATASOURCE_USERNAME=admin_user
+#      - SPRING_DATASOURCE_PASSWORD=pass
+      - SPRING_DATASOURCE_URL=jdbc:mariadb://mariadb:3306/app_db
     volumes:
       - ./logs/usuarios-ms:/app/logs
     networks:
       - microservices-network
 
-    # --- BFF ---
+    # --- PropertyService ---
   property-service:
     build:
       context: ..

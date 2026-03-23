@@ -17,9 +17,33 @@ logging:
   file:
     name: logs/orchestrator.log
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+
 nats:
   consumer:
-    durable-name: OrchestratorService
+  durable-name: OrchestratorService
+  subjects:
+    wildcards:
+      auctions: auctions.>
+      properties: properties.>
+    publisher:
+      auctions: auctions.get
+      properties: properties.get
+    subscriber:
+      auctions: auctions.response
+      properties: properties.response
+  streams:
+    auctions: AUCTIONS_STREAM
+    properties: PROPERTIES_STREAM
+
+schedules:
+  auctions:
+    get-auctions:
+      cron: "0 0 10 * * *" #"0 0 0 * * ?" # las doce de la noche
 
 server:
   port: 8082

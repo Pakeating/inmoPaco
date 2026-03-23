@@ -19,12 +19,13 @@ public class AuctionSchedulersImpl implements AuctionSchedulers {
     @Autowired
     AuctionsUsecaseService auctionsUsecaseService;
 
-    @Scheduled(cron = "0 0 0 * * ?")
+    @Scheduled(cron = "${schedules.auctions.get-auctions.cron:}")
     @Override
     public void scrapeBoeAuctions() {
         auctionConfig.getProvinces().forEach((province, code) -> {
             log.info("[AuctionSchedulersImpl] Triggering scrape for province: {} with code: {}", province, code);
             auctionsUsecaseService.getAuctions(AuctionsEvent.createEventMsg(AuctionsActions.GET_AUCTIONS, code));
         });
+        log.info("Events generated for {} provinces",auctionConfig.getProvinces().size());
     }
 }

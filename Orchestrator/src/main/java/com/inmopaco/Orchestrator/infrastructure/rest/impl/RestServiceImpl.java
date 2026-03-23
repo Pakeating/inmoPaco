@@ -10,10 +10,13 @@ import com.inmopaco.shared.events.enums.AuctionsActions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+
+@RequestMapping("/orchestrator")
 public class RestServiceImpl implements RestService {
 
     @Autowired
@@ -26,7 +29,7 @@ public class RestServiceImpl implements RestService {
     @Autowired
     private NatsStreamManagementService natsStreamManagementService;
 
-    @GetMapping("/orchestrator/auctions/launch-service")
+    @GetMapping("/auctions/launch-service")
     @Override
     public ResponseEntity<Object> executeGetAuctions(@RequestParam String auctionsPayload){
 
@@ -34,13 +37,13 @@ public class RestServiceImpl implements RestService {
         return ResponseEntity.accepted().build();
     }
 
-    @GetMapping("/orchestrator/auctions/launch-scheduler")
+    @GetMapping("/auctions/launch-scheduler")
     public ResponseEntity<Object> executeScheduler(){
         auctionSchedulers.scrapeBoeAuctions();
         return ResponseEntity.accepted().build();
     }
 
-    @GetMapping("/orchestrator/properties/launch-service")
+    @GetMapping("/properties/launch-service")
     @Override
     public ResponseEntity<Object> executeGetProperties(@RequestParam String propertiesPayload) {
 
@@ -48,14 +51,14 @@ public class RestServiceImpl implements RestService {
         return ResponseEntity.accepted().build();
     }
 
-    @GetMapping("/orchestrator/queue-management/purge")
+    @GetMapping("/queue-management/purge")
     @Override
     public ResponseEntity<Object> purgueQueues() throws Exception {
         natsStreamManagementService.purgeAllStreams();
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/orchestrator/queue-management/delete-consumer")
+    @GetMapping("/queue-management/delete-consumer")
     @Override
     public ResponseEntity<Object> deleteConsumer(String stream, String subject) throws Exception {
         natsStreamManagementService.deleteConsumer(stream, subject);

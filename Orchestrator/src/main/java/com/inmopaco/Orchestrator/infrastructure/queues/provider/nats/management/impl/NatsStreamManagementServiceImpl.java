@@ -1,5 +1,6 @@
 package com.inmopaco.Orchestrator.infrastructure.queues.provider.nats.management.impl;
 
+import com.inmopaco.Orchestrator.infrastructure.queues.provider.nats.config.NatsConfig;
 import com.inmopaco.Orchestrator.infrastructure.queues.provider.nats.management.NatsStreamManagementService;
 import io.nats.client.Connection;
 import io.nats.client.JetStreamManagement;
@@ -9,7 +10,6 @@ import io.nats.client.api.StorageType;
 import io.nats.client.api.StreamConfiguration;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.NoSuchElementException;
@@ -17,11 +17,12 @@ import java.util.NoSuchElementException;
 @Service
 @Log4j2
 public class NatsStreamManagementServiceImpl implements NatsStreamManagementService {
+
     @Autowired
     Connection connection;
 
-    @Value("${nats.consumer.durable-name:OrchestratorService}")
-    String durableName;
+    @Autowired
+    NatsConfig natsConfig;
 
     @Override
     public void createStream(Connection natsConnection, String streamName, String subject) throws Exception {
@@ -53,22 +54,27 @@ public class NatsStreamManagementServiceImpl implements NatsStreamManagementServ
 
     @Override
     public void purgeAllStreams() throws Exception {
-        purgeStream(connection, "AUCTIONS_STREAM");
-        purgeStream(connection, "PROPERTIES_STREAM");
+        natsConfig.getStreams().keySet().forEach(stream -> {
+            try {
+                purgeStream(connection, natsConfig.getStreams().get(stream));
+            } catch (Exception e) {
+                log.error("Error purging stream {}: {}", stream, e.getMessage());
+                throw new RuntimeException(e);
+            }
+        });
     }
 
     @Override
     public void deleteConsumer(String stream, String subject) throws NoSuchElementException{
         try {
             JetStreamManagement jsm = connection.jetStreamManagement();
-            ConsumerInfo info = jsm.getConsumerInfo(stream, durableName);
+            ConsumerInfo info = jsm.getConsumerInfo(stream, natsConfig.getDurableName());
             if (info != null) {
-                log.info("Deleting existing consumer '{}' on stream '{}'", durableName, stream);
-                jsm.deleteConsumer(stream, durableName);
+                log.info("Deleting existing consumer '{}' on stream '{}'", natsConfig.getDurableName(), stream);
+                jsm.deleteConsumer(stream, natsConfig.getDurableName());
             }
-
         } catch (Exception e) {
-            log.debug("Consumer '{}' not found on stream '{}', nothing to delete", durableName, stream);
+            log.debug("Consumer '{}' not found on stream '{}', nothing to delete", natsConfig.getDurableName(), stream);
             throw new NoSuchElementException(e);
         }
     }
