@@ -73,7 +73,6 @@
       
     } catch (error) {
       console.error('[AuctionSearch] Error fetching auctions:', error);
-      // Notificar que ha ocurrido un error
       document.dispatchEvent(new CustomEvent('auctions:error', {
         detail: { message: 'Ha ocurrido un error al obtener los datos' },
         bubbles: true

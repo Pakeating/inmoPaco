@@ -1,6 +1,9 @@
 ---
-
+/**
+ * Página principal de subastas
+ */
 import Layout from "../layouts/Layout.astro";
+import FilterModal from "../components/FilterModal.astro";
 ---
 
 <Layout title="Subastas - InmoPaco">
@@ -19,13 +22,22 @@ import Layout from "../layouts/Layout.astro";
 					<p>Todas las subastas activas hoy</p>
 				</div>
 			</a>
-			<div class="card">
+			<div id="filter-card" class="card clickable">
 				<h3>Filtrar Subastas</h3>
 				<p>Filtra por tipo, estado, localización...</p>
 			</div>
 		</section>
+
+    <FilterModal />
 	</main>
 </Layout>
+
+<script>
+  // abre el modal al hacer click
+  document.getElementById('filter-card')?.addEventListener('click', () => {
+    document.dispatchEvent(new CustomEvent('filter:open'));
+  });
+</script>
 
 <style>
 	main {
@@ -55,6 +67,14 @@ import Layout from "../layouts/Layout.astro";
 		margin-bottom: 1rem;
 		height: 100%;
 	}
+  .card.clickable {
+    cursor: pointer;
+    transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+  }
+  .card.clickable:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+  }
 	.card-link {
 		text-decoration: none;
 		color: inherit;
