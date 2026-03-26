@@ -1,4 +1,4 @@
-package com.inmopaco.Orchestrator.infrastructure.schedulers.config;
+package com.inmopaco.AuctionService.infrastructure.scraper.config;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;

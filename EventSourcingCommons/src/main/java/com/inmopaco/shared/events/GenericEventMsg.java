@@ -1,10 +1,10 @@
 package com.inmopaco.shared.events;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.aot.hint.annotation.RegisterReflectionForBinding;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -12,8 +12,7 @@ import java.util.UUID;
 
 @Log4j2
 @Getter
-@NoArgsConstructor
-@RegisterReflectionForBinding
+@NoArgsConstructor(onConstructor_ = {@JsonCreator})
 public abstract class GenericEventMsg implements Serializable {
 
     private UUID eventId;

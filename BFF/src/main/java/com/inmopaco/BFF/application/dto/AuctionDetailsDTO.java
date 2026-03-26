@@ -3,6 +3,7 @@ package com.inmopaco.BFF.application.dto;
 import lombok.Builder;
 import lombok.Data;
 
+import java.time.Instant;
 import java.util.List;
 
 @Data
@@ -11,8 +12,8 @@ public class AuctionDetailsDTO {
     private String auctionId;        // Identificador
     private String type;             // Tipo de subasta
     private String countingAccount;  // Cuenta expediente
-    private String dateOfStart;      // Fecha de inicio
-    private String dateOfEnd;        // Fecha de conclusión
+    private Instant dateOfStart;      // Fecha de inicio
+    private Instant dateOfEnd;        // Fecha de conclusión
     private String claimedAmount;    // Cantidad reclamada
     private String lotsNumber;       // Lotes
     private String boeAnnouncement;  // Anuncio BOE

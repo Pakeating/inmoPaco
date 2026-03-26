@@ -5,7 +5,9 @@ import lombok.*;
 
 @Entity
 @Table(name = "auction_lots")
-@Data
+@Getter
+@Setter
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -40,7 +42,7 @@ public class LotEntity {
     private String city;
     private String province;
 
-    @Column(name = "possession_status")
+    @Column(name = "possession_status", columnDefinition = "TEXT")
     private String possessionStatus;
 
     @Column(name = "postal_code")
@@ -49,7 +51,7 @@ public class LotEntity {
     @Column(name = "is_habitual_residence")
     private String isHabitualResidence;
 
-    @Column(name = "is_visitable")
+    @Column(name = "is_visitable", columnDefinition = "TEXT")
     private String isVisitable;
 
     // Relación con la subasta padre

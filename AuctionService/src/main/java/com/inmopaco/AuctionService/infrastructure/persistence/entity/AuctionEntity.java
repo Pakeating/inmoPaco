@@ -1,24 +1,27 @@
 package com.inmopaco.AuctionService.infrastructure.persistence.entity;
 
+import com.inmopaco.AuctionService.domain.enums.AuctionStatus;
+import com.inmopaco.AuctionService.domain.enums.ProcessingStatus;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Set;
 
 @Entity
 @Table(name = "auctions")
-@Data
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class AuctionEntity {
 
     @Id
     @Column(name = "auction_id")
+    @EqualsAndHashCode.Include
     private String auctionId;
 
     private String type;
@@ -27,10 +30,10 @@ public class AuctionEntity {
     private String countingAccount;
 
     @Column(name = "date_of_start")
-    private String dateOfStart;
+    private Instant dateOfStart;
 
     @Column(name = "date_of_end")
-    private String dateOfEnd;
+    private Instant dateOfEnd;
 
     @Column(name = "claimed_amount")
     private String claimedAmount;
@@ -127,5 +130,10 @@ public class AuctionEntity {
     private String courtName;
 
     private String expediente;
-    private String status;
+
+    @Enumerated(EnumType.STRING)
+    private AuctionStatus status; ///status de la subasta
+
+    @Enumerated(EnumType.STRING)
+    private ProcessingStatus processingStatus; ///status de procesamiento de la subasta
 }

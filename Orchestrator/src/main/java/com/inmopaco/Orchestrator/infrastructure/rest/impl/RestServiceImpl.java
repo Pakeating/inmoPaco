@@ -23,13 +23,12 @@ public class RestServiceImpl implements RestService {
     private AuctionsUsecaseService auctionsUsecaseService;
     @Autowired
     private AuctionSchedulers auctionSchedulers;
-
     @Autowired
     private PropertiesUsecaseService propertiesUsecaseService;
     @Autowired
     private NatsStreamManagementService natsStreamManagementService;
 
-    @GetMapping("/auctions/launch-service")
+    @GetMapping("/auctions/get")
     @Override
     public ResponseEntity<Object> executeGetAuctions(@RequestParam String auctionsPayload){
 
@@ -37,13 +36,21 @@ public class RestServiceImpl implements RestService {
         return ResponseEntity.accepted().build();
     }
 
-    @GetMapping("/auctions/launch-scheduler")
+    @GetMapping("/auctions/process")
+    @Override
+    public ResponseEntity<Object> executeProcessAuctions(String auctionsPayload){
+
+        auctionsUsecaseService.processAuctions(AuctionsEvent.createEventMsg(AuctionsActions.PROCESS_AUCTIONS, auctionsPayload));
+        return ResponseEntity.accepted().build();
+    }
+
+    @GetMapping("/auctions/scheduler")
     public ResponseEntity<Object> executeScheduler(){
         auctionSchedulers.scrapeBoeAuctions();
         return ResponseEntity.accepted().build();
     }
 
-    @GetMapping("/properties/launch-service")
+    @GetMapping("/properties/get")
     @Override
     public ResponseEntity<Object> executeGetProperties(@RequestParam String propertiesPayload) {
 

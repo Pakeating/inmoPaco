@@ -43,7 +43,7 @@ nats:
 schedules:
   auctions:
     get-auctions:
-      cron: "0 0 10 * * *" #"0 0 0 * * ?" # las doce de la noche
+      cron: "0 0 11 * * *" #las 11 del mediodia #"0 0 0 * * ?" # las doce de la noche
 
 server:
   port: 8082

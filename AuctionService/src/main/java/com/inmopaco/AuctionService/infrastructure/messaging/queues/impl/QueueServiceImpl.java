@@ -1,6 +1,7 @@
 package com.inmopaco.AuctionService.infrastructure.messaging.queues.impl;
 
 import com.inmopaco.AuctionService.application.usecases.ScrapeBoeAuctionsUsecase;
+import com.inmopaco.AuctionService.application.usecases.impl.ProcessAuctionsUsecaseImpl;
 import com.inmopaco.AuctionService.infrastructure.messaging.queues.QueueService;
 import com.inmopaco.AuctionService.infrastructure.messaging.queues.provider.GenericQueueProviderServiceImpl;
 import com.inmopaco.shared.events.AuctionsEvent;
@@ -10,6 +11,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -26,6 +28,9 @@ public class QueueServiceImpl implements QueueService {
     @Autowired
     @Lazy
     private ScrapeBoeAuctionsUsecase scrapeBoeAuctionsUsecase;
+    @Autowired
+    @Lazy
+    private ProcessAuctionsUsecaseImpl processAuctionsUsecase;
 
     @Override
     public <EventMsg extends GenericEventMsg> void publish(String subject, EventMsg eventMsg) {
@@ -53,18 +58,18 @@ public class QueueServiceImpl implements QueueService {
                 "AuctionsService",
                 "get",
                 AuctionsEvent.class,
-                this::eventHandler
+                this::auctionsEventHandler
         );
     }
 
-    private void eventHandler (AuctionsEvent event) {
-        log.info("Received event {} with action {}", event.getEventId(), event.getAction());
+    @Async
+    private void auctionsEventHandler(AuctionsEvent event) {
+        log.info("Received Auctions Event {} with action {}", event.getEventId(), event.getAction());
         event.consumed(LocalDateTime.now());
 
         switch (event.getAction()) {
             case GET_AUCTIONS -> scrapeBoeAuctionsUsecase.scrapeBoeAuctions(event);
-
-            case PROCESS_AUCTIONS -> throw new UnsupportedOperationException("Action not implemented yet: " + event.getAction());
+            case PROCESS_AUCTIONS -> processAuctionsUsecase.processAuctions(event);
 
             default -> throw new UnsupportedOperationException("Action not implemented: " + event.getAction());
         }

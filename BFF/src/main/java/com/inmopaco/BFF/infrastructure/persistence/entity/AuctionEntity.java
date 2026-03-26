@@ -3,14 +3,15 @@ package com.inmopaco.BFF.infrastructure.persistence.entity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.Instant;
 import java.util.List;
 
 @Entity
 @Table(name = "auctions")
-@Data
+@Getter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -26,10 +27,10 @@ public class AuctionEntity {
     private String countingAccount;
 
     @Column(name = "date_of_start")
-    private String dateOfStart;
+    private Instant dateOfStart;
 
     @Column(name = "date_of_end")
-    private String dateOfEnd;
+    private Instant dateOfEnd;
 
     @Column(name = "claimed_amount")
     private String claimedAmount;

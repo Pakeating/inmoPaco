@@ -1,4 +1,4 @@
-package com.inmopaco.Orchestrator.infrastructure.schedulers.config;
+package com.inmopaco.AuctionService.infrastructure.scraper.config;
 
 import org.springframework.beans.factory.config.YamlPropertiesFactoryBean;
 import org.springframework.core.env.PropertiesPropertySource;

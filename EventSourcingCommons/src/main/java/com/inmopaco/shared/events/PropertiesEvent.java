@@ -1,15 +1,14 @@
 package com.inmopaco.shared.events;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.inmopaco.shared.events.enums.PropertiesActions;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.aot.hint.annotation.RegisterReflectionForBinding;
 
 import java.util.UUID;
 
 @Getter
-@NoArgsConstructor
-@RegisterReflectionForBinding
+@NoArgsConstructor(onConstructor_ = {@JsonCreator})
 public class PropertiesEvent extends GenericEventMsg {
     private PropertiesActions action;
     private String payload;

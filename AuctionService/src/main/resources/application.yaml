@@ -1,10 +1,10 @@
 spring:
+  application:
+    name: auction-service
   boot:
     admin:
       client:
         url: "http://admin-server:9090/admin"
-  application:
-    name: auction-service
   config:
     import: "optional:configserver:http://config-service-v3:8888"
   datasource:

@@ -13,7 +13,7 @@ public class JsoupScraperProviderServiceTests {
 
     @Test
     public void testScraper() {
-        scrapingService.fetchSearchResults("47");
+        scrapingService.fetchAllSearchResults();
     }
 
 }

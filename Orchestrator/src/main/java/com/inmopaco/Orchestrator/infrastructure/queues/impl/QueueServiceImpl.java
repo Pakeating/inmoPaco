@@ -62,18 +62,17 @@ public class QueueServiceImpl implements QueueService {
                 durableName,
                 "get",
                 AuctionsEvent.class,
-                this::eventHandler
+                this::auctionsEventHandler
         );
     }
 
-    private void eventHandler (AuctionsEvent event) {
-        log.info("Received event {} with action {}", event.getEventId(), event.getAction());
+    private void auctionsEventHandler(AuctionsEvent event) {
+        log.info("Received Auctions Event {}", event.getEventId());
         event.consumed(LocalDateTime.now());
 
         switch (event.getAction()) {
-            case RETRIEVED_AUCTIONS -> auctionsUsecaseService.receivedAuctionsResponse(event);
-
-            case PROCESSED_AUCTIONS -> throw new UnsupportedOperationException("Action not implemented yet: " + event.getAction());
+            case RETRIEVED_AUCTIONS -> auctionsUsecaseService.receivedGetAuctionsResponse(event);
+            case PROCESSED_AUCTIONS -> auctionsUsecaseService.receivedProcessedAuctionsResponse(event);
 
             default -> throw new UnsupportedOperationException("Action not implemented: " + event.getAction());
         }

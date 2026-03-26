@@ -235,8 +235,6 @@ services:
       - SPRING_CLOUD_CONFIG_RETRY_INITIAL_INTERVAL=2000
       - SPRING_CLOUD_CONFIG_RETRY_MULTIPLIER=1.5
       - NATS_URL=nats://nats-server:4222
-#      - SPRING_DATASOURCE_USERNAME=admin_user
-#      - SPRING_DATASOURCE_PASSWORD=pass
       - SPRING_DATASOURCE_URL=jdbc:mariadb://mariadb:3306/app_db
     volumes:
       - ./logs/usuarios-ms:/app/logs

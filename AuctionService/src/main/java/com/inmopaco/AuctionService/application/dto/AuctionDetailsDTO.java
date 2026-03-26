@@ -1,8 +1,11 @@
 package com.inmopaco.AuctionService.application.dto;
 
+import com.inmopaco.AuctionService.domain.enums.AuctionStatus;
+import com.inmopaco.AuctionService.domain.enums.ProcessingStatus;
 import lombok.Builder;
 import lombok.Data;
 
+import java.time.Instant;
 import java.util.List;
 
 @Data
@@ -11,8 +14,8 @@ public class AuctionDetailsDTO {
     private String auctionId;        // Identificador
     private String type;             // Tipo de subasta
     private String countingAccount;  // Cuenta expediente
-    private String dateOfStart;      // Fecha de inicio
-    private String dateOfEnd;        // Fecha de conclusión
+    private Instant dateOfStart;      // Fecha de inicio
+    private Instant dateOfEnd;        // Fecha de conclusión
     private String claimedAmount;    // Cantidad reclamada
     private String lotsNumber;       // Lotes
     private String boeAnnouncement;  // Anuncio BOE
@@ -47,5 +50,6 @@ public class AuctionDetailsDTO {
 
     private String courtName;//ESTOS TRES PROVIENEN DE SUMMARY
     private String expediente;
-    private String status;
+    private AuctionStatus status;
+    private ProcessingStatus processingStatus;
 }

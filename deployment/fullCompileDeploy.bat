@@ -14,25 +14,25 @@ echo ======================================================
 ::--no-cache
 
 echo Compilando Admin...
-call docker-compose -f docker-compose.yml build admin-server|| (echo Error en Admin && pause && exit /b)
+::call docker-compose -f docker-compose.yml build admin-server|| (echo Error en Admin && pause && exit /b)
 
 echo Compilando Config Service...
-call docker-compose -f docker-compose.yml build --no-cache config-service-v3|| (echo Error en Config Service && pause && exit /b)
+::call docker-compose -f docker-compose.yml build --no-cache config-service-v3|| (echo Error en Config Service && pause && exit /b)
 
 echo Compilando API Gateway...
-call docker-compose -f docker-compose.yml build  api-gateway-v3|| (echo Error en API Gateway && pause && exit /b)
+::call docker-compose -f docker-compose.yml build  api-gateway-v3|| (echo Error en API Gateway && pause && exit /b)
 
 echo Compilando Libreria de Eventos...
-call docker build -t eventsourcing-base -f ../EventSourcingCommons/Dockerfile .. || (echo Error en EventSourcingCommons && pause && exit /b)
+::call docker build -t eventsourcing-base -f ../EventSourcingCommons/Dockerfile .. || (echo Error en EventSourcingCommons && pause && exit /b)
 
 echo Compilando Orchestrator...
-call docker-compose -f docker-compose.yml build  orchestrator || (echo Error en Orchestrator && pause && exit /b)
+::call docker-compose -f docker-compose.yml build  orchestrator || (echo Error en Orchestrator && pause && exit /b)
 
 echo Compilando Auction Service...
 call docker-compose -f docker-compose.yml build  auction-service|| (echo Error en Auction Service && pause && exit /b)
 
 echo Compilando Property Service...
-call docker-compose -f docker-compose.yml build  property-service|| (echo Error en Property Service && pause && exit /b)
+::call docker-compose -f docker-compose.yml build  property-service|| (echo Error en Property Service && pause && exit /b)
 
 echo Compilando BFF...
 call docker-compose -f docker-compose.yml build  bff|| (echo Error en BFF && pause && exit /b)

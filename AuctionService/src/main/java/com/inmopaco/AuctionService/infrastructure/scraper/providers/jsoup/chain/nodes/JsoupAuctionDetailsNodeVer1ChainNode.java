@@ -11,6 +11,9 @@ import org.jsoup.nodes.Element;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.time.Instant;
+import java.time.OffsetDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Log4j2
@@ -66,8 +69,8 @@ public class JsoupAuctionDetailsNodeVer1ChainNode extends AbstractJsoupAuctionDe
                 .auctionId(extractValue(tableBody, "Identificador"))
                 .type(extractValue(tableBody, "Tipo de subasta"))
                 .countingAccount(extractValue(tableBody, "Cuenta expediente"))
-                .dateOfStart(extractValue(tableBody, "Fecha de inicio"))
-                .dateOfEnd(extractValue(tableBody, "Fecha de conclusión"))
+                .dateOfStart(date2Instant(extractValue(tableBody, "Fecha de inicio")))
+                .dateOfEnd(date2Instant(extractValue(tableBody, "Fecha de conclusión")))
                 .claimedAmount(extractValue(tableBody, "Cantidad reclamada"))
                 .lotsNumber(extractValue(tableBody, "Lotes"))
                 .boeAnnouncement(extractValue(tableBody, "Anuncio BOE"))
@@ -79,5 +82,12 @@ public class JsoupAuctionDetailsNodeVer1ChainNode extends AbstractJsoupAuctionDe
                 .documentUrls(pdfs)
                 ;
         return context;
+    }
+
+    private Instant date2Instant(String date){
+        String isoDate = date.split("\\(ISO:")[1]
+                .replace(")", "")
+                .trim();
+        return OffsetDateTime.parse(isoDate, DateTimeFormatter.ISO_OFFSET_DATE_TIME).toInstant();
     }
 }

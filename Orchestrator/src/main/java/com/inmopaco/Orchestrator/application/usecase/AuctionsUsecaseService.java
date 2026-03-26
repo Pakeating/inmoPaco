@@ -2,6 +2,7 @@ package com.inmopaco.Orchestrator.application.usecase;
 
 import com.inmopaco.Orchestrator.infrastructure.queues.QueueService;
 import com.inmopaco.shared.events.AuctionsEvent;
+import com.inmopaco.shared.events.enums.AuctionsActions;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,14 +18,24 @@ public class AuctionsUsecaseService {
     @Autowired
     @Lazy
     private QueueService queueService;
-    private int counter = 0;
 
     public void getAuctions(AuctionsEvent event) {
         queueService.publish(publishAuctionsSubject, event);
     }
+    public void processAuctions(AuctionsEvent event) {
+        queueService.publish(publishAuctionsSubject, event);
+    }
 
-    public void receivedAuctionsResponse(AuctionsEvent event) {
-        counter++;
-        log.info("Received auctions response for event {} with action {}, event number: {}", event.getEventId(), event.getAction(), counter);
+    public void receivedGetAuctionsResponse(AuctionsEvent event) {
+        log.info("Received auctions response for event {} with action {} and parent: {}", event.getEventId(), event.getAction(), event.getParentEventId());
+        log.info("Sending AuctionsProcessing order");
+
+        var childEvent = AuctionsEvent.createEventMsg(AuctionsActions.PROCESS_AUCTIONS);
+        childEvent.setParentEventId(event.getEventId());
+        processAuctions(childEvent);
+    }
+
+    public void receivedProcessedAuctionsResponse(AuctionsEvent event) {
+        log.info("Received auctions response for event {} with action {} and parent: {}", event.getEventId(), event.getAction(), event.getParentEventId());
     }
 }
