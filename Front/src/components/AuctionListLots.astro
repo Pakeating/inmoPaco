@@ -1,0 +1,164 @@
+---
+/**
+ * componente de lotes
+ */
+---
+<script>
+  class AuctionListLots extends HTMLElement {
+    set lots(lotsData) {
+      if (!lotsData || lotsData.length === 0) {
+        this.classList.add('hidden');
+        this.innerHTML = '';
+        return;
+      }
+
+      this.classList.remove('hidden');
+      
+      this.innerHTML = `
+        <div class="lots-wrapper">
+          <h4 class="lots-title">Lotes incluidos (<span class="lots-count">${lotsData.length}</span>):</h4>
+          <div class="lots-list">
+            ${lotsData.map((lot) => `
+              <div class="lot-item">
+                <div class="lot-header">
+                  <span class="lot-title text-ellipsis" title="${lot.lotTitle || 'Lote'}">${lot.lotTitle || 'Lote'}</span>
+                </div>
+                
+                <div class="lot-info-grid">
+                  <div class="lot-info-item full-width">
+                    <span class="lot-label">Dirección:</span>
+                    <span class="lot-value">${lot.propertyAddress || '-'}, ${lot.city || ''} (${lot.province || ''})</span>
+                  </div>
+                  <div class="lot-info-item">
+                    <span class="lot-label">Ref. Catastral:</span>
+                    <span class="lot-value">${lot.cadastralReference || '-'}</span>
+                  </div>
+                  <div class="lot-info-item">
+                    <span class="lot-label">Valor Subasta:</span>
+                    <span class="lot-value">${lot.auctionValue || '-'}</span>
+                  </div>
+                  <div class="lot-info-item">
+                    <span class="lot-label">Depósito:</span>
+                    <span class="lot-value">${lot.depositAmount || '-'}</span>
+                  </div>
+                  ${lot.goodsDescription ? `
+                    <div class="lot-info-item full-width">
+                      <span class="lot-label">Descripción:</span>
+                      <p class="lot-description">${lot.goodsDescription}</p>
+                    </div>
+                  ` : ''}
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    }
+  }
+
+  if (!customElements.get('auction-list-lots')) {
+    customElements.define('auction-list-lots', AuctionListLots);
+  }
+</script>
+
+<style is:global>
+  auction-list-lots {
+    display: block;
+  }
+  auction-list-lots.hidden {
+    display: none !important;
+  }
+  auction-list-lots .lots-wrapper {
+    margin-bottom: 1.5rem;
+    padding-top: 0.5rem;
+    border-top: 1px dashed var(--border-color);
+  }
+  auction-list-lots .lots-title {
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+    margin-bottom: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  auction-list-lots .lots-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    max-height: 180px;
+    overflow-y: auto;
+    padding-right: 0.25rem;
+  }
+  auction-list-lots .lots-list::-webkit-scrollbar {
+    width: 4px;
+  }
+  auction-list-lots .lots-list::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  auction-list-lots .lots-list::-webkit-scrollbar-thumb {
+    background-color: var(--border-color);
+    border-radius: 4px;
+  }
+  
+  auction-list-lots .lot-item {
+    background-color: var(--color-bg-card, #ffffff);
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
+    padding: 0.75rem;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  }
+  auction-list-lots .lot-header {
+    margin-bottom: 0.5rem;
+  }
+  auction-list-lots .lot-title {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--color-primary);
+  }
+  auction-list-lots .text-ellipsis {
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  .lot-info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+    padding-top: 0.5rem;
+  }
+  
+  .lot-info-item {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .lot-info-item.full-width {
+    grid-column: 1 / -1;
+  }
+  
+  .lot-label {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+    margin-bottom: 0.15rem;
+    font-weight: 600;
+  }
+  
+  .lot-value {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--color-text-main);
+  }
+  
+  .lot-description {
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+    margin-top: 0.25rem;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+</style>

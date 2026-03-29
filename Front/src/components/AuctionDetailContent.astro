@@ -6,8 +6,10 @@
 ---
 
 <div id="auction-detail-wrapper">
-  <div id="loading-detail" class="loading-state">Obteniendo todos los detalles de la subasta...</div>
-  
+  <div id="loading-detail" class="loading-state">
+    Obteniendo todos los detalles de la subasta...
+  </div>
+
   <div id="auction-detail-content" class="hidden">
     <div class="detail-container">
       <div class="detail-main">
@@ -17,7 +19,10 @@
             <div class="status-badge" data-status=""></div>
           </div>
           <h1 class="property-address"></h1>
-          <p class="location"><span class="icon">📍</span> <span class="location-text"></span></p>
+          <p class="location">
+            <span class="icon">📍</span>
+            <span class="location-text"></span>
+          </p>
         </header>
 
         <section class="detail-section">
@@ -51,7 +56,7 @@
             </div>
           </div>
         </section>
-        
+
         <section class="detail-section">
           <h2>Descripción de los bienes</h2>
           <p class="value goods-description"></p>
@@ -195,7 +200,7 @@
           </ul>
         </section>
       </div>
-      
+
       <aside class="detail-sidebar">
         <div class="sidebar-info">
           <h3>Resumen Rápido</h3>
@@ -219,130 +224,134 @@
 </div>
 
 <script>
-  const wrapper = document.getElementById('auction-detail-content');
-  const loading = document.getElementById('loading-detail');
-  const notFound = document.getElementById('not-found-detail');
+  const wrapper = document.getElementById("auction-detail-content");
+  const loading = document.getElementById("loading-detail");
+  const notFound = document.getElementById("not-found-detail");
 
   // Escuchar el evento cuando se obtienen los datos de la subasta
-  document.addEventListener('auctions:fetched', (event) => {
+  document.addEventListener("auctions:fetched", (event) => {
     // @ts-ignore
     const { results } = event.detail;
-    
-    loading.classList.add('hidden');
+
+    loading.classList.add("hidden");
 
     if (!results || results.length === 0) {
-      notFound.classList.remove('hidden');
-      wrapper.classList.add('hidden');
+      notFound.classList.remove("hidden");
+      wrapper.classList.add("hidden");
       return;
     }
 
-    const auction = results[0]; 
-    notFound.classList.add('hidden');
-    wrapper.classList.remove('hidden');
-
+    const auction = results[0];
+    notFound.classList.add("hidden");
+    wrapper.classList.remove("hidden");
 
     const setT = (selector, value) => {
       if (!wrapper) return;
       const el = wrapper.querySelector(selector);
-      if (el) el.textContent = value || 'No disponible';
+      if (el) el.textContent = value || "No disponible";
     };
 
     // rellenar header
-    const badge = wrapper.querySelector('.status-badge') as HTMLElement;
+    const badge = wrapper.querySelector(".status-badge") as HTMLElement;
     if (badge) {
       badge.textContent = auction.status;
       badge.dataset.status = auction.status;
     }
-    
-    setT('.property-type', auction.type);
-    setT('.property-address', auction.propertyAddress);
-    setT('.location-text', `${auction.city}, ${auction.province}`);
+
+    setT(".property-type", auction.type);
+    setT(".property-address", auction.propertyAddress);
+    setT(".location-text", `${auction.city}, ${auction.province}`);
 
     // rellenar info económica
-    setT('.auction-value', auction.auctionValue);
-    setT('.deposit-amount', auction.depositAmount);
-    setT('.appraisal', auction.appraisal);
-    setT('.minimum-bid', auction.minimumBid);
-    setT('.bid-increments', auction.bidIncrements);
-    setT('.claimed-amount', auction.claimedAmount);
+    setT(".auction-value", auction.auctionValue);
+    setT(".deposit-amount", auction.depositAmount);
+    setT(".appraisal", auction.appraisal);
+    setT(".minimum-bid", auction.minimumBid);
+    setT(".bid-increments", auction.bidIncrements);
+    setT(".claimed-amount", auction.claimedAmount);
 
     // descripción y ubicación
-    setT('.goods-description', auction.goodsDescription);
-    setT('.cadastral-reference', auction.cadastralReference);
-    setT('.postal-code', auction.postalCode);
-    setT('.province-text', auction.province);
-    setT('.city-text', auction.city);
-    setT('.cru-text', auction.cru);
-    setT('.registry-data', auction.registryData);
+    setT(".goods-description", auction.goodsDescription);
+    setT(".cadastral-reference", auction.cadastralReference);
+    setT(".postal-code", auction.postalCode);
+    setT(".province-text", auction.province);
+    setT(".city-text", auction.city);
+    setT(".cru-text", auction.cru);
+    setT(".registry-data", auction.registryData);
 
     // autoridad
-    setT('.authority-code', auction.authorityCode);
-    setT('.authority-description', auction.authorityDescription);
-    setT('.authority-address', auction.authorityAddress);
-    setT('.authority-phone', auction.authorityPhone);
-    setT('.authority-email', auction.authorityEmail);
-    setT('.authority-fax', auction.authorityFax);
+    setT(".authority-code", auction.authorityCode);
+    setT(".authority-description", auction.authorityDescription);
+    setT(".authority-address", auction.authorityAddress);
+    setT(".authority-phone", auction.authorityPhone);
+    setT(".authority-email", auction.authorityEmail);
+    setT(".authority-fax", auction.authorityFax);
 
     // información legal
-    setT('.auction-id', auction.auctionId);
-    setT('.expediente', auction.expediente);
-    setT('.court-name', auction.courtName);
-    setT('.boe-announcement', auction.boeAnnouncement);
-    setT('.date-start', auction.dateOfStart);
-    setT('.date-end', auction.dateOfEnd);
-    setT('.is-habitual-residence', auction.isHabitualResidence);
-    setT('.is-visitable', auction.isVisitable);
-    setT('.possession-status', auction.possessionStatus);
-    setT('.has-bids', auction.hasBids ? 'Sí' : 'No');
+    setT(".auction-id", auction.auctionId);
+    setT(".expediente", auction.expediente);
+    setT(".court-name", auction.courtName);
+    setT(".boe-announcement", auction.boeAnnouncement);
+    setT(".date-start", auction.dateOfStart);
+    setT(".date-end", auction.dateOfEnd);
+    setT(".is-habitual-residence", auction.isHabitualResidence);
+    setT(".is-visitable", auction.isVisitable);
+    setT(".possession-status", auction.possessionStatus);
+    setT(".has-bids", auction.hasBids ? "Sí" : "No");
 
     // acreedor
-    setT('.creditor-name', auction.creditorName);
-    setT('.creditor-nif', auction.creditorNif);
-    setT('.creditor-address', auction.creditorAddress);
+    setT(".creditor-name", auction.creditorName);
+    setT(".creditor-nif", auction.creditorNif);
+    setT(".creditor-address", auction.creditorAddress);
 
     // barra lateral
-    setT('.detail-status', auction.status);
-    setT('.sidebar-has-bids', auction.hasBids ? 'Sí' : 'No');
-    setT('.lots-number', auction.lotsNumber);
-    setT('.counting-account', auction.countingAccount);
+    setT(".detail-status", auction.status);
+    setT(".sidebar-has-bids", auction.hasBids ? "Sí" : "No");
+    setT(".lots-number", auction.lotsNumber);
+    setT(".counting-account", auction.countingAccount);
 
     // documentos
-    const docsSection = document.getElementById('docs-section');
-    const docsList = document.getElementById('docs-list');
-    if (docsSection && docsList && auction.documentUrls && auction.documentUrls.length > 0) {
-      docsSection.classList.remove('hidden');
-      docsList.innerHTML = '';
-      auction.documentUrls.forEach(url => {
-        const li = document.createElement('li');
-        const a = document.createElement('a');
+    const docsSection = document.getElementById("docs-section");
+    const docsList = document.getElementById("docs-list");
+    if (
+      docsSection &&
+      docsList &&
+      auction.documentUrls &&
+      auction.documentUrls.length > 0
+    ) {
+      docsSection.classList.remove("hidden");
+      docsList.innerHTML = "";
+      auction.documentUrls.forEach((url) => {
+        const li = document.createElement("li");
+        const a = document.createElement("a");
         a.href = url;
-        a.target = '_blank';
-        a.textContent = 'Ver documento adjunto';
+        a.target = "_blank";
+        a.textContent = "Ver documento adjunto";
         li.appendChild(a);
         docsList.appendChild(li);
       });
     }
 
     // Lotes
-    const lotsSection = document.getElementById('lots-section');
-    const lotsContainer = document.getElementById('lots-container');
-    const lotsCountEl = document.getElementById('lots-count');
+    const lotsSection = document.getElementById("lots-section");
+    const lotsContainer = document.getElementById("lots-container");
+    const lotsCountEl = document.getElementById("lots-count");
     if (auction.lots && auction.lots.length > 0) {
-      lotsSection.classList.remove('hidden');
+      lotsSection.classList.remove("hidden");
       lotsCountEl.textContent = auction.lots.length;
-      lotsContainer.innerHTML = '';
-      auction.lots.forEach(lot => {
-        const lotCard = document.createElement('div');
-        lotCard.className = 'lot-card';
+      lotsContainer.innerHTML = "";
+      auction.lots.forEach((lot) => {
+        const lotCard = document.createElement("div");
+        lotCard.className = "lot-card";
         lotCard.innerHTML = `
-          <h4>${lot.lotTitle || 'Lote sin título'}</h4>
+          <h4>${lot.lotTitle || "Lote sin título"}</h4>
           <p class="lot-id">ID: ${lot.lotId}</p>
           <div class="lot-data">
-            <p><strong>Valor:</strong> ${lot.auctionValue || 'N/D'}</p>
-            <p><strong>Puja Mín:</strong> ${lot.bidSteps || 'N/D'}</p>
-            <p><strong>Depósito:</strong> ${lot.depositAmount || 'N/D'}</p>
+            <p><strong>Valor:</strong> ${lot.auctionValue || "N/D"}</p>
+            <p><strong>Puja Mín:</strong> ${lot.bidSteps || "N/D"}</p>
+            <p><strong>Depósito:</strong> ${lot.depositAmount || "N/D"}</p>
           </div>
-          <p class="lot-desc">${lot.goodsDescription || ''}</p>
+          <p class="lot-desc">${lot.goodsDescription || ""}</p>
         `;
         lotsContainer.appendChild(lotCard);
       });
@@ -469,8 +478,12 @@
     color: var(--color-text-main);
   }
 
-  .mt-4 { margin-top: 1rem; }
-  .mb-4 { margin-bottom: 1rem; }
+  .mt-4 {
+    margin-top: 1rem;
+  }
+  .mb-4 {
+    margin-bottom: 1rem;
+  }
 
   /* Lots */
   .lots-grid {
@@ -546,24 +559,24 @@
   }
 
   .status-badge {
-		padding: 0.4rem 1rem;
-		border-radius: 2rem;
-		font-size: 0.8rem;
-		font-weight: 700;
-		text-transform: uppercase;
-	}
-	.status-badge[data-status="En curso"] {
-		background-color: #22c55e;
-		color: white;
-	}
-	.status-badge[data-status="Próximamente"] {
-		background-color: #f59e0b;
-		color: white;
-	}
-	.status-badge[data-status="Finalizada"] {
-		background-color: #ef4444;
-		color: white;
-	}
+    padding: 0.4rem 1rem;
+    border-radius: 2rem;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+  .status-badge[data-status="En curso"] {
+    background-color: #22c55e;
+    color: white;
+  }
+  .status-badge[data-status="Próximamente"] {
+    background-color: #f59e0b;
+    color: white;
+  }
+  .status-badge[data-status="Finalizada"] {
+    background-color: #ef4444;
+    color: white;
+  }
 
   .btn-primary-white {
     background: white;
@@ -586,7 +599,13 @@
     font-style: italic;
   }
 
-  .hidden { display: none; }
+  .hidden {
+    display: none;
+  }
 
-  .block { display: block; text-align: center; width: 100%; }
+  .block {
+    display: block;
+    text-align: center;
+    width: 100%;
+  }
 </style>

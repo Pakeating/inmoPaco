@@ -5,7 +5,10 @@
  */
 import LoadingState from './LoadingState.astro';
 import ErrorState from './ErrorState.astro';
+import AuctionListLots from './AuctionListLots.astro';
 ---
+
+<AuctionListLots />
 
 <div id="auction-results-wrapper">
 	
@@ -43,8 +46,10 @@ import ErrorState from './ErrorState.astro';
           <span class="value deposit-amount"></span>
         </div>
       </div>
+
+      <auction-list-lots class="hidden"></auction-list-lots>
       
-      <a href="" class="btn-primary block detail-link">Ver Detalles</a>
+      <a href="" class="btn-primary block detail-link" style="margin-top: auto;">Ver Detalles</a>
     </div>
   </div>
 </template>
@@ -112,6 +117,13 @@ import ErrorState from './ErrorState.astro';
       clone.querySelector('.auction-value').textContent = auction.auctionValue;
       clone.querySelector('.deposit-amount').textContent = auction.depositAmount;
       
+      // Manejo de lotes
+      const lotsComponent = clone.querySelector('auction-list-lots');
+      if (lotsComponent) {
+        // @ts-ignore
+        lotsComponent.lots = auction.lots;
+      }
+
       clone.querySelector('.detail-link').href = `/auctionDetails?auctionIds=${auction.auctionId}`;
       
       container.appendChild(clone);
