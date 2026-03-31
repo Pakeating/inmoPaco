@@ -9,7 +9,7 @@
 
 <script>
   const performSearch = async () => {
-    // Notificar que la carga ha comenzado
+    // evento de carga iniciada
     document.dispatchEvent(new CustomEvent('auctions:loading', { bubbles: true }));
 
     const params = new URLSearchParams(window.location.search);
@@ -31,14 +31,28 @@
     console.log('[AuctionSearch] Fetching from API with filters:', filters, { page, size, sortBy });
 
     try {
-      const query = new URLSearchParams({ page, size, sortBy }).toString();
-      const response = await fetch(`/api/auctions?${query}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(filters)
-      });
+      const queryParams = new URLSearchParams({ page, size, sortBy }).toString();
+      let response;
+
+      if (filters.auctionIds.length === 1 && Object.values({ ...filters, auctionIds: [] }).every(v => v === null || v === undefined || v === '' || (Array.isArray(v) && v.length === 0))) {
+        // si solo hay un ID y ningún otro filtro, usamos GET con pathvariable (simulado con query param id para el proxy)
+        console.log('[AuctionSearch] Single ID detected, using GET');
+        response = await fetch(`/api/auctions?id=${filters.auctionIds[0]}&${queryParams}`, {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/json'
+          }
+        });
+      } else {
+        // sino, post con body
+        response = await fetch(`/api/auctions?${queryParams}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(filters)
+        });
+      }
 
       if (!response.ok) {
         throw new Error(`Error en la respuesta: ${response.status}`);
@@ -50,7 +64,7 @@
       // los resultados están en el campo 'content'
       const results = data.content || [];
 
-      // Extraer info de paginación
+      // info de paginación
       const p = data.page || data;
       const pagination = {
         page: Number(p.number ?? 0),
@@ -82,7 +96,7 @@
 
   // Ejecutar búsqueda cuando el DOM esté listo
   document.addEventListener('DOMContentLoaded', () => {
-    // Pequeño delay para asegurar que los listeners de otros componentes estén registrados
+    // delay para asegurar que los listeners de otros componentes estén registrados
     setTimeout(performSearch, 50);
   });
 </script>

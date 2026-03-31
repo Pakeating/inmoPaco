@@ -36,6 +36,8 @@ import AuctionListLots from './AuctionListLots.astro';
       <h3 class="property-address"></h3>
       <p class="location"><span class="icon">📍</span> <span class="location-text"></span></p>
       
+      <auction-list-lots class="hidden"></auction-list-lots>
+      
       <div class="auction-details">
         <div class="detail">
           <span class="label">Valor Subasta</span>
@@ -46,8 +48,6 @@ import AuctionListLots from './AuctionListLots.astro';
           <span class="value deposit-amount"></span>
         </div>
       </div>
-
-      <auction-list-lots class="hidden"></auction-list-lots>
       
       <a href="" class="btn-primary block detail-link" style="margin-top: auto;">Ver Detalles</a>
     </div>
@@ -119,9 +119,17 @@ import AuctionListLots from './AuctionListLots.astro';
       
       // Manejo de lotes
       const lotsComponent = clone.querySelector('auction-list-lots');
+      const auctionDetails = clone.querySelector('.auction-details');
+      
+      const isMultiLot = auction.lots && auction.lots.length > 1;
+
       if (lotsComponent) {
         // @ts-ignore
         lotsComponent.lots = auction.lots;
+      }
+
+      if (isMultiLot && auctionDetails) {
+        auctionDetails.classList.add('hidden');
       }
 
       clone.querySelector('.detail-link').href = `/auctionDetails?auctionIds=${auction.auctionId}`;

@@ -25,7 +25,14 @@
           </p>
         </header>
 
-        <section class="detail-section">
+        <section id="lots-section" class="detail-section hidden">
+          <h2>Lotes (<span id="lots-count">0</span>)</h2>
+          <div id="lots-container" class="lots-accordion">
+            <!-- Los lotes se inyectarán aquí -->
+          </div>
+        </section>
+
+        <section id="econ-section" class="detail-section">
           <h2>Información Económica</h2>
           <div class="highlight-grid">
             <div class="highlight-item">
@@ -57,12 +64,12 @@
           </div>
         </section>
 
-        <section class="detail-section">
+        <section id="desc-section" class="detail-section">
           <h2>Descripción de los bienes</h2>
           <p class="value goods-description"></p>
         </section>
 
-        <section class="detail-section">
+        <section id="loc-section" class="detail-section">
           <h2>Ubicación y Referencias</h2>
           <div class="data-grid">
             <div class="data-item">
@@ -186,12 +193,6 @@
           </div>
         </section>
 
-        <section id="lots-section" class="detail-section hidden">
-          <h2>Lotes (<span id="lots-count">0</span>)</h2>
-          <div id="lots-container" class="lots-grid">
-            <!-- Los lotes se inyectarán aquí -->
-          </div>
-        </section>
 
         <section id="docs-section" class="detail-section hidden">
           <h2>Documentos Adjuntos</h2>
@@ -336,30 +337,109 @@
     const lotsSection = document.getElementById("lots-section");
     const lotsContainer = document.getElementById("lots-container");
     const lotsCountEl = document.getElementById("lots-count");
+    
+    // secciones que se ocultan para multilote
+    const econSection = document.getElementById("econ-section");
+    const descSection = document.getElementById("desc-section");
+    const locSection = document.getElementById("loc-section");
+
     if (auction.lots && auction.lots.length > 0) {
+      const isMultiLot = auction.lots.length > 1;
+      
       lotsSection.classList.remove("hidden");
       lotsCountEl.textContent = auction.lots.length;
       lotsContainer.innerHTML = "";
-      auction.lots.forEach((lot) => {
-        const lotCard = document.createElement("div");
-        lotCard.className = "lot-card";
-        lotCard.innerHTML = `
-          <h4>${lot.lotTitle || "Lote sin título"}</h4>
-          <p class="lot-id">ID: ${lot.lotId}</p>
-          <div class="lot-data">
-            <p><strong>Valor:</strong> ${lot.auctionValue || "N/D"}</p>
-            <p><strong>Puja Mín:</strong> ${lot.bidSteps || "N/D"}</p>
-            <p><strong>Depósito:</strong> ${lot.depositAmount || "N/D"}</p>
+
+      if (isMultiLot) {
+        econSection?.classList.add("hidden");
+        descSection?.classList.add("hidden");
+        locSection?.classList.add("hidden");
+      } else {
+        econSection?.classList.remove("hidden");
+        descSection?.classList.remove("hidden");
+        locSection?.classList.remove("hidden");
+      }
+
+      auction.lots.forEach((lot, index) => {
+        const accordionItem = document.createElement("div");
+        accordionItem.className = "accordion-item";
+        
+        accordionItem.innerHTML = `
+          <button class="accordion-header" type="button">
+            <span class="accordion-title">
+              <strong>Lote ${index + 1}:</strong> ${lot.lotTitle || "Sin título"}
+            </span>
+            <span class="accordion-icon">▼</span>
+          </button>
+          <div class="accordion-content">
+            <div class="accordion-content-inner">
+              <div class="lot-data-grid">
+                <div class="data-item">
+                  <span class="label">ID Lote:</span>
+                  <span class="value">${lot.lotId}</span>
+                </div>
+                <div class="data-item">
+                  <span class="label">Valor Subasta:</span>
+                  <span class="value">${lot.auctionValue || "N/D"}</span>
+                </div>
+                <div class="data-item">
+                  <span class="label">Depósito:</span>
+                  <span class="value">${lot.depositAmount || "N/D"}</span>
+                </div>
+                <div class="data-item">
+                  <span class="label">Puja Mínima:</span>
+                  <span class="value">${lot.bidSteps || "N/D"}</span>
+                </div>
+                <div class="data-item full-width">
+                  <span class="label">Referencia Catastral:</span>
+                  <span class="value">${lot.cadastralReference || "No disponible"}</span>
+                </div>
+                <div class="data-item full-width">
+                  <span class="label">Ubicación:</span>
+                  <span class="value">${lot.propertyAddress || ""}, ${lot.city || ""} (${lot.province || ""})</span>
+                </div>
+                <div class="data-item full-width">
+                  <span class="label">Descripción:</span>
+                  <p class="value goods-description">${lot.goodsDescription || "Sin descripción"}</p>
+                </div>
+              </div>
+            </div>
           </div>
-          <p class="lot-desc">${lot.goodsDescription || ""}</p>
         `;
-        lotsContainer.appendChild(lotCard);
+
+        const header = accordionItem.querySelector(".accordion-header");
+        header?.addEventListener("click", () => {
+          const isOpen = accordionItem.classList.contains("active");
+          
+          // si se abre uno cerrar todos los demas
+          const allItems = lotsContainer.querySelectorAll('.accordion-item');
+          allItems.forEach(item => {
+            item.classList.remove('active');
+          });
+          
+          // Si no estaba abierto, lo abrimos. Si lo estaba, se queda cerrado (por el remove anterior).
+          if (!isOpen) {
+            accordionItem.classList.add("active");
+          }
+        });
+
+        lotsContainer.appendChild(accordionItem);
       });
+      
+      // Abrir el primero por defecto
+      if (auction.lots.length > 0) {
+        lotsContainer.querySelector(".accordion-item")?.classList.add("active");
+      }
+    } else {
+      lotsSection.classList.add("hidden");
+      econSection?.classList.remove("hidden");
+      descSection?.classList.remove("hidden");
+      locSection?.classList.remove("hidden");
     }
   });
 </script>
 
-<style>
+<style is:global>
   .detail-container {
     display: grid;
     grid-template-columns: 2fr 1fr;
@@ -382,138 +462,121 @@
     border-top: 6px solid var(--color-primary);
   }
 
-  .header-top {
+  /* Accordion Lots */
+  .lots-accordion {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1rem;
-  }
-
-  .property-type {
-    font-size: 0.85rem;
-    font-weight: 700;
-    color: var(--color-accent);
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-  }
-
-  h1 {
-    font-size: 2.5rem;
-    margin-bottom: 1rem;
-    line-height: 1.2;
-  }
-
-  .location {
-    font-size: 1.1rem;
-    color: var(--color-text-muted);
+    flex-direction: column;
+    gap: 1.25rem;
+    margin-top: 1.5rem;
     margin-bottom: 2rem;
   }
 
-  .detail-section {
-    margin-top: 3rem;
-    padding-top: 2rem;
-    border-top: 1px solid var(--border-color);
-  }
-
-  h2 {
-    font-size: 1.5rem;
-    margin-bottom: 1.5rem;
-    color: var(--color-primary);
-  }
-
-  .highlight-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1.5rem;
-  }
-
-  .highlight-item {
-    display: flex;
-    flex-direction: column;
-    padding: 1.5rem;
-    background: rgba(var(--color-primary-rgb, 43, 67, 137), 0.05);
-    border-radius: 1rem;
-    border: 1px solid rgba(var(--color-primary-rgb, 43, 67, 137), 0.1);
-  }
-
-  .data-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 1.5rem;
-  }
-
-  .data-item {
-    display: flex;
-    flex-direction: column;
-  }
-
-  .label {
-    font-size: 0.8rem;
-    text-transform: uppercase;
-    color: var(--color-text-muted);
-    margin-bottom: 0.25rem;
-    font-weight: 600;
-  }
-
-  .value {
-    font-size: 1rem;
-    font-weight: 600;
-    color: var(--color-text-main);
-  }
-
-  .highlight-item .value {
-    font-size: 1.4rem;
-    font-weight: 800;
-    color: var(--color-primary);
-  }
-
-  .goods-description {
-    font-weight: 400;
-    line-height: 1.7;
-    white-space: pre-wrap;
-  }
-
-  .text-content p {
-    line-height: 1.6;
-    color: var(--color-text-main);
-  }
-
-  .mt-4 {
-    margin-top: 1rem;
-  }
-  .mb-4 {
-    margin-bottom: 1rem;
-  }
-
-  /* Lots */
-  .lots-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 1.5rem;
-  }
-  .lot-card {
-    padding: 1.5rem;
+  .accordion-item {
     border: 1px solid var(--border-color);
-    border-radius: 1rem;
+    border-radius: 1.25rem;
+    overflow: hidden;
+    background: white;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+  }
+
+  .accordion-item.active {
+    box-shadow: var(--shadow-md);
+    border-color: var(--color-primary);
+    transform: translateY(-2px);
+  }
+
+  .accordion-header {
+    width: 100%;
+    padding: 0.85rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #f8fafc;
+    border: none;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.3s ease;
+  }
+
+  .accordion-item.active .accordion-header {
+    background: rgba(var(--color-primary-rgb, 43, 67, 137), 0.05);
+  }
+
+  .accordion-header:hover {
+    background: #f1f5f9;
+  }
+
+  .accordion-title {
+    font-size: 1.2rem;
+    color: var(--color-text-main);
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+  }
+
+  .accordion-title strong {
+    color: var(--color-primary);
+    background: rgba(var(--color-primary-rgb, 43, 67, 137), 0.1);
+    padding: 0.25rem 0.75rem;
+    border-radius: 0.5rem;
+    margin-right: 1rem;
+    font-size: 0.9rem;
+    letter-spacing: 0.05em;
+  }
+
+  .accordion-icon {
+    font-size: 0.8rem;
+    color: var(--color-primary);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    background: white;
+    width: 2.25rem;
+    height: 2.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border-color);
+  }
+
+  .accordion-item.active .accordion-icon {
+    transform: rotate(180deg);
+    background: var(--color-primary);
+    color: white;
+    border-color: var(--color-primary);
+    box-shadow: 0 4px 12px rgba(var(--color-primary-rgb, 43, 67, 137), 0.3);
+  }
+
+  .accordion-content {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     background: white;
   }
-  .lot-card h4 {
-    margin-bottom: 0.5rem;
-    color: var(--color-primary);
+
+  .accordion-item.active .accordion-content {
+    grid-template-rows: 1fr;
   }
-  .lot-id {
-    font-size: 0.8rem;
-    color: var(--color-text-muted);
-    margin-bottom: 1rem;
+
+  .accordion-content-inner {
+    overflow: hidden;
   }
-  .lot-data {
-    font-size: 0.9rem;
-    margin-bottom: 1rem;
+
+  .lot-data-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 2rem;
+    padding: 2.5rem 2rem;
+    border-top: 1px solid #f1f5f9;
   }
-  .lot-desc {
-    font-size: 0.85rem;
-    color: var(--color-text-muted);
-    line-height: 1.4;
+
+  .lot-data-grid .data-item.full-width {
+    grid-column: 1 / -1;
+  }
+
+  .lot-data-grid .data-item.full-width {
+    grid-column: 1 / -1;
   }
 
   /* Docs */
