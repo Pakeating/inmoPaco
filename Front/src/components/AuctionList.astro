@@ -34,7 +34,13 @@ import AuctionListLots from './AuctionListLots.astro';
     </div>
     <div class="auction-content">
       <h3 class="property-address"></h3>
-      <p class="location"><span class="icon">📍</span> <span class="location-text"></span></p>
+      <p class="location">
+        <span class="icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        </span> 
+        <span class="location-text"></span>
+      </p>
+
       
       <auction-list-lots class="hidden"></auction-list-lots>
       
