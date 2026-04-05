@@ -60,8 +60,7 @@ public class AuctionEntity {
 
     @ElementCollection
     @CollectionTable(name = "auction_documents", joinColumns = @JoinColumn(name = "auction_id"))
-    @Column(name = "document_url")
-    private List<String> documentUrls;
+    private List<AuctionDocumentEntity> documents;
 
     @Column(name = "authority_code", columnDefinition = "TEXT")
     private String authorityCode;
@@ -136,4 +135,5 @@ public class AuctionEntity {
 
     @Enumerated(EnumType.STRING)
     private ProcessingStatus processingStatus; ///status de procesamiento de la subasta
+
 }

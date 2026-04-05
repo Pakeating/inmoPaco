@@ -15,6 +15,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 
 @Log4j2
@@ -37,6 +38,11 @@ public class AuctionPersistenceServiceImpl implements AuctionPersistenceService 
 
         Specification<AuctionEntity> spec = AuctionSpecification.getSpecification(querySpecs);
         return repository.findAll(spec, pageable).map(mapper::toDTO);
+    }
+
+    @Override
+    public Optional<AuctionDetailsDTO> findAuctionById(String id) {
+        return repository.findById(id).map(mapper::toDTO);
     }
 
 }

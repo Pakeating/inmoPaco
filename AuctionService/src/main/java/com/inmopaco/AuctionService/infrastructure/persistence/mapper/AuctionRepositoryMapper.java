@@ -24,11 +24,48 @@ public abstract class AuctionRepositoryMapper {
     @AfterMapping
     void mergeLots(AuctionDetailsDTO dto, @MappingTarget AuctionEntity entity) {
         if (dto.getLots() == null) return;
+        
+        if (entity.getLots() == null) {
+            entity.setLots(new java.util.HashSet<>());
+        }
+
+        // Creamos un mapa de los lotes actuales para actualizar sus valores en lugar de recrearlos
+        java.util.Map<String, com.inmopaco.AuctionService.infrastructure.persistence.entity.LotEntity> currentLots = 
+            entity.getLots().stream()
+                  .collect(java.util.stream.Collectors.toMap(
+                      com.inmopaco.AuctionService.infrastructure.persistence.entity.LotEntity::getLotId, 
+                      l -> l, 
+                      (l1, l2) -> l1));
+
+        java.util.Set<com.inmopaco.AuctionService.infrastructure.persistence.entity.LotEntity> updatedLots = new java.util.HashSet<>();
 
         dto.getLots().forEach(newLot -> {
-            var lot = lotMapper.toEntity(newLot);
-            entity.getLots().remove(lot); // Quita el viejo si existe
-            entity.getLots().add(lot);    // Añade el nuevo (con datos actualizados)
+            com.inmopaco.AuctionService.infrastructure.persistence.entity.LotEntity lot = currentLots.get(newLot.getLotId());
+            if (lot != null) {
+                // Lote existente: actualizar campos para no perder el objeto de Hibernate (evita el fk_auction_id NULL)
+                lot.setLotTitle(newLot.getLotTitle());
+                lot.setAuctionValue(newLot.getAuctionValue());
+                lot.setBidSteps(newLot.getBidSteps());
+                lot.setDepositAmount(newLot.getDepositAmount());
+                lot.setGoodsDescription(newLot.getGoodsDescription());
+                lot.setCadastralReference(newLot.getCadastralReference());
+                lot.setPropertyAddress(newLot.getPropertyAddress());
+                lot.setCity(newLot.getCity());
+                lot.setProvince(newLot.getProvince());
+                lot.setPossessionStatus(newLot.getPossessionStatus());
+                lot.setPostalCode(newLot.getPostalCode());
+                lot.setIsHabitualResidence(newLot.getIsHabitualResidence());
+                lot.setIsVisitable(newLot.getIsVisitable());
+            } else {
+                // Lote nuevo
+                lot = lotMapper.toEntity(newLot);
+            }
+            // Asegurar que la referencia a la subasta padre esté siempre asignada
+            lot.setAuction(entity);
+            updatedLots.add(lot);
         });
+
+        entity.getLots().retainAll(updatedLots); // Eliminamos lotes que ya no existan en el DTO
+        entity.getLots().addAll(updatedLots);    // Añadimos los lotes nuevos
     }
 }

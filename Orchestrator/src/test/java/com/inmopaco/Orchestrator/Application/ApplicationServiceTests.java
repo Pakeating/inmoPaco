@@ -17,7 +17,7 @@ public class ApplicationServiceTests {
 
     @Test
     void sendAuctionsMsg(){
-        auctionsUsecaseService.getAuctions(AuctionsEvent.createEventMsg(AuctionsActions.GET_AUCTIONS, "47"));
+        auctionsUsecaseService.publish(AuctionsEvent.createEventMsg(AuctionsActions.GET_AUCTIONS, "47"));
     }
 
 }

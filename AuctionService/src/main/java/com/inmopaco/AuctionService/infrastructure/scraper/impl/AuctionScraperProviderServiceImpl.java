@@ -32,7 +32,7 @@ public class AuctionScraperProviderServiceImpl implements AuctionScraperProvider
                log.info("[fetchSearchResults] Fetching auctions for province: {}, code: {}", name, code);
                List<AuctionDetailsDTO> auctionList = chooseProvider(code);
                try {
-                   auctionsPersistence.smartSaveAuctions(auctionList);
+                   auctionsPersistence.smartSaveObtainedAuctions(auctionList);
                    auctionIdList.addAll(auctionList.stream().map(AuctionDetailsDTO::getAuctionId).toList());
                } catch (Exception e) {
                    log.warn("[fetchSearchResults] Error saving {} auctions for {}, code : {}", auctionList.size(), name, code);
@@ -51,7 +51,7 @@ public class AuctionScraperProviderServiceImpl implements AuctionScraperProvider
     @Override
     public Integer fetchSearchResultsByProvince(String province) {
         List<AuctionDetailsDTO> auctionList = chooseProvider(province);
-        auctionsPersistence.smartSaveAuctions(auctionList);
+        auctionsPersistence.smartSaveObtainedAuctions(auctionList);
 
         log.info("[fetchSearchResultsByProvince] Finished fetching and saving auctions for province {}. Total auctions fetched: {}", province, auctionList.size());
         log.info("[fetchSearchResultsByProvince] Auction IDs: {}", auctionList.stream().map(AuctionDetailsDTO::getAuctionId).reduce((a, b) -> a + ", " + b).orElse("No auctions found"));

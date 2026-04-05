@@ -72,8 +72,9 @@ public class QueueServiceImpl implements QueueService {
 
         switch (event.getAction()) {
             case RETRIEVED_AUCTIONS -> auctionsUsecaseService.receivedGetAuctionsResponse(event);
+            case PARTIALLY_PROCESSED_AUCTIONS -> auctionsUsecaseService.receivedPartiallyProcessedAuctionsResponse(event);
             case PROCESSED_AUCTIONS -> auctionsUsecaseService.receivedProcessedAuctionsResponse(event);
-
+            case ERROR -> auctionsUsecaseService.receivedErrorAuctionsResponse(event);
             default -> throw new UnsupportedOperationException("Action not implemented: " + event.getAction());
         }
     }

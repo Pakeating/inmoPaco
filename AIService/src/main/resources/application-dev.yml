@@ -1,0 +1,40 @@
+spring:
+  boot:
+    admin:
+      client:
+        url: "http://localhost:9090/admin"
+  application:
+    name: ai-service-local
+  config:
+    import: "optional:configserver:http://localhost:8888"
+
+logging:
+  file:
+    name: logs/ai-service.log
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  info:
+    env:
+      enabled: true
+  endpoint:
+    health:
+      show-details: always
+    env:
+      show-values: always
+      post:
+        enabled: true
+
+nats:
+  url: nats://localhost:4222
+
+openrouter:
+  api:
+    url: https://openrouter.ai/api/v1/chat/completions
+    key: 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 #caduca en una semana, solo modelos free
+
+server:
+  port: 7085

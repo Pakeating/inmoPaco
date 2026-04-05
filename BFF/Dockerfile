@@ -1,7 +1,7 @@
 # --- Etapa 1: Build ---
 
-#JVM VERSION:
-#
+##JVM VERSION:
+##
 FROM maven:3.9.5-eclipse-temurin-21-alpine AS build
 ENV LANG=C.UTF-8
 ENV LC_ALL=C.UTF-8
@@ -32,7 +32,7 @@ ENTRYPOINT ["java", "-jar", "app.jar"]
 
 ##GRAALVM VERSION:
 #
-# Fase 1: Compilación
+## Fase 1: Compilación
 #FROM ghcr.io/graalvm/native-image-community:21 AS build
 #FROM eventsourcing-base AS build
 #ENV LANG=C.UTF-8

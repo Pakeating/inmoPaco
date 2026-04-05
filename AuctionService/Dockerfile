@@ -22,6 +22,7 @@ WORKDIR /app
 
 # Creamos un usuario no root por seguridad
 RUN addgroup -S spring && adduser -S spring -G spring
+RUN mkdir -p /app/logs && chown -R spring:spring /app # Si no hacemos esto, no se puede depositar correctamente el log.
 USER spring
 
 # Copiamos el archivo JAR generado en la etapa anterior
@@ -48,7 +49,7 @@ ENTRYPOINT ["java", "-jar", "app.jar"]
 #
 ## Copiamos el codigo y compilamos a nativo
 #COPY AuctionService/src ./AuctionService/src
-#RUN ./mvnw -f ./AuctionService/pom.xml native:compile -Pnative -DskipTests -Dmaven.test.skip=true -Dnative.buildArgs="-Ob"
+#RUN ./mvnw -f ./AuctionService/pom.xml native:compile -Pnative -DskipTests -Dmaven.test.skip=true -Dnative.buildArgs="-Ob -J-XX:ActiveProcessorCount=2"
 #
 ## Fase 2: Ejecución
 ## para desarrollo, incluye ssh, etc

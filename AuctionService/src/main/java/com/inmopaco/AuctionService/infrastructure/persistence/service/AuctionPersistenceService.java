@@ -5,6 +5,7 @@ import com.inmopaco.AuctionService.domain.enums.AuctionStatus;
 import com.inmopaco.AuctionService.domain.enums.ProcessingStatus;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface AuctionPersistenceService {
 
@@ -12,7 +13,9 @@ public interface AuctionPersistenceService {
 
     void saveAllAuctions(List<AuctionDetailsDTO> auctionList);
 
-    long saveOrUpdateAuctions(List<AuctionDetailsDTO> auctionList);
+    Optional<AuctionDetailsDTO> findByAuctionId(String auctionId);
+
+    List<AuctionDetailsDTO> findAllByAuctionIdIn(List<String> identifiers);
 
     List<AuctionDetailsDTO> listAllAuctions();
 

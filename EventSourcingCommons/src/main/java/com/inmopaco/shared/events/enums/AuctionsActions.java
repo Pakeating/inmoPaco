@@ -2,7 +2,10 @@ package com.inmopaco.shared.events.enums;
 
 public enum AuctionsActions {
     GET_AUCTIONS,
-    PROCESS_AUCTIONS,
     RETRIEVED_AUCTIONS,
-    PROCESSED_AUCTIONS
+    PARTIALLY_PROCESS_AUCTIONS,
+    PARTIALLY_PROCESSED_AUCTIONS,
+    PROCESS_AUCTIONS,
+    PROCESSED_AUCTIONS,
+    ERROR
 }

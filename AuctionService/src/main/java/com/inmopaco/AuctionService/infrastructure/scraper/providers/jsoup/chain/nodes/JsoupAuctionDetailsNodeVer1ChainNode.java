@@ -1,5 +1,6 @@
 package com.inmopaco.AuctionService.infrastructure.scraper.providers.jsoup.chain.nodes;
 
+import com.inmopaco.AuctionService.application.dto.AuctionDocumentDTO;
 import com.inmopaco.AuctionService.application.dto.AuctionSummaryDTO;
 import com.inmopaco.AuctionService.infrastructure.scraper.providers.jsoup.chain.JsoupScraperChainNode;
 import com.inmopaco.AuctionService.infrastructure.scraper.providers.jsoup.chain.dto.JsoupChainContextDTO;
@@ -57,8 +58,10 @@ public class JsoupAuctionDetailsNodeVer1ChainNode extends AbstractJsoupAuctionDe
     private JsoupChainContextDTO parse(Document doc, JsoupChainContextDTO context) {
         Element tableBody = doc.select("#idBloqueDatos1 table tbody").first();
 
-        List<String> pdfs = doc.select("li.puntoPDF a").stream()
-                .map(a -> a.attr("abs:href")) // Convierte a URL absoluta
+        List<AuctionDocumentDTO> pdfs = doc.select("li.puntoPDF a").stream()
+                .map(a -> AuctionDocumentDTO.builder()
+                        .documentUrl(a.attr("abs:href"))
+                        .build()) // url absoluta
                 .toList();
 
         if (tableBody == null) {
@@ -79,7 +82,7 @@ public class JsoupAuctionDetailsNodeVer1ChainNode extends AbstractJsoupAuctionDe
                 .minimumBid(extractValue(tableBody, "Puja mínima"))
                 .bidIncrements(extractValue(tableBody, "Tramos entre pujas"))
                 .depositAmount(extractValue(tableBody, "Importe del depósito"))
-                .documentUrls(pdfs)
+                .documents(pdfs)
                 ;
         return context;
     }

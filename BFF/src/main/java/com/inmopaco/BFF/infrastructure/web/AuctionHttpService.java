@@ -4,6 +4,7 @@ import com.inmopaco.BFF.application.dto.AuctionDetailsDTO;
 import com.inmopaco.BFF.application.dto.AuctionQueryDTO;
 import com.inmopaco.BFF.application.usecases.AuctionQueryUsecase;
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.websocket.server.PathParam;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -24,9 +25,17 @@ public class AuctionHttpService {
     @Operation(summary = "Busca subastas por Id",
             description = "Busca subastas por su identificador único. Devuelve un solo resultado")
     @GetMapping("/search/{id}")
-    public ResponseEntity<AuctionDetailsDTO> searchAuctionById( @RequestParam String id ) {
+    public ResponseEntity<AuctionDetailsDTO> searchAuctionById( @PathVariable String id ) {
 
-        return ResponseEntity.ok().build();
+        var result = auctionUsecase.searchById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+
+        log.info("Search executed for id {}", id);
+        log.info("Search result: {}", result);
+
+        return result;
+
     }
 
     @Operation(summary = "Busca subastas con filtros dinámicos",

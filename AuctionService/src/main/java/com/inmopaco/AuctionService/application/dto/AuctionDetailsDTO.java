@@ -24,7 +24,7 @@ public class AuctionDetailsDTO {
     private String minimumBid;       // Puja mínima
     private String bidIncrements;    // Tramos entre pujas
     private String depositAmount;    // Importe del depósito
-    private List<String> documentUrls; //documentos asociados
+    private List<AuctionDocumentDTO> documents; //documentos asociados
     private String authorityCode;        // Código
     private String authorityDescription; // Descripción (Nombre del Juzgado)
     private String authorityAddress;     // Dirección

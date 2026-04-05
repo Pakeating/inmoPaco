@@ -20,6 +20,6 @@ public class AuctionSchedulersImpl implements AuctionSchedulers {
     @Override
     public void scrapeBoeAuctions() {
         log.info("[AuctionSchedulersImpl] Triggering Auction scraping...");
-        auctionsUsecaseService.getAuctions(AuctionsEvent.createEventMsg(AuctionsActions.GET_AUCTIONS));
+        auctionsUsecaseService.publish(AuctionsEvent.createEventMsg(AuctionsActions.GET_AUCTIONS));
     }
 }

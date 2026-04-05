@@ -8,13 +8,14 @@ import com.inmopaco.AuctionService.infrastructure.persistence.mapper.AuctionRepo
 import com.inmopaco.AuctionService.infrastructure.persistence.repository.AuctionRepository;
 import com.inmopaco.AuctionService.infrastructure.persistence.service.AuctionPersistenceService;
 import jakarta.transaction.Transactional;
-import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
+import lombok.extern.log4j.Log4j2;
 
 @Log4j2
 @Service
@@ -31,21 +32,26 @@ public class AuctionPersistenceServiceImpl implements AuctionPersistenceService 
         repository.save(mapper.toEntity(auctionDTO));
     }
 
-    @Transactional
     @Override
-    public void saveAllAuctions(List<AuctionDetailsDTO> auctionList) {
-        List<AuctionEntity> entities = auctionList.stream()
-                .map(dto -> mapper.toEntity(dto))
-                .toList();
-        repository.saveAll(entities);
+    public Optional<AuctionDetailsDTO> findByAuctionId(String auctionId) {
+        return repository.findById(auctionId)
+                .map(mapper::toDTO);
     }
 
-    @Transactional
     @Override
-    //returns the number of new auctions created
-    public long saveOrUpdateAuctions(List<AuctionDetailsDTO> auctionList) {
+    public List<AuctionDetailsDTO> findAllByAuctionIdIn(List<String> identifiers) {
+        return repository.findAllByAuctionIdIn(identifiers)
+                .stream()
+                .map(mapper::toDTO)
+                .toList();
+    }
 
-        //Smart-saving: check existing by boeIdentifier and update, else create new
+    @Override
+    public void saveAllAuctions(List<AuctionDetailsDTO> auctionList) {
+        if (auctionList == null || auctionList.isEmpty()) {
+            return;
+        }
+
         List<String> identifiers = auctionList.stream()
                 .map(AuctionDetailsDTO::getAuctionId)
                 .toList();
@@ -58,29 +64,19 @@ public class AuctionPersistenceServiceImpl implements AuctionPersistenceService 
             AuctionEntity existingEntity = entityMap.get(dto.getAuctionId());
 
             if (existingEntity != null) {
-                //si existe, se mantiene el processingStatus
-                dto.setProcessingStatus(existingEntity.getProcessingStatus());
                 mapper.updateEntityFromDTO(dto, existingEntity);
-
                 return existingEntity;
             } else {
-                try { //se mantiene por seguridad, se creaba un bucle infinito hasta overflow por los hashcodes
-                    //si es nueva, se setea el processingStatus a OBTAINED
-                    dto.setProcessingStatus(ProcessingStatus.OBTAINED);
+                try {
                     return mapper.toEntity(dto);
-                }catch (Throwable e) {
+                } catch (Throwable e) {
                     log.error("Error mapping DTO to Entity for auctionId: {}. Error: {}, with stackTrace: {}", dto.getAuctionId(), e.getMessage(), e.getStackTrace());
                     return null;
                 }
             }
-        }).toList();
-
-        log.info("Saving {} auctions", entitiesToSave.size());
-        log.debug("Auction IDs: {}", auctionList.stream().map(AuctionDetailsDTO::getAuctionId).toList());
+        }).filter(java.util.Objects::nonNull).toList();
 
         repository.saveAll(entitiesToSave);
-
-        return auctionList.size() - entityMap.size();
     }
 
     @Override

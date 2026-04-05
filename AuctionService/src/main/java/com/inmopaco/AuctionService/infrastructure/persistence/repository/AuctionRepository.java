@@ -14,11 +14,12 @@ public interface AuctionRepository extends JpaRepository<AuctionEntity, String> 
 
     List<AuctionEntity> findAllByStatus(AuctionStatus status);
 
+    @EntityGraph(attributePaths = {"documents", "lots"})
     List<AuctionEntity> findAllByAuctionIdIn(List<String> auctionId);
 
     List<AuctionEntity> findByCityIgnoreCase(String city);
 
-    @EntityGraph(attributePaths = {"documentUrls", "lots"})
+    @EntityGraph(attributePaths = {"documents", "lots"})
     List<AuctionEntity> findAllByProcessingStatus(ProcessingStatus processingStatus);
 
 }

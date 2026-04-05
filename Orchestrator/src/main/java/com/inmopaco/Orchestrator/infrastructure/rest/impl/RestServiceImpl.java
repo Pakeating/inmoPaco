@@ -32,7 +32,7 @@ public class RestServiceImpl implements RestService {
     @Override
     public ResponseEntity<Object> executeGetAuctions(@RequestParam String auctionsPayload){
 
-        auctionsUsecaseService.getAuctions(AuctionsEvent.createEventMsg(AuctionsActions.GET_AUCTIONS, auctionsPayload));
+        auctionsUsecaseService.publish(AuctionsEvent.createEventMsg(AuctionsActions.GET_AUCTIONS, auctionsPayload));
         return ResponseEntity.accepted().build();
     }
 
@@ -40,7 +40,7 @@ public class RestServiceImpl implements RestService {
     @Override
     public ResponseEntity<Object> executeProcessAuctions(String auctionsPayload){
 
-        auctionsUsecaseService.processAuctions(AuctionsEvent.createEventMsg(AuctionsActions.PROCESS_AUCTIONS, auctionsPayload));
+        auctionsUsecaseService.publish(AuctionsEvent.createEventMsg(AuctionsActions.PROCESS_AUCTIONS, auctionsPayload));
         return ResponseEntity.accepted().build();
     }
 

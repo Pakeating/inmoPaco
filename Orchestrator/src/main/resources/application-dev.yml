@@ -40,15 +40,19 @@ nats:
     wildcards:
       auctions: auctions.>
       properties: properties.>
+      ai: ai.>
     publisher:
       auctions: auctions.get
       properties: properties.get
+      ai: ai.get
     subscriber:
       auctions: auctions.response
       properties: properties.response
+      ai: ai.response
   streams:
     auctions: AUCTIONS_STREAM
     properties: PROPERTIES_STREAM
+    ai: AI_STREAM
 
 logging:
   file:

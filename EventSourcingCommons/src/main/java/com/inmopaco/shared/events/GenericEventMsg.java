@@ -1,6 +1,7 @@
 package com.inmopaco.shared.events;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.inmopaco.shared.events.enums.Agents;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -19,8 +20,10 @@ public abstract class GenericEventMsg implements Serializable {
     protected LocalDateTime createdAt;
     protected LocalDateTime publishedAt;
     protected LocalDateTime consumedAt;
-    protected String producedBy;
-    protected String consumedBy;
+    @Setter
+    protected Agents producedBy;
+    @Setter
+    protected Agents destinedTo;
     protected EventStatus status;
     protected boolean isPersistent;
     @Setter

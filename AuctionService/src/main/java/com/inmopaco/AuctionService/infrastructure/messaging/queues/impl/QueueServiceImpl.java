@@ -1,9 +1,10 @@
 package com.inmopaco.AuctionService.infrastructure.messaging.queues.impl;
 
 import com.inmopaco.AuctionService.application.usecases.ScrapeBoeAuctionsUsecase;
-import com.inmopaco.AuctionService.application.usecases.impl.ProcessAuctionsUsecaseImpl;
+import com.inmopaco.AuctionService.application.usecases.ProcessAuctionsUsecase;
 import com.inmopaco.AuctionService.infrastructure.messaging.queues.QueueService;
 import com.inmopaco.AuctionService.infrastructure.messaging.queues.provider.GenericQueueProviderServiceImpl;
+import com.inmopaco.shared.events.AIEvent;
 import com.inmopaco.shared.events.AuctionsEvent;
 import com.inmopaco.shared.events.GenericEventMsg;
 import jakarta.annotation.PostConstruct;
@@ -30,7 +31,7 @@ public class QueueServiceImpl implements QueueService {
     private ScrapeBoeAuctionsUsecase scrapeBoeAuctionsUsecase;
     @Autowired
     @Lazy
-    private ProcessAuctionsUsecaseImpl processAuctionsUsecase;
+    private ProcessAuctionsUsecase processAuctionsUsecase;
 
     @Override
     public <EventMsg extends GenericEventMsg> void publish(String subject, EventMsg eventMsg) {
@@ -60,6 +61,12 @@ public class QueueServiceImpl implements QueueService {
                 AuctionsEvent.class,
                 this::auctionsEventHandler
         );
+        subscribePersistent("ai.response",
+                "AuctionsService",
+                "get",
+                AIEvent.class,
+                this::aiEventHandler
+        );
     }
 
     @Async
@@ -72,6 +79,17 @@ public class QueueServiceImpl implements QueueService {
             case PROCESS_AUCTIONS -> processAuctionsUsecase.processAuctions(event);
 
             default -> throw new UnsupportedOperationException("Action not implemented: " + event.getAction());
+        }
+    }
+
+    private void aiEventHandler(AIEvent event) {
+        log.info("Received AI Event {} with action {}", event.getEventId(), event.getAction());
+        event.consumed(LocalDateTime.now());
+
+        switch (event.getAction()) {
+            case OBTAINED_AUCTIONS_REPORT -> processAuctionsUsecase.saveAIProcessing(event);
+
+            default -> throw new UnsupportedOperationException("Action not implemented yet: " + event.getAction());
         }
     }
 }

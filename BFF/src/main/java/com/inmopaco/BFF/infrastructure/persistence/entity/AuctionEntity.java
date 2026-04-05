@@ -57,8 +57,7 @@ public class AuctionEntity {
 
     @ElementCollection
     @CollectionTable(name = "auction_documents", joinColumns = @JoinColumn(name = "auction_id"))
-    @Column(name = "document_url")
-    private List<String> documentUrls;
+    private List<AuctionDocumentEntity> documents;
 
     @Column(name = "authority_code", columnDefinition = "TEXT")
     private String authorityCode;
@@ -128,4 +127,5 @@ public class AuctionEntity {
 
     private String expediente;
     private String status;
+    private String processingStatus;
 }

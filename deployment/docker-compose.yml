@@ -121,7 +121,7 @@ services:
     deploy:
       resources:
         limits:
-          memory: 64M        #deberia ser suficiente...
+          memory: 100M        #deberia ser suficiente...
 
   # --- NATS DASHBOARD ---
   nats-dashboard:
@@ -259,6 +259,29 @@ services:
       - SPRING_CLOUD_CONFIG_RETRY_INITIAL_INTERVAL=2000
       - SPRING_CLOUD_CONFIG_RETRY_MULTIPLIER=1.5
       - NATS_URL=nats://nats-server:4222
+    volumes:
+      - ./logs/usuarios-ms:/app/logs
+    networks:
+      - microservices-network
+
+    # --- AIService ---
+  ai-service:
+    build:
+      context: ..
+      dockerfile: AIService/Dockerfile
+    container_name: ai-service
+    ports:
+      - "8085:8085"
+    depends_on:
+      config-service-v3:
+        condition: service_healthy
+    environment:
+      - SPRING_CONFIG_IMPORT=optional:configserver:http://config-service-v3:8888
+      - SPRING_CLOUD_CONFIG_FAIL_FAST=false
+      - SPRING_CLOUD_CONFIG_RETRY_MAX_ATTEMPTS=20
+      - SPRING_CLOUD_CONFIG_RETRY_INITIAL_INTERVAL=2000
+      - SPRING_CLOUD_CONFIG_RETRY_MULTIPLIER=1.5
+#      - NATS_URL=nats://nats-server:4222
     volumes:
       - ./logs/usuarios-ms:/app/logs
     networks:
