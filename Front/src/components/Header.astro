@@ -118,7 +118,7 @@ const userInitial = user?.name
   }
 
   /* logout (actualmente no en uso) */
-  const logoutBtn = document.getElementById('logout-btn');
+  const logoutBtn = document.getElementById('logout-btn') as HTMLButtonElement | null; //tipo agregado porque tira error en la pipeline de compilacion de cloudflare 
   if (logoutBtn) {
     logoutBtn.addEventListener('click', async () => {
       logoutBtn.disabled = true;
