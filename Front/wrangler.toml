@@ -23,3 +23,4 @@ binding      = "DB"
 database_name = "inmopaco-auth"
 database_id  = "f5d8c18c-6b5f-48b0-85b4-8704346a615c"
 compatibility_flags = [“nodejs_compat”]
+compatibility_date = "2024-09-23"
