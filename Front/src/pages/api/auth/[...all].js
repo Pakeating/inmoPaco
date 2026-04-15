@@ -14,21 +14,24 @@ export const prerender = false;
  *  - Otros
  */
 export const ALL = async (context) => {
-  const db = context.locals.runtime?.env?.DB;
+  const env = context.locals.runtime?.env;
+  const db = env?.DB;
 
   if (!db) {
-    console.error(
-      "[Auth API] D1 Binding not available"
-    );
-    return new Response(
-      JSON.stringify({ error: " Auth not available" }),
-      {
-        status: 503,
-        headers: { "Content-Type": "application/json" },
-      }
-    );
+    console.error("[Auth API] D1 Binding not available");
+    return new Response(JSON.stringify({ error: " Auth not available" }), {
+      status: 503,
+      headers: { "Content-Type": "application/json" },
+    });
   }
 
-  const auth = getAuth(db);
+  // Detectamos baseURL dinámicamente si no está en env
+  const baseURL = env?.BETTER_AUTH_URL || context.url.origin;
+
+  const auth = getAuth(db, {
+    secret: env?.BETTER_AUTH_SECRET,
+    baseURL: baseURL
+  });
+
   return auth.handler(context.request);
 };

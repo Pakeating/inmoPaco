@@ -8,6 +8,9 @@ const BACKEND_BASE_URL = import.meta.env.BACKEND_BASE_URL;
  * Si hay una sesión activa, inyecta el JWT en la cabecera Authorization.
  */
 export async function POST ({ request, locals }) {
+  const env = locals.runtime?.env;
+  const backendBase = env?.BACKEND_BASE_URL || import.meta.env.BACKEND_BASE_URL;
+
   let body;
   try {
     body = await request.json();
@@ -19,13 +22,11 @@ export async function POST ({ request, locals }) {
     });
   }
 
-  console.log('[API Proxy] Forwarding body to backend:', body);
-
   const url = new URL(request.url);
   const queryParams = url.searchParams.toString();
   
-  // construimos la URL del backend usando la base configurada
-  const backendUrl = `${BACKEND_BASE_URL}/bff/auctions/search${queryParams ? '?' + queryParams : ''}`;
+  // construimos la URL del backend usando la base dinámica
+  const backendUrl = `${backendBase}/bff/auctions/search${queryParams ? '?' + queryParams : ''}`;
 
   try {
     const backendHeaders = { 
@@ -49,7 +50,6 @@ export async function POST ({ request, locals }) {
 
     const data = await response.json();
     
-    // Devolvemos el objeto Page de Spring tal cual.
     return new Response(JSON.stringify(data), {
       status: 200,
       headers: { "Content-Type": "application/json" }
@@ -62,7 +62,11 @@ export async function POST ({ request, locals }) {
     });
   }
 };
+
 export async function GET ({ request, locals }) {
+  const env = locals.runtime?.env;
+  const backendBase = env?.BACKEND_BASE_URL || import.meta.env.BACKEND_BASE_URL;
+
   const url = new URL(request.url);
   const idValue = url.searchParams.get('id');
   
@@ -73,15 +77,12 @@ export async function GET ({ request, locals }) {
     });
   }
 
-  // Extraemos parámetros de paginación de la query string
   const page = url.searchParams.get('page') || '0';
   const size = url.searchParams.get('size') || '10';
   const sortBy = url.searchParams.get('sortBy') || '+dateOfEnd';
   const queryParams = new URLSearchParams({ page, size, sortBy }).toString();
 
-  console.log(`[API Proxy] Single ID GET search for: ${idValue}`);
-
-  const backendUrl = `${BACKEND_BASE_URL}/bff/auctions/search/${idValue}?${queryParams}`;
+  const backendUrl = `${backendBase}/bff/auctions/search/${idValue}?${queryParams}`;
 
   try {
     const backendHeaders = { 
@@ -108,7 +109,6 @@ export async function GET ({ request, locals }) {
     // devuelte el auction directamente, envolvemos en page apra reutilizar el componente del front
     let PageData = data;
     if (!data.content && !Array.isArray(data)) {
-  
         PageData = {
             content: [data],
             page: {

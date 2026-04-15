@@ -3,11 +3,17 @@ import { getAuth } from "./lib/auth";
 import { SignJWT } from "jose";
 
 export const onRequest = defineMiddleware(async (context, next) => {
-  const db = context.locals.runtime?.env?.DB;
+  const env = context.locals.runtime?.env;
+  const db = env?.DB;
 
   if (db) {
     try {
-      const auth = getAuth(db);
+      // Configuramos auth con datos del runtime (env)
+      const baseURL = env?.BETTER_AUTH_URL || context.url.origin;
+      const auth = getAuth(db, {
+        secret: env?.BETTER_AUTH_SECRET,
+        baseURL: baseURL
+      });
 
       // sesion activa a partir de las cookies
       const session = await auth.api.getSession({
@@ -35,7 +41,9 @@ export const onRequest = defineMiddleware(async (context, next) => {
       }
 
       // generamos JWT siempre, con datos de user o guest
-      const secret = new TextEncoder().encode(import.meta.env.JWT_SECRET);
+      // Prioridad al secreto del runtime (env)
+      const jwtSecret = env?.JWT_SECRET || import.meta.env.JWT_SECRET;
+      const secret = new TextEncoder().encode(jwtSecret);
       const jwtToken = await new SignJWT(jwtPayload)
         .setProtectedHeader({ alg: "HS256" })
         .setIssuedAt()
@@ -48,7 +56,6 @@ export const onRequest = defineMiddleware(async (context, next) => {
       
       // si se accede a administration y no es admin se redirige
       if (url.pathname.startsWith("/administration")) {
-        
         if (!session || session.user.role !== "admin") {
           console.warn(`[Middleware] Access bloqued to ${url.pathname} for ${session?.user?.email ?? "Anon"}`);
           return context.redirect("/login");
