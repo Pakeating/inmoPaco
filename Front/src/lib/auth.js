@@ -1,3 +1,5 @@
+import { betterAuth } from "better-auth";
+
 /**
  * recibe el binding D1 y datos opcionales de entorno para crear la instancia de BetterAuth.
  *
