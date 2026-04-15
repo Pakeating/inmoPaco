@@ -1,12 +1,13 @@
 export const prerender = false;
 
-const BACKEND_BASE_URL = 'https://backend.inmopaco.com';
+const BACKEND_BASE_URL = import.meta.env.BACKEND_BASE_URL;
 
 /**
- * Endpoint de la API: /api/auctions
+ * Endpoint /api/auctions
  * Actúa como un proxy para reenviar las peticiones de búsqueda al backend de Java.
+ * Si hay una sesión activa, inyecta el JWT en la cabecera Authorization.
  */
-export async function POST ({ request }) {
+export async function POST ({ request, locals }) {
   let body;
   try {
     body = await request.json();
@@ -27,11 +28,14 @@ export async function POST ({ request }) {
   const backendUrl = `${BACKEND_BASE_URL}/bff/auctions/search${queryParams ? '?' + queryParams : ''}`;
 
   try {
+    const backendHeaders = { 
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${locals.jwtToken}`
+    };
+
     const response = await fetch(backendUrl, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
+      headers: backendHeaders,
       body: JSON.stringify(body)
     });
 
@@ -58,7 +62,7 @@ export async function POST ({ request }) {
     });
   }
 };
-export async function GET ({ request }) {
+export async function GET ({ request, locals }) {
   const url = new URL(request.url);
   const idValue = url.searchParams.get('id');
   
@@ -80,11 +84,14 @@ export async function GET ({ request }) {
   const backendUrl = `${BACKEND_BASE_URL}/bff/auctions/search/${idValue}?${queryParams}`;
 
   try {
+    const backendHeaders = { 
+      'Accept': 'application/json',
+      'Authorization': `Bearer ${locals.jwtToken}`
+    };
+
     const response = await fetch(backendUrl, {
       method: 'GET',
-      headers: {
-        'Accept': 'application/json'
-      }
+      headers: backendHeaders
     });
 
     if (!response.ok) {

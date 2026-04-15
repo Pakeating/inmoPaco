@@ -1,5 +1,11 @@
 ---
 const { title = "InmoPaco" } = Astro.props;
+
+// Sesion establecida por el middleware (puede ser undefined)
+const user = Astro.locals.user ?? null;
+const userInitial = user?.name
+  ? user.name.charAt(0).toUpperCase()
+  : user?.email?.charAt(0).toUpperCase() ?? "?";
 ---
 
 <header class="site-header">
@@ -17,14 +23,63 @@ const { title = "InmoPaco" } = Astro.props;
         <li><a href="/properties" class="disabled">Propiedades</a></li>
         <li><a href="/auctions">Subastas</a></li>
         <li><a href="/contact" class="disabled">Contacto</a></li>
+
+        <!-- auth-->
+        {user && (
+          <li class="auth-item">
+            <div class="user-menu">
+              <button class="user-avatar-btn" id="user-menu-toggle" aria-expanded="false" aria-label="Menú de usuario">
+                <div class="user-avatar">{userInitial}</div>
+                <span class="user-name">{user.name ?? user.email}</span>
+                <svg class="chevron" viewBox="0 0 20 20" fill="currentColor" width="14" height="14" aria-hidden="true">
+                  <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd"/>
+                </svg>
+              </button>
+              <div class="user-dropdown" id="user-dropdown" role="menu">
+                <div class="user-dropdown-header">
+                  <div class="dropdown-avatar">{userInitial}</div>
+                  <div>
+                    <div class="dropdown-name">{user.name ?? "Usuario"}</div>
+                    <div class="dropdown-email">{user.email}</div>
+                    {user.role && user.role !== "user" && (
+                      <span class="dropdown-role">{user.role}</span>
+                    )}
+                  </div>
+                </div>
+                <div class="dropdown-divider"></div>
+                
+                {user.role === 'admin' && (
+                  <a href="/administration" class="dropdown-item">
+                    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.75" width="15" height="15" aria-hidden="true">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                    Panel Admin
+                  </a>
+                )}
+                <button id="logout-btn" class="dropdown-item dropdown-item--danger" role="menuitem">
+                  <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.75" width="15" height="15" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                  </svg>
+                  Cerrar sesión
+                </button>
+              </div>
+            </div>
+          </li>
+        )}
       </ul>
     </nav>
   </div>
 </header>
 
 <script>
+  import { createAuthClient } from "better-auth/client";
+
+  const authClient = createAuthClient();
+
+  /* responsive */
   const navToggle = document.querySelector('.mobile-nav-toggle');
-  const navMenu = document.querySelector('.nav-menu');
+  const navMenu   = document.querySelector('.nav-menu');
 
   if (navToggle && navMenu) {
     navToggle.addEventListener('click', () => {
@@ -34,7 +89,6 @@ const { title = "InmoPaco" } = Astro.props;
       document.body.classList.toggle('menu-open');
     });
 
-    // cierra menu al hacer clic en un enlace
     const navLinks = navMenu.querySelectorAll('a');
     navLinks.forEach(link => {
       link.addEventListener('click', () => {
@@ -42,6 +96,41 @@ const { title = "InmoPaco" } = Astro.props;
         navMenu.classList.remove('active');
         document.body.classList.remove('menu-open');
       });
+    });
+  }
+
+  /* burguer */
+  const menuToggle = document.getElementById('user-menu-toggle');
+  const dropdown   = document.getElementById('user-dropdown');
+
+  if (menuToggle && dropdown) {
+    menuToggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isOpen = dropdown.classList.toggle('is-open');
+      menuToggle.setAttribute('aria-expanded', isOpen.toString());
+    });
+
+    // cierra al hacer clic fuera
+    document.addEventListener('click', () => {
+      dropdown.classList.remove('is-open');
+      menuToggle.setAttribute('aria-expanded', 'false');
+    });
+  }
+
+  /* logout (actualmente no en uso) */
+  const logoutBtn = document.getElementById('logout-btn');
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', async () => {
+      logoutBtn.disabled = true;
+      logoutBtn.textContent = 'Cerrando sesión...';
+      try {
+        await authClient.signOut();
+        window.location.href = '/';
+      } catch (err) {
+        console.error('[Header] Error al cerrar sesión:', err);
+        logoutBtn.disabled = false;
+        logoutBtn.textContent = 'Cerrar sesión';
+      }
     });
   }
 </script>
@@ -72,10 +161,11 @@ const { title = "InmoPaco" } = Astro.props;
     color: var(--color-accent);
   }
 
-  /* Navigation Desktop */
+  /* nav escritorio */
   .nav-menu ul {
     list-style: none;
     display: flex;
+    align-items: center;
     gap: 1.5rem;
   }
   .nav-menu a {
@@ -87,7 +177,176 @@ const { title = "InmoPaco" } = Astro.props;
     color: var(--color-primary);
   }
 
-  /* Mobile Toggle Styles */
+  /* login (no en uso, por si se agregan mas funciones a futuro) */
+  .btn-login {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    background-color: var(--color-accent);
+    color: #fff !important;
+    padding: 0.45rem 1rem;
+    border-radius: var(--radius-md);
+    font-size: 0.875rem;
+    font-weight: 600;
+    transition: background-color var(--transition-fast), transform var(--transition-fast);
+    white-space: nowrap;
+  }
+  .btn-login:hover {
+    background-color: var(--color-accent-hover);
+    color: #fff !important;
+    transform: translateY(-1px);
+  }
+
+  .user-menu {
+    position: relative;
+  }
+
+  .user-avatar-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: transparent;
+    border: 1.5px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 0.375rem 0.75rem 0.375rem 0.375rem;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--color-text-main);
+    transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+  }
+  .user-avatar-btn:hover {
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 3px rgba(249,115,22,0.1);
+  }
+
+  .user-avatar {
+    width: 1.75rem;
+    height: 1.75rem;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--color-primary), #1e5799);
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .user-name {
+    max-width: 120px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .chevron {
+    color: var(--color-text-muted);
+    transition: transform var(--transition-fast);
+  }
+  .user-avatar-btn[aria-expanded="true"] .chevron {
+    transform: rotate(180deg);
+  }
+
+  /* dropdown */
+  .user-dropdown {
+    display: none;
+    position: absolute;
+    top: calc(100% + 0.625rem);
+    right: 0;
+    min-width: 220px;
+    background: var(--color-bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    z-index: 200;
+    overflow: hidden;
+    animation: dropIn 0.15s ease-out both;
+  }
+  .user-dropdown.is-open { display: block; }
+
+  @keyframes dropIn {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .user-dropdown-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.875rem 1rem;
+  }
+
+  .dropdown-avatar {
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--color-primary), #1e5799);
+    color: #fff;
+    font-size: 0.875rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .dropdown-name {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-text-main);
+    line-height: 1.2;
+  }
+
+  .dropdown-email {
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+    margin-top: 0.125rem;
+  }
+
+  .dropdown-role {
+    display: inline-block;
+    margin-top: 0.25rem;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    background: rgba(249,115,22,0.12);
+    color: var(--color-accent);
+    border-radius: 0.25rem;
+    padding: 0.1rem 0.375rem;
+  }
+
+  .dropdown-divider {
+    height: 1px;
+    background: var(--border-color);
+    margin: 0;
+  }
+
+  .dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    width: 100%;
+    padding: 0.75rem 1rem;
+    font-family: inherit;
+    font-size: 0.875rem;
+    font-weight: 500;
+    background: none;
+    border: none;
+    cursor: pointer;
+    text-align: left;
+    color: var(--color-text-main);
+    transition: background-color var(--transition-fast);
+  }
+  .dropdown-item:hover { background-color: var(--color-bg-page); }
+
+  .dropdown-item--danger { color: #dc2626; }
+  .dropdown-item--danger:hover { background-color: #fef2f2; }
+
+  /* responsive para movil */
   .mobile-nav-toggle {
     display: none;
     background: transparent;
@@ -120,7 +379,7 @@ const { title = "InmoPaco" } = Astro.props;
   .hamburger-icon::before { top: -8px; }
   .hamburger-icon::after { top: 8px; }
 
-  /* Animation when expanded */
+  /* animaciones para burguer */
   .mobile-nav-toggle[aria-expanded="true"] .hamburger-icon {
     background-color: transparent;
   }
@@ -145,7 +404,7 @@ const { title = "InmoPaco" } = Astro.props;
     border: 0;
   }
 
-  /* Tablet & Mobile Styles */
+  /* responsive para pantallas peque;as */
   @media (max-width: 768px) {
     .mobile-nav-toggle {
       display: block;
