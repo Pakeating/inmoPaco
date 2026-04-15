@@ -52,14 +52,16 @@ public class ProcessAuctionsUsecaseImpl implements ProcessAuctionsUsecase {
                 if (dto.getDateOfEnd().isBefore(now.minus(1, ChronoUnit.DAYS))) {
                     // fecha de fin pasada con un dia de margen de mas, ya que el fin de subasta puede alargarse un dia
                     dto.setStatus(AuctionStatus.EXPIRED);
+                    //si la subasta ya ha expirado, se marca directamente como procesada, no tiene sentido malgastar recursos
+                    dto.setProcessingStatus(ProcessingStatus.PROCESSED);
                 } else if (dto.getDateOfStart().isAfter(now)) {
                     dto.setStatus(AuctionStatus.UPCOMING);
+                    dto.setProcessingStatus(ProcessingStatus.PARTIALLY_PROCESSED);
                 } else {
                     dto.setStatus(AuctionStatus.ACTIVE);
+                    dto.setProcessingStatus(ProcessingStatus.PARTIALLY_PROCESSED);
                 }
-                dto.setProcessingStatus(ProcessingStatus.PARTIALLY_PROCESSED);
             });
-
             auctionsPersistenceUsecase.smartSaveObtainedAuctions(auctionsList);
         }
 
@@ -71,34 +73,79 @@ public class ProcessAuctionsUsecaseImpl implements ProcessAuctionsUsecase {
 
 
         log.info("[ProcessAuctionsUsecase] Processing documents");
-        //guarda en un Map el id el el texto del pdf. formato de la key: "auctionId -> pdfUrl"
         auctionsList = persistenceService.listAuctionsByProcessingStatus(ProcessingStatus.PARTIALLY_PROCESSED);
-        log.info("[ProcessAuctionsUsecase] Sending AI-Processing requests for {} auctions", auctionsList.size());
+
         List<String> sent = new ArrayList<>();
         List<String> failed = new ArrayList<>();
+        List<String> alreadyProcessed = new ArrayList<>();
+        List<String> blankDocs = new ArrayList<>();
 
         //TODO: Revisar que pasa si no hay doc, nunca pasa a procesado?
-        auctionsList.parallelStream().forEach(dto -> {
-            if (dto.getDocuments() != null) {
-                for (var doc : dto.getDocuments()) {
-                    String docUrl = doc.getDocumentUrl();
-                    try {
-                        String key = dto.getAuctionId().concat(" -> ").concat(docUrl);
-                        String value = pdfProcessingService.getTextFromPdfUrl(docUrl);
-
-                        var requestAIEvent = AIEvent.createEventMsg(AIActions.GET_AUCTIONS_REPORT, key);
-                        requestAIEvent.setContent(value);
-                        publish(requestAIEvent, Agents.AI_SERVICE);
-                        sent.add(key);
-                    } catch (Exception e) {
-                        log.error("[ProcessAuctionsUsecase] Error processing or sending PDF for auction {}: {}", dto.getAuctionId(), e.getMessage());
-                        failed.add(dto.getAuctionId().concat(" -> ").concat(docUrl));
+        auctionsList.stream()
+                .filter(dto -> dto.getDocuments() != null && !dto.getDocuments().isEmpty())
+                .forEach(dto -> {
+                    for (var doc : dto.getDocuments()) {
+                        if (doc.getDocAiAnalysis() == null) { //si ya se ha generado no se repite
+                            String docUrl = doc.getDocumentUrl();
+                            String key = dto.getAuctionId().concat(" -> ").concat(docUrl);
+                            try {
+                                String value = pdfProcessingService.getTextFromPdfUrl(docUrl);
+                                if (!value.isBlank()) {
+                                    var requestAIEvent = AIEvent.createEventMsg(AIActions.GET_AUCTIONS_REPORT, key);
+                                    requestAIEvent.setContent(value);
+                                    log.info("[ProcessAuctionsUsecase] Sending AI-Processing request for {}", key);
+                                    publish(requestAIEvent, Agents.AI_SERVICE);
+                                    sent.add(key);
+                                } else {
+                                    log.warn("[ProcessAuctionsUsecase] Extracted empty text from PDF for auction {}: {}", dto.getAuctionId(), docUrl);
+                                    blankDocs.add(key);
+                                }
+                            } catch (Exception e) {
+                                log.error("[ProcessAuctionsUsecase] Error processing or sending PDF for auction {}: {}", dto.getAuctionId(), e.getMessage());
+                                failed.add(key);
+                            }
+                        } else {
+                            alreadyProcessed.add(dto.getAuctionId());
+                        }
                     }
-                }
-            }
-        });
+                });
 
-        log.info("[ProcessAuctionsUsecase] Finished sending AI-Processing requests. Sent: {}, Failed: {}", sent.size(), failed.size());
+        //eliminar posibles duplicados
+        var alreadyProcessedFiltered = alreadyProcessed.stream().distinct().toList();
+        log.info("[ProcessAuctionsUsecase] Finished sending AI-Processing requests. Sent: {}, Failed: {}, BlankDocs: {}, Already processed: {}",
+                sent.size(), failed.size(), blankDocs.size(), alreadyProcessedFiltered.size()
+        );
+
+        /// procesar los docs en blanco, probablemente el pdf sea una foto o escaneado
+        if (!blankDocs.isEmpty()) {
+            log.warn("[ProcessAuctionsUsecase] The following documents resulted in blank text extraction:");
+            var blankIds = blankDocs.stream()
+                    .map(key -> key.split(" -> ")[0].trim())
+                    .distinct()
+                    .toList();
+            var blankUrls = blankDocs.stream()
+                    .map(key -> key.split(" -> ")[1].trim())
+                    .toList();
+            var auctions = persistenceService.findAllByAuctionIdIn(blankIds);
+            var docs = auctions.stream()
+                    .flatMap(dto -> dto.getDocuments().stream())
+                    .filter(doc -> blankUrls.contains(doc.getDocumentUrl().trim()))
+                    .peek(doc -> doc.setDocAiAnalysis("AI processing skipped due to blank text extraction"))
+                    .toList();
+
+            auctionsPersistenceUsecase.smartSaveAuctionDocs(docs);
+        }
+
+        /// ya procesados de antes, se marcan PROCESSED
+        if (!alreadyProcessed.isEmpty()) {
+            var auctions = persistenceService.findAllByAuctionIdIn(alreadyProcessedFiltered);
+            auctions = auctions.stream()
+                    .peek(dto -> dto.setProcessingStatus(ProcessingStatus.PROCESSED))
+                    .toList();
+            auctionsPersistenceUsecase.smartSaveObtainedAuctions(auctions);
+        }
+
+        /// errores
         if (!failed.isEmpty()) {
             log.error("[ProcessAuctionsUsecase] Failed to process or send the following documents:");
             failed.forEach(doc -> log.warn("\\\t{}", doc));
@@ -137,7 +184,8 @@ public class ProcessAuctionsUsecaseImpl implements ProcessAuctionsUsecase {
         publish(responseEvent, Agents.ORCHESTRATOR_SERVICE);
 
         log.info("[ProcessAuctionsUsecase] Processing documents for auction [{}]", auctionId);
-        
+
+        /// no diferencia si ya esta o no, se machaca lo que haya
         if (dto.getDocuments() != null) {
             for (var doc : dto.getDocuments()) {
                 String docUrl = doc.getDocumentUrl();
@@ -168,6 +216,9 @@ public class ProcessAuctionsUsecaseImpl implements ProcessAuctionsUsecase {
         String auctionId = keyParts[0].trim();
         String docUrl = keyParts[1].trim();
 
+        log.info("[ProcessAuctionsUsecase] Extracted auctionId: [{}], docUrl: [{}] from event key", auctionId, docUrl);
+        log.info("[ProcessAuctionsUsecase] AI processing content: {}", event.getContent());
+
         try {
             var auctionOpt = persistenceService.findByAuctionId(auctionId);
             if (auctionOpt.isPresent()) {
@@ -189,7 +240,6 @@ public class ProcessAuctionsUsecaseImpl implements ProcessAuctionsUsecase {
             log.error("[ProcessAuctionsUsecase] Error saving AI processing for auction [{}]: {}", auctionId, e.getMessage());
         }
     }
-
 
     private void publish(GenericEventMsg event, Agents destinedTo) {
         event.setProducedBy(Agents.AUCTIONS_SERVICE);

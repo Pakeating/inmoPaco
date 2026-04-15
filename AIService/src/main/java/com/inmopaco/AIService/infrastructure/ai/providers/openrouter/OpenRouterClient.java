@@ -69,7 +69,7 @@ public class OpenRouterClient implements AIProviderService {
 
     private OpenRouterResponse callProvider(OpenRouterRequest request) throws Exception {
         try {
-            log.info("Enviando petición a OpenRouter: {}", request);
+            log.info("Enviando petición a OpenRouter with model: {}", request.getModel());
 
             var responseBody = restClient.post()
                     .uri(apiUrl)

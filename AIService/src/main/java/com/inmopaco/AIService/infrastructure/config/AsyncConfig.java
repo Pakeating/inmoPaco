@@ -14,7 +14,7 @@ public class AsyncConfig {
 
     @Bean(name = "NATSExecutor")
     public Executor taskExecutor() {
-        /// cambiar por hilos virtuales?
+        /// cambiar por hilos virtuales? Seria lo suyo pero hay que cambiar el pool por un semaforo
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
         executor.setCorePoolSize(4);    // igualo el maxpoolsize para evitar esperar a que se  llene la cola para procesar en paralelo
         executor.setMaxPoolSize(4); 
@@ -23,7 +23,7 @@ public class AsyncConfig {
         // si la cola esta llena, el hilo del NATS ejecuta la tarea en lugar de seguir escuchando
         executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
 
-        executor.setThreadNamePrefix("NATS-Event-Task");
+        executor.setThreadNamePrefix("NATS-Event");
         executor.initialize();
         return executor;
     }

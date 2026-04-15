@@ -22,4 +22,6 @@ public interface AuctionPersistenceService {
     List<String> listAuctionIdsByStatus(AuctionStatus status);
 
     List<AuctionDetailsDTO> listAuctionsByProcessingStatus(ProcessingStatus status);
+
+    void deleteAuction(String auctionId);
 }

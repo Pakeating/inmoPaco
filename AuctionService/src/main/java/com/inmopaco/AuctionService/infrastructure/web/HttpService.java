@@ -14,4 +14,6 @@ public interface HttpService  {
 
     @GetMapping("/process-auction")
     void executeProcessAuction(String auctionId);
+
+    void deleteAuction(String auctionId);
 }

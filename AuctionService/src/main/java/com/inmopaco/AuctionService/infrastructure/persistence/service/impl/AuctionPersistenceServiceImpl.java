@@ -8,6 +8,7 @@ import com.inmopaco.AuctionService.infrastructure.persistence.mapper.AuctionRepo
 import com.inmopaco.AuctionService.infrastructure.persistence.repository.AuctionRepository;
 import com.inmopaco.AuctionService.infrastructure.persistence.service.AuctionPersistenceService;
 import jakarta.transaction.Transactional;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,7 +16,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import lombok.extern.log4j.Log4j2;
 
 @Log4j2
 @Service
@@ -101,5 +101,12 @@ public class AuctionPersistenceServiceImpl implements AuctionPersistenceService 
         }
 
         return auctionList.parallelStream().map(mapper::toDTO).toList();
+    }
+    
+    @Override
+    @Transactional
+    public void deleteAuction(String auctionId) {
+        log.info("[deleteAuction] Deleting auction with id: {}", auctionId);
+        repository.deleteById(auctionId);
     }
 }

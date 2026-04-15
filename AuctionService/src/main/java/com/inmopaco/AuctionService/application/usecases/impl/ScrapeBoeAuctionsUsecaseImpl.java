@@ -2,7 +2,6 @@ package com.inmopaco.AuctionService.application.usecases.impl;
 
 import com.inmopaco.AuctionService.application.usecases.ScrapeBoeAuctionsUsecase;
 import com.inmopaco.AuctionService.infrastructure.messaging.queues.QueueService;
-import com.inmopaco.AuctionService.infrastructure.persistence.service.AuctionPersistenceService;
 import com.inmopaco.AuctionService.infrastructure.scraper.AuctionScraperProviderService;
 import com.inmopaco.shared.events.AuctionsEvent;
 import com.inmopaco.shared.events.enums.AuctionsActions;
@@ -21,9 +20,6 @@ public class ScrapeBoeAuctionsUsecaseImpl implements ScrapeBoeAuctionsUsecase {
     @Autowired
     @Lazy
     private QueueService queueService;
-
-    @Autowired
-    private AuctionPersistenceService persistenceService;
 
     @Override
     public void scrapeBoeAuctions(AuctionsEvent event) {
