@@ -14,7 +14,10 @@ export const getAuth = (db, options = {}) => {
     // URL base: necesaria para redirecciones y cookies seguras en Cloudflare
     baseURL: options.baseURL || import.meta.env.BETTER_AUTH_URL,
 
-    database: db,
+    database: {
+      db: db,
+      type: "sqlite"
+    },
 
     emailAndPassword: {
       enabled: true,
