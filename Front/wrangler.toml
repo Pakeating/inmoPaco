@@ -1,6 +1,6 @@
 name = "inmopaco-front"
 compatibility_date = "2024-09-23"
-compatibility_flags = ["nodejs_compat"]
+compatibility_flags = ["nodejs_compat", "nodejs_als"]
 
 # ─────────────────────────────────────────────────────────────────────────────
 # CONFIGURACIÓN DE BASE DE DATOS D1
@@ -22,5 +22,3 @@ compatibility_flags = ["nodejs_compat"]
 binding      = "DB"
 database_name = "inmopaco-auth"
 database_id  = "f5d8c18c-6b5f-48b0-85b4-8704346a615c"
-compatibility_flags = ["nodejs_compat", "nodejs_als"]
-compatibility_date = "2024-09-23"

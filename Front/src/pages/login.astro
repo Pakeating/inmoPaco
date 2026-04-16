@@ -1,24 +1,12 @@
 ---
 /**
  * Página de login — standalone (sin Layout principal)
- * Si ya hay sesión activa, redirige directamente a /auctions
+ * Si ya hay sesión activa, redirige directamente a /auctions o /administration
  */
-import { getAuth } from "../lib/auth";
 
-// Si hay sesión activa, redirigimos al usuario
-const db = Astro.locals.runtime?.env?.DB;
-if (db) {
-  try {
-    const auth = getAuth(db);
-    const session = await auth.api.getSession({
-      headers: Astro.request.headers,
-    });
-    if (session) {
-      return Astro.redirect("/administration");
-    }
-  } catch {
-    // Sin sesión o error — mostramos el formulario normalmente
-  }
+// Si el middleware ya detectó una sesión válida
+if (Astro.locals.session) {
+  return Astro.redirect("/administration");
 }
 ---
 
@@ -262,10 +250,6 @@ if (db) {
 
     <script>
       // @ts-nocheck
-      import { createAuthClient } from "better-auth/client";
-
-      const authClient = createAuthClient();
-
       const form = document.getElementById("login-form");
       const errorBox = document.getElementById("error-box");
       const submitBtn = document.getElementById("submit-btn");
@@ -302,18 +286,22 @@ if (db) {
 
         setLoading(true);
         try {
-          const { data, error } = await authClient.signIn.email({
-            email,
-            password,
-            callbackURL: "/administration",
+          const response = await fetch("/api/login", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ email, password })
           });
-
-          if (error) {
-            showError(
-              error.message ?? "Credenciales incorrectas. Inténtalo de nuevo.",
-            );
+          
+          if (!response.ok) {
+            const data = await response.json();
+            showError(data.error ?? "Credenciales incorrectas. Inténtalo de nuevo.");
           } else {
-            window.location.href = "/administration";
+            const data = await response.json();
+            if (data.success) {
+              window.location.href = data.redirect || "/administration";
+            }
           }
         } catch (err) {
           showError("Error de conexión. Por favor, inténtalo más tarde.");
@@ -327,7 +315,7 @@ if (db) {
 </html>
 
 <style>
-  /* ─── Reset & Base ──────────────────────────────────────────── */
+  /* Reset */
   *,
   *::before,
   *::after {
@@ -348,14 +336,14 @@ if (db) {
     background: #0a2540;
   }
 
-  /* ─── Layout ────────────────────────────────────────────────── */
+  /* Layout */
   .login-layout {
     display: grid;
     grid-template-columns: 1fr 1fr;
     min-height: 100vh;
   }
 
-  /* ─── Brand Panel (left) ────────────────────────────────────── */
+  /* Brand Panel (left) */
   .brand-panel {
     background: linear-gradient(145deg, #051729 0%, #0a2540 40%, #0f3460 100%);
     position: relative;
@@ -484,7 +472,7 @@ if (db) {
     background: rgba(249, 115, 22, 0.22);
   }
 
-  /* ─── Form Panel (right) ────────────────────────────────────── */
+  /* Form Panel (right) */
   .form-panel {
     display: flex;
     align-items: center;
@@ -728,7 +716,7 @@ if (db) {
     color: #0a2540;
   }
 
-  /* ─── Responsive ────────────────────────────────────────────── */
+  /* Responsive */
   @media (max-width: 768px) {
     body {
       background: #0a2540;

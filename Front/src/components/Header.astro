@@ -73,10 +73,6 @@ const userInitial = user?.name
 </header>
 
 <script>
-  import { createAuthClient } from "better-auth/client";
-
-  const authClient = createAuthClient();
-
   /* responsive */
   const navToggle = document.querySelector('.mobile-nav-toggle');
   const navMenu   = document.querySelector('.nav-menu');
@@ -117,14 +113,14 @@ const userInitial = user?.name
     });
   }
 
-  /* logout (actualmente no en uso) */
-  const logoutBtn = document.getElementById('logout-btn') as HTMLButtonElement | null; //tipo agregado porque tira error en la pipeline de compilacion de cloudflare 
+  /* logout*/
+  const logoutBtn = document.getElementById('logout-btn') as HTMLButtonElement | null;
   if (logoutBtn) {
     logoutBtn.addEventListener('click', async () => {
       logoutBtn.disabled = true;
       logoutBtn.textContent = 'Cerrando sesión...';
       try {
-        await authClient.signOut();
+        await fetch('/api/logout', { method: 'POST' });
         window.location.href = '/';
       } catch (err) {
         console.error('[Header] Error al cerrar sesión:', err);

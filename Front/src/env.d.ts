@@ -11,22 +11,19 @@ declare namespace App {
       id: string;
       name: string;
       email: string;
-      role?: string;
-      image?: string | null;
-      emailVerified: boolean;
+      role: string;
     } | null;
 
     /** Sesión activa (establecida por el middleware) */
     session?: {
       id: string;
-      token: string;
-      expiresAt: Date;
       userId: string;
+      expiresAt: Date;
+      fresh: boolean;
     } | null;
 
     /**
      * JWT firmado con HS256 (expira en 5 min) para llamadas al backend Java.
-     * Úsalo en las API routes BFF: Authorization: `Bearer ${locals.jwtToken}`
      */
     jwtToken?: string;
   }
