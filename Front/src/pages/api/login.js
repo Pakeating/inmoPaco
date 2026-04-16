@@ -1,5 +1,5 @@
 import { initializeLucia } from "../../lib/lucia.js";
-import { Scrypt } from "oslo/password";
+import { verifyPassword } from "../../lib/hash.js";
 
 export const prerender = false;
 
@@ -28,10 +28,9 @@ export async function POST(context) {
       return new Response(JSON.stringify({ error: "Correo o contraseña incorrectos" }), { status: 401 });
     }
 
-    // valida contraseña
+    // valida contraseña nativamente
     const user = results[0];
-    const scrypt = new Scrypt();
-    const validPassword = await scrypt.verify(user.password_hash, password);
+    const validPassword = await verifyPassword(password, user.password_hash);
 
     if (!validPassword) {
       return new Response(JSON.stringify({ error: "Correo o contraseña incorrectos" }), { status: 401 });

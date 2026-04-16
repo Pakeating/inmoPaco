@@ -15,8 +15,7 @@
     "@lucia-auth/adapter-sqlite": "^3.0.2",
     "astro": "^5.0.0",
     "jose": "^6.2.2",
-    "lucia": "^3.2.2",
-    "oslo": "^1.2.1"
+    "lucia": "^3.2.2"
   },
   "devDependencies": {
     "typescript": "^5.9.3"
