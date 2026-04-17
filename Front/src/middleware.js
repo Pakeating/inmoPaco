@@ -19,12 +19,12 @@ export const onRequest = defineMiddleware(async (context, next) => {
         session = result.session;
         user = result.user;
 
-        // Si la sesión es válida pero acaba de ser extendida, asegurar que renovamos la cookie
+        // Si la sesion es valida pero acaba de ser extendida, renovamos la cookie
         if (session && session.fresh) {
           const sessionCookie = lucia.createSessionCookie(session.id);
           context.cookies.set(sessionCookie.name, sessionCookie.value, sessionCookie.attributes);
         }
-        // Si no es válida, limpiamos la cookie
+        // Si no limpiamos la cookie
         if (!session) {
           const sessionCookie = lucia.createBlankSessionCookie();
           context.cookies.set(sessionCookie.name, sessionCookie.value, sessionCookie.attributes);
@@ -39,7 +39,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
       };
 
       if (session && user) {
-        // En Lucia v3, user contiene los datos expuestos en getUserAttributes
+        // En Lucia, user contiene los datos de getUserAttributes
         context.locals.user = user;
         context.locals.session = session;
 
@@ -52,7 +52,6 @@ export const onRequest = defineMiddleware(async (context, next) => {
       }
 
       // Generamos JWT siempre, con datos de user o guest
-      // Prioridad al secreto del runtime (env)
       const jwtSecret = env?.JWT_SECRET || import.meta.env.JWT_SECRET;
       const secret = new TextEncoder().encode(jwtSecret);
       const jwtToken = await new SignJWT(jwtPayload)
@@ -65,8 +64,8 @@ export const onRequest = defineMiddleware(async (context, next) => {
 
       const url = new URL(context.request.url);
       
-      // Control de acceso a administracion
-      if (url.pathname.startsWith("/administration")) {
+      // Control de acceso a administracion y proxy backend admin
+      if (url.pathname.startsWith("/administration") || url.pathname.startsWith("/admin")) {
         if (!session || !user || user.role !== "admin") {
           console.warn(`[Middleware] Acceso bloqueado a ${url.pathname} para ${user?.email ?? "Anon"}`);
           return context.redirect("/login");
