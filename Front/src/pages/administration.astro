@@ -4,10 +4,8 @@
  */
 import Layout from "../layouts/Layout.astro";
 
-// Obtenemos el usuario de locals (inyectado por el middleware)
 const user = Astro.locals.user;
 
-// Verificación de seguridad adicional (Middleware ya protege esta ruta, pero esto es redundante por seguridad)
 if (!user || user.role !== 'admin') {
   return Astro.redirect("/login");
 }
@@ -47,7 +45,7 @@ if (!user || user.role !== 'admin') {
     </div>
 
     <div class="admin-layout">
-      <!-- Columna Izquierda: Botón Admin -->
+      <!-- Columna Izquierda: Boton Admin -->
       <div class="admin-left-col">
         <section class="backend-admin-section">
           <div class="backend-admin-content">
@@ -56,10 +54,10 @@ if (!user || user.role !== 'admin') {
         </section>
       </div>
 
-      <!-- Columna Derecha: Cards de Estado/Configuración -->
+      <!-- Columna Derecha: Cards de Estado/Configuracion -->
       <div class="admin-right-col">
         <div class="admin-grid-column">
-          <!-- Card: Estadísticas rápidas -->
+          <!-- Card: Estadisticas rapidas -->
           <div class="admin-card stats-card">
             <div class="card-icon">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24" height="24">
@@ -73,7 +71,7 @@ if (!user || user.role !== 'admin') {
             </div>
           </div>
 
-          <!-- Card: Gestión de Usuarios -->
+          <!-- Card: Gestion de Usuarios -->
           <div class="admin-card action-card">
             <div class="card-icon">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24" height="24">
@@ -90,7 +88,7 @@ if (!user || user.role !== 'admin') {
             </div>
           </div>
 
-          <!-- Card: Configuración de la IA -->
+          <!-- Card: Configuracion de la IA -->
           <div class="admin-card action-card">
             <div class="card-icon">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24" height="24">
@@ -107,7 +105,7 @@ if (!user || user.role !== 'admin') {
       </div>
     </div>
 
-    <!-- Toast de respuesta -->
+    <!-- Toast-->
     <div id="toast" class="toast" role="alert" aria-live="polite"></div>
 
     <!-- Modal: Delete Consumer -->
@@ -341,7 +339,7 @@ if (!user || user.role !== 'admin') {
     margin-right: 0.25rem;
   }
 
-  /* ── Modales ── */
+  /* Modales */
   .modal-overlay {
     display: none;
     position: fixed;
@@ -444,7 +442,7 @@ if (!user || user.role !== 'admin') {
   .btn-modal-confirm.btn-danger { background: #dc2626; }
   .btn-modal-confirm:hover { opacity: 0.9; }
 
-  /* ── Toast ── */
+  /* Toast */
   .toast {
     position: fixed;
     bottom: 2rem;
@@ -475,7 +473,7 @@ if (!user || user.role !== 'admin') {
 </style>
 
 <script>
-  // ── Utilidades de Modal (usa style.display para evitar confusiones de scoping) ──
+  // Modal
   function openModal(id) {
     const el = document.getElementById(id);
     if (el) el.style.display = 'flex';
@@ -486,7 +484,7 @@ if (!user || user.role !== 'admin') {
     if (el) el.style.display = 'none';
   }
 
-  // ── Toast ────────────────────────────────────────────────────────────────
+  // Toast
   let toastTimer;
   function showToast(msg, type = 'success') {
     const toast = document.getElementById('toast');
@@ -497,7 +495,7 @@ if (!user || user.role !== 'admin') {
     toastTimer = setTimeout(() => toast.classList.remove('show'), 5000);
   }
 
-  // ── Llamada al orquestrador con timeout de 30s ───────────────────────────
+  // llama al orquestrador con timeout de 30s
   async function callOrchestrator(action, params = {}) {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 30000);
@@ -513,28 +511,28 @@ if (!user || user.role !== 'admin') {
 
       const data = await res.json();
       if (res.ok && data.success) {
-        showToast(`✅ ${action}: completado (HTTP ${data.status})`, 'success');
+        showToast(` ${action}: completado (HTTP ${data.status})`, 'success');
       } else {
         const msg = data.error ?? data.data?.message ?? `Error ${res.status}`;
-        showToast(`⚠️ ${action}: ${msg}`, 'error');
+        showToast(` ${action}: ${msg}`, 'error');
       }
     } catch (err) {
       clearTimeout(timeout);
       if (err.name === 'AbortError') {
-        showToast(`⏱️ ${action}: tiempo de espera agotado (30s)`, 'error');
+        showToast(` ${action}: tiempo de espera agotado (30s)`, 'error');
       } else {
-        showToast(`❌ Error de conexión: ${err.message}`, 'error');
+        showToast(` Error de conexión: ${err.message}`, 'error');
       }
     }
   }
 
-  // ── Botón 1: Purge Queue ─────────────────────────────────────────────────
+  // Purge Queue
   document.getElementById('btn-purge')?.addEventListener('click', () => {
     if (!confirm('¿Seguro que quieres purgar la cola? Esta acción no se puede deshacer.')) return;
     callOrchestrator('purge');
   });
 
-  // ── Botón 2: Delete Consumer (modal con form) ────────────────────────────
+  // Delete Consumer
   document.getElementById('btn-delete-consumer')?.addEventListener('click', () => {
     openModal('modal-delete-consumer');
   });
@@ -543,20 +541,20 @@ if (!user || user.role !== 'admin') {
   });
   document.getElementById('form-delete-consumer')?.addEventListener('submit', (e) => {
     e.preventDefault();
-    const stream = document.getElementById('dc-stream').value.trim();
-    const subject = document.getElementById('dc-subject').value.trim();
+    const stream = (document.getElementById('dc-stream') as HTMLInputElement).value.trim();
+    const subject = (document.getElementById('dc-subject') as HTMLInputElement).value.trim();
     if (!stream || !subject) { showToast('Completa todos los campos', 'error'); return; }
     closeModal('modal-delete-consumer');
     callOrchestrator('deleteConsumer', { stream, subject });
   });
 
-  // ── Botón 3: Lanzar AuctionScheduler ────────────────────────────────────
+  // AuctionScheduler
   document.getElementById('btn-scheduler')?.addEventListener('click', () => {
     if (!confirm('¿Lanzar el AuctionScheduler ahora?')) return;
     callOrchestrator('scheduler');
   });
 
-  // ── Botón 4: Get Auctions (modal con form) ───────────────────────────────
+  // Get Auctions
   document.getElementById('btn-get-auctions')?.addEventListener('click', () => {
     openModal('modal-get-auctions');
   });
@@ -565,22 +563,25 @@ if (!user || user.role !== 'admin') {
   });
   document.getElementById('form-get-auctions')?.addEventListener('submit', (e) => {
     e.preventDefault();
-    const auctionsPayload = document.getElementById('ga-payload').value.trim();
+    const auctionsPayload = (document.getElementById('ga-payload') as HTMLInputElement).value.trim();
     if (!auctionsPayload) { showToast('Introduce un payload válido', 'error'); return; }
     closeModal('modal-get-auctions');
     callOrchestrator('getAuctions', { auctionsPayload });
   });
 
-  // ── Botón 5: Process Auctions ────────────────────────────────────────────
+  // Process Auctions
   document.getElementById('btn-process')?.addEventListener('click', () => {
     if (!confirm('¿Procesar subastas ahora? (auctionsPayload vacío)')) return;
     callOrchestrator('processAuctions');
   });
 
-  // Cerrar modales al clicar fuera del modal-box
+  // Cerrar modales al clicar fuera
   document.querySelectorAll('.modal-overlay').forEach(overlay => {
-    overlay.addEventListener('click', (e) => {
-      if (e.target === overlay) overlay.style.display = 'none';
-    });
+  const el = overlay as HTMLElement; 
+  el.addEventListener('click', (e) => {
+    if (e.target === el) {
+      el.style.display = 'none';
+    }
   });
+});
 </script>
