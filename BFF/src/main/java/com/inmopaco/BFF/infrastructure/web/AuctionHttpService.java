@@ -4,7 +4,6 @@ import com.inmopaco.BFF.application.dto.AuctionDetailsDTO;
 import com.inmopaco.BFF.application.dto.AuctionQueryDTO;
 import com.inmopaco.BFF.application.usecases.AuctionQueryUsecase;
 import io.swagger.v3.oas.annotations.Operation;
-import jakarta.websocket.server.PathParam;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -32,7 +31,7 @@ public class AuctionHttpService {
                 .orElse(ResponseEntity.notFound().build());
 
         log.info("Search executed for id {}", id);
-        log.info("Search result: {}", result);
+//        log.info("Search result: {}", result);
 
         return result;
 
@@ -50,7 +49,7 @@ public class AuctionHttpService {
         Pageable pageable = getPaginationAndSorting(page, size, sortBy);
         Page<AuctionDetailsDTO> result = auctionUsecase.search(filter, pageable);
         log.info("Search executed with filters: {}, page: {}, size: {}, sortBy: {}", filter, page, size, sortBy);
-        log.info("Search result: totalElements={}, totalPages={}, content: {}", result.getTotalElements(), result.getTotalPages(), result.getContent());
+        log.info("Search result: totalElements: {}, totalPages: {}", result.getTotalElements(), result.getTotalPages());
 
         return ResponseEntity.ok(result);
     }

@@ -7,11 +7,12 @@ import com.inmopaco.Orchestrator.infrastructure.queues.provider.GenericQueueProv
 import com.inmopaco.Orchestrator.infrastructure.queues.provider.nats.management.impl.NatsStreamManagementServiceImpl;
 import com.inmopaco.shared.events.AuctionsEvent;
 import com.inmopaco.shared.events.GenericEventMsg;
-import jakarta.annotation.PostConstruct;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -56,7 +57,7 @@ public class QueueServiceImpl implements QueueService {
     }
 
     //TODO: Las colas no deberian estar hardcodeadas
-    @PostConstruct
+    @EventListener(ApplicationReadyEvent.class) //garantiza que se haya incializado todo, lo que implica que se hayan creado los streams y las colas
     public void subscribeToQueues(){
         subscribePersistent("auctions.response",
                 durableName,

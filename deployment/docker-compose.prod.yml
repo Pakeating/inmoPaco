@@ -1,4 +1,3 @@
-
 networks:
   microservices-network:
     driver: bridge
@@ -10,17 +9,11 @@ services:
 
   # --- CONFIG SERVICE V3---
   config-service-v3:
-    build:
-      context: ../ConfigServiceV3
-    container_name: ${CONFIG}
-    image: ${CONFIG}
+    image: ghcr.io/${GH_USER}/inmopaco/${CONFIG}:V0.1.0
     hostname: config-service-v3
     ports:
       - "8888:8888"
     volumes:
-      # archivos locales en el config
-      #      - ./configs:/app/resources/configurations
-      # archivos en deployment/config
       - ./configurations:/app/config-repo
     environment:
       - SPRING_PROFILES_ACTIVE=native
@@ -37,10 +30,7 @@ services:
 
   # --- API GATEWAY V3 ---
   api-gateway-v3:
-    build:
-      context: ../APIGatewayV3
-    container_name: ${GATEWAY}
-    image: ${GATEWAY}
+    image: ghcr.io/${GH_USER}/inmopaco/${GATEWAY}:V0.1.0
     ports:
       - "8080:8080"
     depends_on:
@@ -48,12 +38,10 @@ services:
         condition: service_healthy
     environment:
       - SPRING_CONFIG_IMPORT=optional:configserver:${CONFIG}:8888
-      - SPRING_CLOUD_CONFIG_FAIL_FAST=false     #failfast y reintentos forzados para que reconecte si esta inestable
+      - SPRING_CLOUD_CONFIG_FAIL_FAST=false
       - SPRING_CLOUD_CONFIG_RETRY_MAX_ATTEMPTS=20
       - SPRING_CLOUD_CONFIG_RETRY_INITIAL_INTERVAL=2000
       - SPRING_CLOUD_CONFIG_RETRY_MULTIPLIER=1.5
-      #      Desactivado EUREKA
-      #      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
       - EUREKA_CLIENT_ENABLED=false
       - SPRING_CLOUD_DISCOVERY_ENABLED=false
     networks:
@@ -62,10 +50,7 @@ services:
 
   # --- ADMIN ---
   admin-server:
-    build:
-      context: ../Admin
-    container_name: ${ADMIN}
-    image: ${ADMIN}
+    image: ghcr.io/${GH_USER}/inmopaco/${ADMIN}:V0.1.0
     ports:
       - "9090:9090"
     healthcheck:
@@ -78,7 +63,6 @@ services:
     networks:
       - microservices-network
 
-
   # --- ACTUALIZADOR AUTOMÁTICO ---
   watchtower:
     image: containrrr/watchtower
@@ -86,52 +70,49 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
-      # Forzamos la versión exacta que soporta tu Server Engine
       - DOCKER_API_VERSION=1.52
     command: --interval 30 --cleanup
     networks:
       - microservices-network
 
-#   --- CONECTOR DE CLOUDFLARE TUNNELS ---
+  # --- CONECTOR DE CLOUDFLARE TUNNELS ---
   cloudflared:
     image: cloudflare/cloudflared:latest
     container_name: ${CLOUDFLARE}
     restart: unless-stopped
     networks:
       - public-tunnel-network
-    environment: ## TODO: CAMBIAR POR VARIABLE DE ENTORNO, NO PUEDE ESTAR EN EL REPOSITORIO
-      - TUNNEL_TOKEN=${CLOUDFLARE_TUNNEL_TOKEN_DEV}
+    environment:
+      - TUNNEL_TOKEN=${CLOUDFLARE_TUNNEL_TOKEN}
     command: tunnel --no-autoupdate run
-#    depends_on:
-#      - gateway
 
   # --- COLAS MENSAJERIA ---
   nats-server:
     image: nats:2.10-alpine
     container_name: ${NATS}
     ports:
-      - "4222:4222" # Puerto para clientes
-      - "8222:8222" # Puerto de monitoreo HTTP (Métricas)
+      - "4222:4222"
+      - "8222:8222"
     command: [
-      "-js",                 # JetStream (Persistencia)
-      "-m", "8222",          # servidor de monitoreo HTTP
-      "--sd", "/data"        # directorio donde se guardarán los mensajes persistentes
+      "-js",
+      "-m", "8222",
+      "--sd", "/data"
     ]
     volumes:
-      - ./nats_data:/data    # persistencia
+      - ./nats_data:/data
     networks:
       - microservices-network
     deploy:
       resources:
         limits:
-          memory: 100M        #deberia ser suficiente...
+          memory: 100M
 
   # --- NATS DASHBOARD ---
   nats-dashboard:
     image: mdawar/nats-dashboard:latest
     container_name: ${NATS_DASHBOARD}
     ports:
-      - "8282:80" # Mapeamos el 8080 interno al 8282 para no chocar con el Gateway
+      - "8282:80"
     environment:
       - REVERSE_PROXY_UPSTREAM=nats-server:8222
     depends_on:
@@ -144,7 +125,6 @@ services:
     image: mariadb:10.11
     container_name: ${MARIADB}
     restart: always
-    # Para minimizar la huella de memoria, si escala habra que subirlo:
     command: [
       "mysqld",
       "--performance-schema=OFF",
@@ -164,23 +144,18 @@ services:
     ports:
       - "3306:3306"
     volumes:
-      # PERSISTENCIA: Se guarda en el sistema de archivos en lugar del contenedor
       - ./mariadb_data:/var/lib/mysql
     networks:
       - microservices-network
     deploy:
       resources:
         limits:
-          memory: 150M # RAM maxima por ahora
+          memory: 150M
 
 #    SERVICIOS DE NEGOCIO
 
   orchestrator:
-    build:
-      context: ..
-      dockerfile: Orchestrator/Dockerfile
-    container_name: ${ORCHESTRATOR}
-    image: ${ORCHESTRATOR}
+    image: ghcr.io/${GH_USER}/inmopaco/${ORCHESTRATOR}:V0.1.0
     ports:
       - "8082:8082"
     depends_on:
@@ -200,13 +175,9 @@ services:
     networks:
       - microservices-network
 
-    # --- AUCTION SERVICE ---
+  # --- AUCTION SERVICE ---
   auction-service:
-    build:
-      context: ..
-      dockerfile: AuctionService/Dockerfile
-    container_name: ${AUCTIONS}
-    image: ${AUCTIONS}
+    image: ghcr.io/${GH_USER}/inmopaco/${AUCTIONS}:V0.1.0
     ports:
       - "8081:8081"
     depends_on:
@@ -226,13 +197,9 @@ services:
     networks:
       - microservices-network
 
-    # --- BFF ---
+  # --- BFF ---
   bff:
-    build:
-      context: ..
-      dockerfile: BFF/Dockerfile
-    container_name: ${BFF}
-    image: ${BFF}
+    image: ghcr.io/${GH_USER}/inmopaco/${BFF}:V0.1.0
     ports:
       - "8083:8083"
     depends_on:
@@ -253,13 +220,9 @@ services:
     networks:
       - microservices-network
 
-    # --- PropertyService ---
+  # --- PropertyService ---
   property-service:
-    build:
-      context: ..
-      dockerfile: PropertyService/Dockerfile
-    container_name: ${PROPERTY}
-    image: ${PROPERTY}
+    image: ghcr.io/${GH_USER}/inmopaco/${PROPERTY}:V0.1.0
     ports:
       - "8084:8084"
     depends_on:
@@ -279,13 +242,9 @@ services:
     networks:
       - microservices-network
 
-    # --- AIService ---
+  # --- AIService ---
   ai-service:
-    build:
-      context: ..
-      dockerfile: AIService/Dockerfile
-    container_name: ${AI}
-    image: ${AI}
+    image: ghcr.io/${GH_USER}/inmopaco/${AI}:V0.1.0
     ports:
       - "8085:8085"
     depends_on:
@@ -297,7 +256,6 @@ services:
       - SPRING_CLOUD_CONFIG_RETRY_MAX_ATTEMPTS=20
       - SPRING_CLOUD_CONFIG_RETRY_INITIAL_INTERVAL=2000
       - SPRING_CLOUD_CONFIG_RETRY_MULTIPLIER=1.5
-#      - NATS_URL=nats://nats-server:4222
     volumes:
       - ./logs/usuarios-ms:/app/logs
     networks:

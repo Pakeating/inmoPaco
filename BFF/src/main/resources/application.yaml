@@ -8,9 +8,9 @@ spring:
   config:
     import: "optional:configserver:http://config-service-v3:8888"
   datasource:
-    url: jdbc:mariadb://mariadb:3306/app_db # database es el nombre del docker
-    username: admin_user
-    password: pass
+    url: jdbc:mariadb://mariadb:3306/app_db
+    username: ${DB_USER}
+    password: ${DB_PASS}
     driver-class-name: org.mariadb.jdbc.Driver
     hikari:
       maximum-pool-size: 5  # optimización de RAM, no quiero que se sature la base de datos

@@ -3,15 +3,14 @@ package com.inmopaco.Orchestrator.infrastructure.queues.provider.nats.config;
 import com.inmopaco.Orchestrator.infrastructure.queues.provider.nats.management.NatsStreamManagementService;
 import io.nats.client.Connection;
 import jakarta.annotation.PostConstruct;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
 public class NatsStreamConfig {
 
-    private final Connection natsConnection;
+    @Autowired
+    private Connection natsConnection;
     @Autowired
     private NatsConfig natsConfig;
     @Autowired
