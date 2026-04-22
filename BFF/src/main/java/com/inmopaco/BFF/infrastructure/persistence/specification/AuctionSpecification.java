@@ -2,6 +2,8 @@ package com.inmopaco.BFF.infrastructure.persistence.specification;
 
 import com.inmopaco.BFF.application.dto.AuctionQueryDTO;
 import com.inmopaco.BFF.infrastructure.persistence.entity.AuctionEntity;
+import com.inmopaco.BFF.infrastructure.util.AuctionTypeMapper;
+import com.inmopaco.BFF.infrastructure.util.ProvinceMapper;
 import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.jpa.domain.Specification;
 
@@ -15,12 +17,15 @@ public class AuctionSpecification {
 
             // IDS
             if (dto.getAuctionIds() != null && !dto.getAuctionIds().isEmpty()) {
-                predicates.add(root.get("id").in(dto.getAuctionIds()));
+                predicates.add(root.get("auctionId").in(dto.getAuctionIds()));
             }
 
             // TYPE
             if (dto.getType() != null && !dto.getType().isBlank()) {
-                predicates.add(cb.equal(root.get("type"), dto.getType()));
+                List<String> mappedTypes = AuctionTypeMapper.map(dto.getType());
+                if (!mappedTypes.isEmpty()) {
+                    predicates.add(root.get("type").in(mappedTypes));
+                }
             }
 
             if (dto.getDateOfEnd() != null && !dto.getDateOfEnd().isBlank()) {
@@ -31,8 +36,9 @@ public class AuctionSpecification {
                 predicates.add(cb.like(cb.lower(root.get("city")), "%" + dto.getCity().toLowerCase() + "%"));
             }
 
-            if (dto.getProvince() != null && !dto.getProvince().isBlank()) {
-                predicates.add(cb.equal(root.get("province"), dto.getProvince()));
+            if (dto.getProvinces() != null && !dto.getProvinces().isEmpty()) {
+                List<String> mappedProvinces = ProvinceMapper.map(dto.getProvinces());
+                predicates.add(root.get("province").in(mappedProvinces));
             }
 
             if (dto.getIsVisitable() != null && !dto.getIsVisitable().isBlank()) {

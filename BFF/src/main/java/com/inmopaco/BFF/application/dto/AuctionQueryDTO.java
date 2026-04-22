@@ -17,7 +17,7 @@ public class AuctionQueryDTO {
 
     private String city;                 // Localidad
 
-    private String province;             // Provincia
+    private List<String> provinces;      // Provincias
 
     private String isVisitable;         // Visitable
 

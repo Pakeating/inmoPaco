@@ -240,7 +240,7 @@
 
   <div id="not-found-detail" class="no-results hidden">
     <p>Lo sentimos, no pudimos encontrar los detalles de esta subasta.</p>
-    <a href="/auctionsList" class="btn-accent">Volver al Listado</a>
+    <a href="/auctionsList" class="btn-accent" id="back-to-list-bottom">Volver al Listado</a>
   </div>
 </div>
 
@@ -503,6 +503,17 @@
       locSection?.classList.remove("hidden");
     }
   });
+
+  // Restaurar estado de búsqueda en el botón de retorno (si existe en el DOM)
+  if (typeof window !== 'undefined') {
+    const savedSearch = sessionStorage.getItem('last_auction_search');
+    if (savedSearch) {
+      const backBtn = document.getElementById('back-to-list-bottom') as HTMLAnchorElement;
+      if (backBtn) {
+        backBtn.href = `/auctionsList${savedSearch}`;
+      }
+    }
+  }
 </script>
 
 <style is:global>

@@ -9,8 +9,8 @@ spring:
     import: "optional:configserver:http://localhost:8888"
   datasource:
     url: jdbc:mariadb://localhost:3306/app_db
-    username: admin_user
-    password: pass
+    username: ${DB_USER}
+    password: ${DB_PASS}
     driver-class-name: org.mariadb.jdbc.Driver
     hikari:
       maximum-pool-size: 5  # optimización de RAM, no quiero que se sature la base de datos

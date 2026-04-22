@@ -23,6 +23,14 @@ import Pagination from "../components/Pagination.astro";
 	</main>
 </Layout>
 
+<script>
+  // Guardar el estado de la búsqueda actual para poder volver desde el detalle
+  if (typeof window !== 'undefined') {
+    const currentSearch = window.location.search;
+    sessionStorage.setItem('last_auction_search', currentSearch);
+  }
+</script>
+
 <style>
 	main {
 		padding-top: 4rem;

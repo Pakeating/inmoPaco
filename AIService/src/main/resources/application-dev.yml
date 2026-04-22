@@ -34,7 +34,7 @@ nats:
 openrouter:
   api:
     url: https://openrouter.ai/api/v1/chat/completions
-    key: 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 #caduca en una semana, solo modelos free
+    key: ${OPENROUTER_API_KEY}
 
 server:
   port: 7085
