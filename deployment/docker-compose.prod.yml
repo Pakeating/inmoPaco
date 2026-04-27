@@ -9,7 +9,7 @@ services:
 
   # --- CONFIG SERVICE V3---
   config-service-v3:
-    image: ghcr.io/${GH_USER}/inmopaco/${CONFIG}:V0.1.0
+    image: ghcr.io/${GH_USER}/inmopaco/${CONFIG}:latest
     hostname: config-service-v3
     ports:
       - "8888:8888"
@@ -30,7 +30,7 @@ services:
 
   # --- API GATEWAY V3 ---
   api-gateway-v3:
-    image: ghcr.io/${GH_USER}/inmopaco/${GATEWAY}:V0.1.0
+    image: ghcr.io/${GH_USER}/inmopaco/${GATEWAY}:latest
     ports:
       - "8080:8080"
     depends_on:
@@ -50,7 +50,7 @@ services:
 
   # --- ADMIN ---
   admin-server:
-    image: ghcr.io/${GH_USER}/inmopaco/${ADMIN}:V0.1.0
+    image: ghcr.io/${GH_USER}/inmopaco/${ADMIN}:latest
     ports:
       - "9090:9090"
     healthcheck:
@@ -152,10 +152,20 @@ services:
         limits:
           memory: 150M
 
+  # --- ADMINER ---
+  adminer:
+    image: adminer:latest
+    container_name: ${ADMINER}
+    restart: always
+    ports:
+      - "4000:8080"
+    networks:
+      - microservices-network
+
 #    SERVICIOS DE NEGOCIO
 
   orchestrator:
-    image: ghcr.io/${GH_USER}/inmopaco/${ORCHESTRATOR}:V0.1.0
+    image: ghcr.io/${GH_USER}/inmopaco/${ORCHESTRATOR}:latest
     ports:
       - "8082:8082"
     depends_on:
@@ -177,7 +187,7 @@ services:
 
   # --- AUCTION SERVICE ---
   auction-service:
-    image: ghcr.io/${GH_USER}/inmopaco/${AUCTIONS}:V0.1.0
+    image: ghcr.io/${GH_USER}/inmopaco/${AUCTIONS}:latest
     ports:
       - "8081:8081"
     depends_on:
@@ -199,7 +209,7 @@ services:
 
   # --- BFF ---
   bff:
-    image: ghcr.io/${GH_USER}/inmopaco/${BFF}:V0.1.0
+    image: ghcr.io/${GH_USER}/inmopaco/${BFF}:latest
     ports:
       - "8083:8083"
     depends_on:
@@ -222,7 +232,7 @@ services:
 
   # --- PropertyService ---
   property-service:
-    image: ghcr.io/${GH_USER}/inmopaco/${PROPERTY}:V0.1.0
+    image: ghcr.io/${GH_USER}/inmopaco/${PROPERTY}:latest
     ports:
       - "8084:8084"
     depends_on:
@@ -244,7 +254,7 @@ services:
 
   # --- AIService ---
   ai-service:
-    image: ghcr.io/${GH_USER}/inmopaco/${AI}:V0.1.0
+    image: ghcr.io/${GH_USER}/inmopaco/${AI}:latest
     ports:
       - "8085:8085"
     depends_on:

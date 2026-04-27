@@ -26,6 +26,30 @@ spring:
                 - name: CircuitBreaker
                   args:
                     name: AdminServer
+            - id: portainer
+              uri: http://localhost:9000
+              predicates:
+                - name: Path
+                  args:
+                    patterns: /portainer/**
+              filters:
+                - name: PreserveHostHeader
+            - id: nats-dashboard
+              uri: http://localhost:8282
+              predicates:
+                - name: Path
+                  args:
+                    patterns: /nats/**
+              filters:
+                - name: PreserveHostHeader
+            - id: adminer
+              uri: http://localhost:4000
+              predicates:
+                - name: Path
+                  args:
+                    patterns: /adminer/**
+              filters:
+                - name: PreserveHostHeader
             - id: auctions
               uri: http://auction-service:8081
               predicates:

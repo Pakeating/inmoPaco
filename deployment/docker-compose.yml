@@ -139,6 +139,16 @@ services:
     networks:
       - microservices-network
 
+  # --- ADMINER ---
+  adminer:
+    image: adminer:latest
+    container_name: ${ADMINER}
+    restart: always
+    ports:
+      - "4000:8080"
+    networks:
+      - microservices-network
+
   # --- DATABASES ---
   mariadb:
     image: mariadb:10.11
