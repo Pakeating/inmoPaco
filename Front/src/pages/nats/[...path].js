@@ -51,19 +51,17 @@ export const ALL = async ({ params, request, locals }) => {
     if (contentType.includes('text/html') || contentType.includes('application/javascript')) {
       let text = await response.text();
       
-      // Reemplazar rutas absolutas que apuntan a la raíz
-      text = text.replaceAll('"/app/', '"/nats/app/');
-      text = text.replaceAll('\'/app/', '\'/nats/app/');
-      text = text.replaceAll('"/sw.js"', '"/nats/sw.js"');
-      text = text.replaceAll('"/favicon', '"/nats/favicon');
-      text = text.replaceAll('"/manifest.webmanifest"', '"/nats/manifest.webmanifest"');
-      text = text.replaceAll('"/icons/"', '"/nats/icons/"');
-      text = text.replaceAll('"/config.json"', '"/nats/config.json"');
-      text = text.replaceAll('"/proxy/', '"/nats/proxy/');
+      // Reemplazar rutas absolutas que apuntan a la raíz usando Regex para capturar comillas simples y dobles
+      text = text.replace(/["']\/app\//g, m => m[0] + '/nats/app/');
+      text = text.replace(/["']\/sw\.js["']/g, m => m[0] + '/nats/sw.js' + m[0]);
+      text = text.replace(/["']\/favicon/g, m => m[0] + '/nats/favicon');
+      text = text.replace(/["']\/manifest\.webmanifest["']/g, m => m[0] + '/nats/manifest.webmanifest' + m[0]);
+      text = text.replace(/["']\/icons\//g, m => m[0] + '/nats/icons/');
+      text = text.replace(/["']\/config\.json["']/g, m => m[0] + '/nats/config.json' + m[0]);
+      text = text.replace(/["']\/proxy\//g, m => m[0] + '/nats/proxy/');
       
       // Corregir el scope del Service Worker
-      text = text.replaceAll('scope: "/"', 'scope: "/nats/"');
-      text = text.replaceAll('scope:"/"', 'scope:"/nats/"');
+      text = text.replace(/scope\s*:\s*["']\/["']/g, m => m.split(':')[0] + ': "/nats/"');
 
       // Parche específico para desarrollo local si es necesario
       const requestHost = new URL(request.url).host;
