@@ -44,21 +44,36 @@ export const ALL = async ({ params, request, locals }) => {
     responseHeaders.delete('content-encoding');
     responseHeaders.delete('content-length');
 
+    let body = response.body;
     const contentType = responseHeaders.get('content-type') ?? '';
-    const requestHost = new URL(request.url).host;
-    const isLocalDev = requestHost.startsWith('localhost') || requestHost.startsWith('127.0.0.1');
 
-    if (isLocalDev && contentType.includes('text/html')) {
-      let html = await response.text();
-      html = html.replaceAll(`https://${requestHost}`, `http://${requestHost}`);
-      return new Response(html, {
+    // Si es HTML o JS, necesitamos reescribir las rutas de los assets para que apunten a /nats/
+    if (contentType.includes('text/html') || contentType.includes('application/javascript')) {
+      let text = await response.text();
+      
+      // Reemplazar rutas absolutas que apuntan a la raíz
+      text = text.replaceAll('"/app/', '"/nats/app/');
+      text = text.replaceAll('\'/app/', '\'/nats/app/');
+      text = text.replaceAll('"/sw.js"', '"/nats/sw.js"');
+      text = text.replaceAll('"/favicon', '"/nats/favicon');
+      text = text.replaceAll('"/manifest.webmanifest"', '"/nats/manifest.webmanifest"');
+      text = text.replaceAll('"/icons/"', '"/nats/icons/"');
+
+      // Parche específico para desarrollo local si es necesario
+      const requestHost = new URL(request.url).host;
+      const isLocalDev = requestHost.startsWith('localhost') || requestHost.startsWith('127.0.0.1');
+      if (isLocalDev) {
+        text = text.replaceAll(`https://${requestHost}`, `http://${requestHost}`);
+      }
+
+      return new Response(text, {
         status: response.status,
         statusText: response.statusText,
         headers: responseHeaders
       });
     }
 
-    return new Response(response.body, {
+    return new Response(body, {
       status: response.status,
       statusText: response.statusText,
       headers: responseHeaders
