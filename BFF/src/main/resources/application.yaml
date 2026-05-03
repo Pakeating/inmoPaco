@@ -38,3 +38,9 @@ nats:
 
 server:
   port: 8083
+
+springdoc:
+  swagger-ui:
+    path: /bff/swagger-ui/index.html
+  api-docs:
+    path: /bff/v3/api-docs

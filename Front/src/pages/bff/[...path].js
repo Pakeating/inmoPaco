@@ -45,13 +45,28 @@ export const ALL = async ({ params, request, locals }) => {
     responseHeaders.delete('content-length');
 
     const contentType = responseHeaders.get('content-type') ?? '';
-    const requestHost = new URL(request.url).host;
-    const isLocalDev = requestHost.startsWith('localhost') || requestHost.startsWith('127.0.0.1');
+    const pathName = new URL(request.url).pathname;
+    const isResource = pathName.endsWith('.js') || pathName.endsWith('.css') || pathName.endsWith('.json');
 
-    if (isLocalDev && contentType.includes('text/html')) {
-      let html = await response.text();
-      html = html.replaceAll(`https://${requestHost}`, `http://${requestHost}`);
-      return new Response(html, {
+    if (contentType.includes('text/html') || contentType.includes('javascript') || isResource) {
+      let text = await response.text();
+      
+      // Reemplazar rutas de Swagger para que incluyan el prefijo /bff/
+      text = text.replace(/["']\/swagger-ui\//g, m => m[0] + '/bff/swagger-ui/');
+      text = text.replace(/["']\/v3\/api-docs/g, m => m[0] + '/bff/v3/api-docs');
+      text = text.replace(/["']\/favicon/g, m => m[0] + '/bff/favicon');
+      
+      // Casos específicos de archivos que Swagger pide a la raíz
+      text = text.replace(/["']\/index\.css["']/g, m => m[0] + '/bff/swagger-ui/index.css' + m[0]);
+      text = text.replace(/["']\/swagger-ui\.css["']/g, m => m[0] + '/bff/swagger-ui/swagger-ui.css' + m[0]);
+
+      const requestHost = new URL(request.url).host;
+      const isLocalDev = requestHost.startsWith('localhost') || requestHost.startsWith('127.0.0.1');
+      if (isLocalDev) {
+        text = text.replaceAll(`https://${requestHost}`, `http://${requestHost}`);
+      }
+
+      return new Response(text, {
         status: response.status,
         statusText: response.statusText,
         headers: responseHeaders
