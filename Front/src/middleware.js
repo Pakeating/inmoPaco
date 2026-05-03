@@ -65,7 +65,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
       const url = new URL(context.request.url);
       
       // Control de acceso a administracion y proxy backend admin/servicios
-      const protectedPaths = ["/administration", "/admin", "/portainer", "/nats", "/adminer"];
+      const protectedPaths = ["/administration", "/admin", "/portainer", "/bff", "/adminer"];
       if (protectedPaths.some(path => url.pathname.startsWith(path))) {
         if (!session || !user || user.role !== "admin") {
           console.warn(`[Middleware] Acceso bloqueado a ${url.pathname} para ${user?.email ?? "Anon"}`);
