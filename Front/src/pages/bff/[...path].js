@@ -18,6 +18,7 @@ export const ALL = async ({ params, request, locals }) => {
   // clonar la petición original pero inyectando el Token
   const headers = new Headers(request.headers);
   headers.set('Authorization', `Bearer ${token}`);
+  headers.set('X-Forwarded-Prefix', '/bff');
   
   if (headers.has('host')) {
      headers.set('X-Forwarded-Host', headers.get('host'));
@@ -51,15 +52,6 @@ export const ALL = async ({ params, request, locals }) => {
     if (contentType.includes('text/html') || contentType.includes('javascript') || isResource) {
       let text = await response.text();
       
-      // Reemplazar rutas de Swagger para que incluyan el prefijo /bff/
-      text = text.replace(/["']\/swagger-ui\//g, m => m[0] + '/bff/swagger-ui/');
-      text = text.replace(/["']\/v3\/api-docs/g, m => m[0] + '/bff/v3/api-docs');
-      text = text.replace(/["']\/favicon/g, m => m[0] + '/bff/favicon');
-      
-      // Casos específicos de archivos que Swagger pide a la raíz
-      text = text.replace(/["']\/index\.css["']/g, m => m[0] + '/bff/swagger-ui/index.css' + m[0]);
-      text = text.replace(/["']\/swagger-ui\.css["']/g, m => m[0] + '/bff/swagger-ui/swagger-ui.css' + m[0]);
-
       const requestHost = new URL(request.url).host;
       const isLocalDev = requestHost.startsWith('localhost') || requestHost.startsWith('127.0.0.1');
       if (isLocalDev) {

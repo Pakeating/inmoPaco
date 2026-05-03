@@ -38,6 +38,7 @@ nats:
 
 server:
   port: 8083
+  forward-headers-strategy: framework
 
 springdoc:
   swagger-ui:
