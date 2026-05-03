@@ -48,7 +48,7 @@ export const ALL = async ({ params, request, locals }) => {
     const contentType = responseHeaders.get('content-type') ?? '';
 
     // Si es HTML o JS, necesitamos reescribir las rutas de los assets para que apunten a /nats/
-    if (contentType.includes('text/html') || contentType.includes('application/javascript')) {
+    if (contentType.includes('text/html') || contentType.includes('javascript')) {
       let text = await response.text();
       
       // Reemplazar rutas absolutas que apuntan a la raíz usando Regex para capturar comillas simples y dobles
