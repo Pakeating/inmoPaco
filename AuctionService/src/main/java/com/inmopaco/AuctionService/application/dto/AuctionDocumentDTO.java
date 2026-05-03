@@ -12,4 +12,5 @@ import lombok.NoArgsConstructor;
 public class AuctionDocumentDTO {
     private String documentUrl;
     private String docAiAnalysis;
+    private String extractedText;
 }

@@ -58,8 +58,7 @@ public class AuctionEntity {
     @Column(name = "deposit_amount")
     private String depositAmount;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "auction_id")
+    @OneToMany(mappedBy = "auction", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<AuctionDocumentEntity> documents;
 
     @Column(name = "authority_code", columnDefinition = "TEXT")

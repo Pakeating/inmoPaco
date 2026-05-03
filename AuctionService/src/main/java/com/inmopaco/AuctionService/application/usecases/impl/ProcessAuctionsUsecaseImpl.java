@@ -1,5 +1,6 @@
 package com.inmopaco.AuctionService.application.usecases.impl;
 
+import com.inmopaco.AuctionService.application.dto.AuctionDetailsDTO;
 import com.inmopaco.AuctionService.application.usecases.AuctionsPersistenceUsecase;
 import com.inmopaco.AuctionService.application.usecases.ProcessAuctionsUsecase;
 import com.inmopaco.AuctionService.domain.enums.AuctionStatus;
@@ -23,10 +24,13 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
 @Service
 @Log4j2
 public class ProcessAuctionsUsecaseImpl implements ProcessAuctionsUsecase {
+
+    private static final int EXPIRY_MARGIN_DAYS = 2;
 
     @Autowired
     private AuctionPersistenceService persistenceService;
@@ -48,22 +52,12 @@ public class ProcessAuctionsUsecaseImpl implements ProcessAuctionsUsecase {
         if (!auctionsList.isEmpty()) {
             Instant now = Instant.now();
 
-            auctionsList.forEach(dto -> {
-                if (dto.getDateOfEnd().isBefore(now.minus(1, ChronoUnit.DAYS))) {
-                    // fecha de fin pasada con un dia de margen de mas, ya que el fin de subasta puede alargarse un dia
-                    dto.setStatus(AuctionStatus.EXPIRED);
-                    //si la subasta ya ha expirado, se marca directamente como procesada, no tiene sentido malgastar recursos
-                    dto.setProcessingStatus(ProcessingStatus.PROCESSED);
-                } else if (dto.getDateOfStart().isAfter(now)) {
-                    dto.setStatus(AuctionStatus.UPCOMING);
-                    dto.setProcessingStatus(ProcessingStatus.PARTIALLY_PROCESSED);
-                } else {
-                    dto.setStatus(AuctionStatus.ACTIVE);
-                    dto.setProcessingStatus(ProcessingStatus.PARTIALLY_PROCESSED);
-                }
-            });
+            auctionsList.forEach(dto -> classifyAuctionStatus(dto, now));
             auctionsPersistenceUsecase.smartSaveObtainedAuctions(auctionsList);
         }
+
+        log.info("[ProcessAuctionsUsecase] Re-evaluating already processed auctions for status updates");
+        reevaluateAuctionStatuses();
 
         var responseEvent = AuctionsEvent.createEventMsg(AuctionsActions.PARTIALLY_PROCESSED_AUCTIONS,
                 "Processed [" + auctionsList.size() + "] auctions");
@@ -80,17 +74,38 @@ public class ProcessAuctionsUsecaseImpl implements ProcessAuctionsUsecase {
         List<String> alreadyProcessed = new ArrayList<>();
         List<String> blankDocs = new ArrayList<>();
 
-        //TODO: Revisar que pasa si no hay doc, nunca pasa a procesado?
-        auctionsList.stream()
+        var auctionsWithDocs = auctionsList.stream()
                 .filter(dto -> dto.getDocuments() != null && !dto.getDocuments().isEmpty())
-                .forEach(dto -> {
+                .toList();
+
+        var auctionsNoDocs = auctionsList.stream()
+                .filter(dto -> dto.getDocuments() == null || dto.getDocuments().isEmpty())
+                .toList();
+
+        if (!auctionsNoDocs.isEmpty()) {
+            log.info("[ProcessAuctionsUsecase] Found [{}] auctions without documents, marking as PROCESSED", auctionsNoDocs.size());
+            auctionsNoDocs.forEach(dto -> dto.setProcessingStatus(ProcessingStatus.PROCESSED));
+            auctionsPersistenceUsecase.smartSaveObtainedAuctions(auctionsNoDocs);
+        }
+
+        auctionsWithDocs.forEach(dto -> {
+                    boolean modified = false;
                     for (var doc : dto.getDocuments()) {
                         if (doc.getDocAiAnalysis() == null) { //si ya se ha generado no se repite
                             String docUrl = doc.getDocumentUrl();
                             String key = dto.getAuctionId().concat(" -> ").concat(docUrl);
                             try {
-                                String value = pdfProcessingService.getTextFromPdfUrl(docUrl);
-                                if (!value.isBlank()) {
+                                String value = doc.getExtractedText();
+                                if (value == null || value.isBlank()) {
+                                    log.info("[ProcessAuctionsUsecase] Extracting text from PDF for {}", key);
+                                    value = pdfProcessingService.getTextFromPdfUrl(docUrl);
+                                    doc.setExtractedText(value);
+                                    modified = true;
+                                } else {
+                                    log.info("[ProcessAuctionsUsecase] Using already cached extracted text for {}", key);
+                                }
+
+                                if (value != null && !value.isBlank()) {
                                     var requestAIEvent = AIEvent.createEventMsg(AIActions.GET_AUCTIONS_REPORT, key);
                                     requestAIEvent.setContent(value);
                                     log.info("[ProcessAuctionsUsecase] Sending AI-Processing request for {}", key);
@@ -107,6 +122,9 @@ public class ProcessAuctionsUsecaseImpl implements ProcessAuctionsUsecase {
                         } else {
                             alreadyProcessed.add(dto.getAuctionId());
                         }
+                    }
+                    if (modified) {
+                        auctionsPersistenceUsecase.smartSaveObtainedAuctions(List.of(dto));
                     }
                 });
 
@@ -167,7 +185,7 @@ public class ProcessAuctionsUsecaseImpl implements ProcessAuctionsUsecase {
         var dto = auctionOpt.get();
         Instant now = Instant.now();
 
-        if (dto.getDateOfEnd().isBefore(now.minus(1, ChronoUnit.DAYS))) {
+        if (dto.getDateOfEnd().isBefore(now.minus(EXPIRY_MARGIN_DAYS, ChronoUnit.DAYS))) {
             dto.setStatus(AuctionStatus.EXPIRED);
         } else if (dto.getDateOfStart().isAfter(now)) {
             dto.setStatus(AuctionStatus.UPCOMING);
@@ -187,21 +205,74 @@ public class ProcessAuctionsUsecaseImpl implements ProcessAuctionsUsecase {
 
         /// no diferencia si ya esta o no, se machaca lo que haya
         if (dto.getDocuments() != null) {
+            boolean modified = false;
             for (var doc : dto.getDocuments()) {
                 String docUrl = doc.getDocumentUrl();
                 try {
                     String key = dto.getAuctionId().concat(" -> ").concat(docUrl);
-                    String value = pdfProcessingService.getTextFromPdfUrl(docUrl);
+                    String value = doc.getExtractedText();
+                    
+                    if (value == null || value.isBlank()) {
+                        log.info("[ProcessAuctionsUsecase] Extracting text from PDF for {}", key);
+                        value = pdfProcessingService.getTextFromPdfUrl(docUrl);
+                        doc.setExtractedText(value);
+                        modified = true;
+                    } else {
+                        log.info("[ProcessAuctionsUsecase] Using already cached extracted text for {}", key);
+                    }
 
-                    var requestAIEvent = AIEvent.createEventMsg(AIActions.GET_AUCTIONS_REPORT, key);
-                    requestAIEvent.setContent(value);
-                    publish(requestAIEvent, Agents.AI_SERVICE);
+                    if (value != null && !value.isBlank()) {
+                        var requestAIEvent = AIEvent.createEventMsg(AIActions.GET_AUCTIONS_REPORT, key);
+                        requestAIEvent.setContent(value);
+                        publish(requestAIEvent, Agents.AI_SERVICE);
+                    }
                 } catch (Exception e) {
                     log.error("[ProcessAuctionsUsecase] Error processing or sending PDF for auction {}: {}", dto.getAuctionId(), e.getMessage());
                 }
             }
+            if (modified) {
+                auctionsPersistenceUsecase.smartSaveObtainedAuctions(List.of(dto));
+            }
         }
         log.info("[ProcessAuctionsUsecase] END Processing auction [{}]", auctionId);
+    }
+
+    private void classifyAuctionStatus(AuctionDetailsDTO dto, Instant now) {
+        if (dto.getDateOfEnd().isBefore(now.minus(EXPIRY_MARGIN_DAYS, ChronoUnit.DAYS))) {
+            dto.setStatus(AuctionStatus.EXPIRED);
+            dto.setProcessingStatus(ProcessingStatus.PROCESSED);
+        } else if (dto.getDateOfStart().isAfter(now)) {
+            dto.setStatus(AuctionStatus.UPCOMING);
+            dto.setProcessingStatus(ProcessingStatus.PARTIALLY_PROCESSED);
+        } else {
+            dto.setStatus(AuctionStatus.ACTIVE);
+            dto.setProcessingStatus(ProcessingStatus.PARTIALLY_PROCESSED);
+        }
+    }
+
+    private void reevaluateAuctionStatuses() {
+        Instant now = Instant.now();
+        var partiallyProcessed = persistenceService.listAuctionsByProcessingStatus(ProcessingStatus.PARTIALLY_PROCESSED);
+        var processed = persistenceService.listAuctionsByProcessingStatus(ProcessingStatus.PROCESSED);
+
+        List<AuctionDetailsDTO> toUpdate = new ArrayList<>();
+
+        Stream.concat(partiallyProcessed.stream(), processed.stream())
+                .filter(dto -> dto.getStatus() != AuctionStatus.EXPIRED)
+                .forEach(dto -> {
+                    AuctionStatus previousStatus = dto.getStatus();
+                    classifyAuctionStatus(dto, now);
+                    if (previousStatus != dto.getStatus()) {
+                        log.info("[ProcessAuctionsUsecase] Re-evaluating auction [{}]: {} -> {}",
+                                dto.getAuctionId(), previousStatus, dto.getStatus());
+                        toUpdate.add(dto);
+                    }
+                });
+
+        if (!toUpdate.isEmpty()) {
+            auctionsPersistenceUsecase.smartSaveObtainedAuctions(toUpdate);
+            log.info("[ProcessAuctionsUsecase] Updated {} auction statuses after re-evaluation", toUpdate.size());
+        }
     }
 
     @Transactional

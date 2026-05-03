@@ -56,6 +56,7 @@ services:
       #      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
       - EUREKA_CLIENT_ENABLED=false
       - SPRING_CLOUD_DISCOVERY_ENABLED=false
+      - JWT_SECRET=dev-secret-please-change-in-production
     networks:
       - microservices-network
       - public-tunnel-network
@@ -307,6 +308,7 @@ services:
       - SPRING_CLOUD_CONFIG_RETRY_MAX_ATTEMPTS=20
       - SPRING_CLOUD_CONFIG_RETRY_INITIAL_INTERVAL=2000
       - SPRING_CLOUD_CONFIG_RETRY_MULTIPLIER=1.5
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
 #      - NATS_URL=nats://nats-server:4222
     volumes:
       - ./logs/usuarios-ms:/app/logs

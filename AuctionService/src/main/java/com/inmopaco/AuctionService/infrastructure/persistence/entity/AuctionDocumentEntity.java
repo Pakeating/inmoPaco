@@ -1,9 +1,6 @@
 package com.inmopaco.AuctionService.infrastructure.persistence.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
@@ -21,6 +18,13 @@ public class AuctionDocumentEntity {
     @EqualsAndHashCode.Include
     private String documentUrl;
 
-    @Column(name = "doc_ai_analysis", columnDefinition = "TEXT")
+    @Column(name = "doc_ai_analysis", columnDefinition = "LONGTEXT")
     private String docAiAnalysis;
+
+    @Column(name = "extracted_text", columnDefinition = "LONGTEXT")
+    private String extractedText;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "auction_id")
+    private AuctionEntity auction;
 }

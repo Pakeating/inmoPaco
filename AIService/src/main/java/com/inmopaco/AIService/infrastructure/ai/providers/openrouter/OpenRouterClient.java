@@ -57,7 +57,7 @@ public class OpenRouterClient implements AIProviderService {
         switch (request.getRequestType()) {
             case AUCTIONS_DEBT_ANALYSIS -> {
                 orRequest.setModel(providersConfig.getModel("NEMOTRON").getName());
-                msg.setRole("assistant");
+                msg.setRole("user");
             }
 
             default -> throw new IllegalArgumentException("Unsupported request type: " + request.getRequestType());

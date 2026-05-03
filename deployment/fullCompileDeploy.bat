@@ -20,7 +20,7 @@ echo Compilando Config Service...
 ::call docker-compose -f docker-compose.yml build --no-cache config-service-v3|| (echo Error en Config Service && pause && exit /b)
 
 echo Compilando API Gateway...
-call docker-compose -f docker-compose.yml build  api-gateway-v3|| (echo Error en API Gateway && pause && exit /b)
+::call docker-compose -f docker-compose.yml build  api-gateway-v3|| (echo Error en API Gateway && pause && exit /b)
 
 echo Compilando Libreria de Eventos...
 ::call docker build -t eventsourcing-base -f ../EventSourcingCommons/Dockerfile .. || (echo Error en EventSourcingCommons && pause && exit /b)
@@ -35,7 +35,7 @@ echo Compilando Property Service...
 ::call docker-compose -f docker-compose.yml build  property-service|| (echo Error en Property Service && pause && exit /b)
 
 echo Compilando AI Service...
-::call docker-compose -f docker-compose.yml build  ai-service|| (echo Error en AI Service && pause && exit /b)
+call docker-compose -f docker-compose.yml build  ai-service|| (echo Error en AI Service && pause && exit /b)
 
 echo Compilando BFF...
 ::call docker-compose -f docker-compose.yml build  bff|| (echo Error en BFF && pause && exit /b)
@@ -44,12 +44,12 @@ echo Compilando BFF...
 ::echo "Limpiando infraestructura anterior..."
 ::docker-compose down
 
-::echo Levantando un solo contenedor
-::call docker-compose -f docker-compose.yml up -d --force-recreate bff
+echo Levantando un solo contenedor
+call docker-compose -f docker-compose.yml up -d --force-recreate ai-service
 
 ::--force-recreate obliga a tumbar los contenedores que ya esten creados de antes, se puede quitar mas adelante...
-echo Levantando infraestructura completa...
-call docker-compose -f docker-compose.yml up -d --force-recreate
+::echo Levantando infraestructura completa...
+::call docker-compose -f docker-compose.yml up -d --force-recreate
 
 echo ======================================================
 echo   Despliegue finalizado

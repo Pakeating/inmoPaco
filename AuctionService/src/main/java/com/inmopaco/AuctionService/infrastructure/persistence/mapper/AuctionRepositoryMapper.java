@@ -52,13 +52,18 @@ public abstract class AuctionRepositoryMapper {
                 if (newDoc.getDocAiAnalysis() != null) {
                     doc.setDocAiAnalysis(newDoc.getDocAiAnalysis());
                 }
+                if (newDoc.getExtractedText() != null) {
+                    doc.setExtractedText(newDoc.getExtractedText());
+                }
             } else {
                 // nuevo docu
                 doc = AuctionDocumentEntity.builder()
                         .documentUrl(newDoc.getDocumentUrl())
                         .docAiAnalysis(newDoc.getDocAiAnalysis())
+                        .extractedText(newDoc.getExtractedText())
                         .build();
             }
+            doc.setAuction(entity);
             updatedDocs.add(doc);
         });
 

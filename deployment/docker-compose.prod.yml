@@ -266,6 +266,7 @@ services:
       - SPRING_CLOUD_CONFIG_RETRY_MAX_ATTEMPTS=20
       - SPRING_CLOUD_CONFIG_RETRY_INITIAL_INTERVAL=2000
       - SPRING_CLOUD_CONFIG_RETRY_MULTIPLIER=1.5
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
     volumes:
       - ./logs/usuarios-ms:/app/logs
     networks:

@@ -14,7 +14,7 @@ for /f "usebackq delims=" %%a in (".env") do (
 )
 
 :: cambiar nombre del servicio aqui
-set IMAGE_NAME=%ORCHESTRATOR%
+set IMAGE_NAME=%BFF%
 
 echo === Iniciando sesion en GHCR para %GH_USER% ===
 echo %GH_PAT% | docker login ghcr.io -u %GH_USER% --password-stdin

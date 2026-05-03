@@ -28,6 +28,9 @@ public class JsoupScraperChainServiceImpl implements JsoupScraperChainService {
         this.context = new JsoupChainContextDTO(
                 summary,
                 AuctionDetailsDTO.builder()
+                        .auctionId(summary.getBoeIdentifier())
+                        .courtName(summary.getCourtName())
+                        .expediente(summary.getExpediente())
         );
     }
 

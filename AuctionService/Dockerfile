@@ -20,9 +20,20 @@ RUN mvn clean package -DskipNativeBuild=true -DskipTests
 FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
 
+# Instalar Tesseract OCR y dependencias necesarias para el procesamiento de imágenes asegurando repositorios compatibles
+RUN apk add --no-cache \
+    --repository http://dl-cdn.alpinelinux.org/alpine/edge/community \
+    --repository http://dl-cdn.alpinelinux.org/alpine/edge/main \
+    tesseract-ocr \
+    tesseract-ocr-data-spa \
+    leptonica \
+    libjpeg-turbo \
+    libpng \
+    tiff \
+    giflib
 # Creamos un usuario no root por seguridad
 RUN addgroup -S spring && adduser -S spring -G spring
-RUN mkdir -p /app/logs && chown -R spring:spring /app # Si no hacemos esto, no se puede depositar correctamente el log.
+RUN mkdir -p /app/logs && chown -R spring:spring /app
 USER spring
 
 # Copiamos el archivo JAR generado en la etapa anterior

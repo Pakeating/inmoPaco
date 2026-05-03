@@ -86,6 +86,10 @@ public class AuctionsPersistenceUsecaseImpl implements AuctionsPersistenceUsecas
                         entity.setDocAiAnalysis(dto.getDocAiAnalysis());
                         modified = true;
                     }
+                    if (dto.getExtractedText() != null && !dto.getExtractedText().equals(entity.getExtractedText())) {
+                        entity.setExtractedText(dto.getExtractedText());
+                        modified = true;
+                    }
                     if (modified) {
                         toSave.add(entity);
                     }
@@ -94,6 +98,7 @@ public class AuctionsPersistenceUsecaseImpl implements AuctionsPersistenceUsecas
                     toSave.add(AuctionDocumentEntity.builder()
                             .documentUrl(dto.getDocumentUrl())
                             .docAiAnalysis(dto.getDocAiAnalysis())
+                            .extractedText(dto.getExtractedText())
                             .build());
                 }
             });

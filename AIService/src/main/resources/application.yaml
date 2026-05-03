@@ -25,7 +25,7 @@ ai-config: #el nombre del modelo no se puede repetir entre providers
   providers:
     - id: "openrouter"
       url: "https://openrouter.ai/api/v1/chat/completions"
-      key: "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" #caduca en una semana, solo modelos free
+      key: "${OPENROUTER_API_KEY}"
       models:
         - code: "ORFREE"
           name: "openrouter/free"
