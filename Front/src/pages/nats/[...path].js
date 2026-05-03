@@ -58,6 +58,12 @@ export const ALL = async ({ params, request, locals }) => {
       text = text.replaceAll('"/favicon', '"/nats/favicon');
       text = text.replaceAll('"/manifest.webmanifest"', '"/nats/manifest.webmanifest"');
       text = text.replaceAll('"/icons/"', '"/nats/icons/"');
+      text = text.replaceAll('"/config.json"', '"/nats/config.json"');
+      text = text.replaceAll('"/proxy/', '"/nats/proxy/');
+      
+      // Corregir el scope del Service Worker
+      text = text.replaceAll('scope: "/"', 'scope: "/nats/"');
+      text = text.replaceAll('scope:"/"', 'scope:"/nats/"');
 
       // Parche específico para desarrollo local si es necesario
       const requestHost = new URL(request.url).host;
