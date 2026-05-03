@@ -46,9 +46,11 @@ export const ALL = async ({ params, request, locals }) => {
 
     let body = response.body;
     const contentType = responseHeaders.get('content-type') ?? '';
+    const pathName = new URL(request.url).pathname;
+    const isResource = pathName.endsWith('.js') || pathName.endsWith('.webmanifest') || pathName.endsWith('.json');
 
-    // Si es HTML o JS, necesitamos reescribir las rutas de los assets para que apunten a /nats/
-    if (contentType.includes('text/html') || contentType.includes('javascript')) {
+    // Si es HTML, JS o un recurso conocido, necesitamos reescribir las rutas
+    if (contentType.includes('text/html') || contentType.includes('javascript') || isResource) {
       let text = await response.text();
       
       // Reemplazar rutas absolutas que apuntan a la raíz usando Regex para capturar comillas simples y dobles
