@@ -32,10 +32,20 @@ import AuctionDetailContent from "../components/AuctionDetailContent.astro";
 
 <style>
 	main.container {
-		padding-top: 4rem;
-		padding-bottom: 6rem;
+		padding-top: 2rem;
+		padding-bottom: 4rem;
 		max-width: 1400px;
 	}
+
+  @media (max-width: 768px) {
+    main.container {
+      padding-top: 1rem;
+      padding-bottom: 2rem;
+    }
+    .page-header h1 {
+      font-size: 1.75rem;
+    }
+  }
 	.page-header {
 		margin-bottom: 2rem;
 	}

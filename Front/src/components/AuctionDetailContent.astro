@@ -537,6 +537,14 @@
     border-radius: 1.5rem;
     box-shadow: var(--shadow-sm);
     border-top: 6px solid var(--color-primary);
+    overflow: hidden; /* Prevent internal overflow from breaking the card */
+  }
+
+  @media (max-width: 768px) {
+    .detail-main {
+      padding: 1.5rem;
+      border-radius: 1rem;
+    }
   }
 
   .detail-section {
@@ -561,6 +569,84 @@
 
   .mt-4 {
     margin-top: 2rem;
+  }
+
+  /* Data Grids */
+  .data-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1rem;
+  }
+
+  .highlight-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.25rem;
+    margin-bottom: 2rem;
+  }
+
+  .highlight-item {
+    background: #f8fafc;
+    padding: 1.25rem;
+    border-radius: 1rem;
+    border: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .highlight-item .label {
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+
+  .highlight-item .value {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--color-primary);
+  }
+
+  .data-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    min-width: 0; /* Allow compression */
+  }
+
+  .data-item .label {
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+    font-weight: 600;
+  }
+
+  .data-item .value {
+    font-weight: 600;
+    color: var(--color-text-main);
+    word-break: break-word;
+    overflow-wrap: anywhere;
+  }
+
+  .goods-description {
+    line-height: 1.6;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+    white-space: pre-wrap;
+  }
+
+  @media (max-width: 600px) {
+    .data-grid {
+      grid-template-columns: 1fr;
+      gap: 1.25rem;
+    }
+    .highlight-grid {
+      grid-template-columns: 1fr;
+    }
+    .detail-section h2 {
+      font-size: 1.25rem;
+    }
   }
 
   /* Accordion Lots */
@@ -589,7 +675,7 @@
 
   .accordion-header {
     width: 100%;
-    padding: 0.85rem 2rem;
+    padding: 1rem 1.5rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -598,6 +684,13 @@
     cursor: pointer;
     text-align: left;
     transition: all 0.3s ease;
+    gap: 1rem;
+  }
+
+  @media (max-width: 600px) {
+    .accordion-header {
+      padding: 0.85rem 1rem;
+    }
   }
 
   .accordion-item.active .accordion-header {
@@ -609,20 +702,21 @@
   }
 
   .accordion-title {
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     color: var(--color-text-main);
     font-weight: 600;
     display: flex;
     align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
   }
 
   .accordion-title strong {
     color: var(--color-primary);
     background: rgba(var(--color-primary-rgb, 43, 67, 137), 0.1);
-    padding: 0.25rem 0.75rem;
-    border-radius: 0.5rem;
-    margin-right: 1rem;
-    font-size: 0.9rem;
+    padding: 0.2rem 0.6rem;
+    border-radius: 0.4rem;
+    font-size: 0.85rem;
     letter-spacing: 0.05em;
   }
 
@@ -666,10 +760,17 @@
 
   .lot-data-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 2rem;
-    padding: 2.5rem 2rem;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.5rem;
+    padding: 2rem 1.5rem;
     border-top: 1px solid #f1f5f9;
+  }
+
+  @media (max-width: 480px) {
+    .lot-data-grid {
+      grid-template-columns: 1fr;
+      padding: 1.5rem 1rem;
+    }
   }
 
   .lot-data-grid .data-item.full-width {
