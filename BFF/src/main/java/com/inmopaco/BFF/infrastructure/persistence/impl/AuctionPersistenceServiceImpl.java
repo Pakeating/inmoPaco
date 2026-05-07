@@ -2,6 +2,7 @@ package com.inmopaco.BFF.infrastructure.persistence.impl;
 
 import com.inmopaco.BFF.application.dto.AuctionDetailsDTO;
 import com.inmopaco.BFF.application.dto.AuctionQueryDTO;
+import com.inmopaco.BFF.application.dto.ProvinceAuctionCount;
 import com.inmopaco.BFF.infrastructure.persistence.AuctionPersistenceService;
 import com.inmopaco.BFF.infrastructure.persistence.entity.AuctionEntity;
 import com.inmopaco.BFF.infrastructure.persistence.mapper.AuctionRepositoryMapper;
@@ -14,6 +15,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -43,6 +45,24 @@ public class AuctionPersistenceServiceImpl implements AuctionPersistenceService 
     @Override
     public Optional<AuctionDetailsDTO> findAuctionById(String id) {
         return repository.findById(id).map(mapper::toDTO);
+    }
+
+    @Override
+    public List<ProvinceAuctionCount> getActiveAuctionsCountByProvince() {
+        log.info("Fetching active auctions count by province");
+        Instant now = Instant.now();
+        List<AuctionEntity> activeAuctions = repository.findByStatusAndDateOfEndAfter("ACTIVE", now);
+
+        return activeAuctions.stream()
+                .collect(java.util.stream.Collectors.groupingBy(
+                        auction -> auction.getProvince() != null ? auction.getProvince() : "UNKNOWN",
+                        java.util.stream.Collectors.counting()))
+                .entrySet().stream()
+                .map(entry -> ProvinceAuctionCount.builder()
+                        .province(entry.getKey())
+                        .count(entry.getValue().intValue())
+                        .build())
+                .toList();
     }
 
 }

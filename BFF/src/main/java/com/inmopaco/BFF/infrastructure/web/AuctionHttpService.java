@@ -2,6 +2,7 @@ package com.inmopaco.BFF.infrastructure.web;
 
 import com.inmopaco.BFF.application.dto.AuctionDetailsDTO;
 import com.inmopaco.BFF.application.dto.AuctionQueryDTO;
+import com.inmopaco.BFF.application.dto.ProvinceAuctionCount;
 import com.inmopaco.BFF.application.usecases.AuctionQueryUsecase;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.extern.log4j.Log4j2;
@@ -12,6 +13,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @Log4j2
@@ -51,6 +54,16 @@ public class AuctionHttpService {
         log.info("Search executed with filters: {}, page: {}, size: {}, sortBy: {}", filter, page, size, sortBy);
         log.info("Search result: totalElements: {}, totalPages: {}", result.getTotalElements(), result.getTotalPages());
 
+        return ResponseEntity.ok(result);
+    }
+
+    @Operation(summary = "Obtiene número de subastas activas por provincia",
+            description = "Devuelve el conteo de subastas con status ACTIVE agrupado por provincia")
+    @GetMapping("/active-by-province")
+    public ResponseEntity<List<ProvinceAuctionCount>> getActiveAuctionsCountByProvince() {
+        log.info("Request received: get active auctions count by province");
+        List<ProvinceAuctionCount> result = auctionUsecase.getActiveAuctionsCountByProvince();
+        log.info("Returning {} active auctions by province records", result.size());
         return ResponseEntity.ok(result);
     }
 

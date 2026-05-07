@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Repository;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,5 +25,7 @@ public interface AuctionRepository extends JpaRepository<AuctionEntity, String>,
     List<AuctionEntity> findAllByAuctionIdIn(List<String> auctionId);
 
     List<AuctionEntity> findByCityIgnoreCase(String city);
+
+    List<AuctionEntity> findByStatusAndDateOfEndAfter(String status, Instant now);
 
 }

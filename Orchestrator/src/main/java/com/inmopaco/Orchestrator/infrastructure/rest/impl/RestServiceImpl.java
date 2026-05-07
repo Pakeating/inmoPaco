@@ -1,6 +1,7 @@
 package com.inmopaco.Orchestrator.infrastructure.rest.impl;
 
 import com.inmopaco.Orchestrator.application.usecase.AuctionsUsecaseService;
+import com.inmopaco.Orchestrator.application.usecase.NotificationUsecaseService;
 import com.inmopaco.Orchestrator.application.usecase.PropertiesUsecaseService;
 import com.inmopaco.Orchestrator.infrastructure.queues.provider.nats.management.NatsStreamManagementService;
 import com.inmopaco.Orchestrator.infrastructure.rest.RestService;
@@ -10,6 +11,7 @@ import com.inmopaco.shared.events.enums.AuctionsActions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -27,6 +29,8 @@ public class RestServiceImpl implements RestService {
     private PropertiesUsecaseService propertiesUsecaseService;
     @Autowired
     private NatsStreamManagementService natsStreamManagementService;
+    @Autowired
+    private NotificationUsecaseService notificationUsecaseService;
 
     @GetMapping("/auctions/get")
     @Override
@@ -70,5 +74,12 @@ public class RestServiceImpl implements RestService {
     public ResponseEntity<Object> deleteConsumer(String stream, String subject) throws Exception {
         natsStreamManagementService.deleteConsumer(stream, subject);
         return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/notification/province-auctions-flow")
+    @Override
+    public ResponseEntity<Object> sendProvinceAuctionsNotificationFlow() {
+        notificationUsecaseService.executeProvinceNotificationFlow();
+        return ResponseEntity.accepted().build();
     }
 }

@@ -1,7 +1,10 @@
 package com.inmopaco.Orchestrator.application.usecase.impl;
 
 import com.inmopaco.Orchestrator.application.usecase.AuctionsUsecaseService;
+import com.inmopaco.Orchestrator.application.usecase.NotificationUsecaseService;
 import com.inmopaco.Orchestrator.infrastructure.queues.QueueService;
+import com.inmopaco.Orchestrator.infrastructure.rest.RestClientService;
+import com.inmopaco.Orchestrator.infrastructure.rest.dto.ProvinceCountResponse;
 import com.inmopaco.shared.events.AuctionsEvent;
 import com.inmopaco.shared.events.enums.Agents;
 import com.inmopaco.shared.events.enums.AuctionsActions;
@@ -10,6 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @Log4j2
@@ -20,6 +25,11 @@ public class AuctionsUsecaseServiceImpl implements AuctionsUsecaseService {
     @Autowired
     @Lazy
     private QueueService queueService;
+
+    @Autowired
+    private RestClientService restClientService;
+    @Autowired
+    private NotificationUsecaseService notificationUsecaseService;
 
     @Override
     public void receivedGetAuctionsResponse(AuctionsEvent event) {
@@ -38,6 +48,13 @@ public class AuctionsUsecaseServiceImpl implements AuctionsUsecaseService {
     @Override
     public void receivedProcessedAuctionsResponse(AuctionsEvent event) {
         genericLog(event);
+        log.info("Starting province notification flow");
+
+        try {
+            notificationUsecaseService.executeProvinceNotificationFlow();
+        } catch (Exception e) {
+            log.error("Error executing province notification flow: {}", e.getMessage(), e);
+        }
     }
 
     @Override
@@ -52,6 +69,7 @@ public class AuctionsUsecaseServiceImpl implements AuctionsUsecaseService {
         event.setDestinedTo(Agents.AUCTIONS_SERVICE);
         queueService.publish(publishAuctionsSubject, event);
     }
+
 
 
     private void genericLog(AuctionsEvent event){

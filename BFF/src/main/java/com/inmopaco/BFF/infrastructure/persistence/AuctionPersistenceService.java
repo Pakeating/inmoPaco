@@ -2,6 +2,7 @@ package com.inmopaco.BFF.infrastructure.persistence;
 
 import com.inmopaco.BFF.application.dto.AuctionDetailsDTO;
 import com.inmopaco.BFF.application.dto.AuctionQueryDTO;
+import com.inmopaco.BFF.application.dto.ProvinceAuctionCount;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -14,4 +15,6 @@ public interface AuctionPersistenceService {
     Page<AuctionDetailsDTO> findAuctions(AuctionQueryDTO querySpecs, Pageable pageable);
 
     Optional<AuctionDetailsDTO> findAuctionById(String id);
+
+    List<ProvinceAuctionCount> getActiveAuctionsCountByProvince();
 }

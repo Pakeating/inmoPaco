@@ -1,6 +1,7 @@
 package com.inmopaco.Orchestrator.infrastructure.rest;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 public interface RestService {
@@ -14,4 +15,6 @@ public interface RestService {
     ResponseEntity<Object> purgueQueues() throws Exception;
 
     ResponseEntity<Object> deleteConsumer(String stream, String subject) throws Exception;
+
+    ResponseEntity<Object> sendProvinceAuctionsNotificationFlow();
 }
