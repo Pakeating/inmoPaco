@@ -43,18 +43,17 @@ public class AuctionsUsecaseServiceImpl implements AuctionsUsecaseService {
     @Override
     public void receivedPartiallyProcessedAuctionsResponse(AuctionsEvent event) {
         genericLog(event);
-    }
-
-    @Override
-    public void receivedProcessedAuctionsResponse(AuctionsEvent event) {
-        genericLog(event);
         log.info("Starting province notification flow");
-
         try {
             notificationUsecaseService.executeProvinceNotificationFlow();
         } catch (Exception e) {
             log.error("Error executing province notification flow: {}", e.getMessage(), e);
         }
+    }
+
+    @Override
+    public void receivedProcessedAuctionsResponse(AuctionsEvent event) {
+        genericLog(event);
     }
 
     @Override

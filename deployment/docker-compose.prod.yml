@@ -271,3 +271,24 @@ services:
       - ./logs/usuarios-ms:/app/logs
     networks:
       - microservices-network
+
+  # --- NotificationService ---
+  notification-service:
+    container_name: ${NOTIFICATION}
+    build:
+      context: ..
+      dockerfile: NotificationService/Dockerfile
+    image: ghcr.io/${GH_USER}/inmopaco/${NOTIFICATION}:latest
+    ports:
+      - "8086:8086"
+    depends_on:
+      config-service-v3:
+        condition: service_healthy
+    environment:
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+      - TELEGRAM_BOT_USERNAME=${TELEGRAM_BOT_USERNAME}
+      - TELEGRAM_USERS_FILE=/app/data/users.json
+    volumes:
+      - ./notification_data:/app/data
+    networks:
+      - microservices-network

@@ -59,19 +59,15 @@ public class NotificationUsecaseServiceImpl implements NotificationUsecaseServic
 
     @Override
     public void executeProvinceNotificationFlow() {
-        log.info("Step 1: Fetching active auctions count by province from BFF");
         List<ProvinceCountResponse> provinceCounts = restClientService.getActiveAuctionsCountByProvince();
-
         if (provinceCounts == null || provinceCounts.isEmpty()) {
             log.warn("No province data received from BFF, skipping notification");
             return;
         }
 
-        log.info("Step 2: Received {} province records, formatting notification message", provinceCounts.size());
         String formattedContent = formatProvinceNotification(provinceCounts);
-
         String channel = "TELEGRAM";
-        log.info("Step 3: Sending notification to NotificationService with channel={}", channel);
+        log.info("Sending notification to NotificationService with channel={}", channel);
         sendDailyAuctionsNotification(channel, formattedContent);
 
         log.info("Province notification flow completed");
