@@ -116,9 +116,19 @@ import AuctionListLots from './AuctionListLots.astro';
       badge.textContent = auction.status;
       badge.dataset.status = auction.status;
       
-      clone.querySelector('.property-type').textContent = auction.type;
-      clone.querySelector('.property-address').textContent = auction.propertyAddress;
-      clone.querySelector('.location-text').textContent = `${auction.city}, ${auction.province}`;
+      // Determinar si es multilote usando el número de lotes del campo o la longitud del array
+      const lotsCount = parseInt(auction.lotsNumber) || (auction.lots ? auction.lots.length : 0);
+      const isMultiLot = lotsCount > 1;
+      
+      if (isMultiLot) {
+        clone.querySelector('.property-type').textContent = 'Multilote';
+        clone.querySelector('.property-address').textContent = 'Subasta Multilote';
+        clone.querySelector('.location-text').textContent = 'No disponible';
+      } else {
+        clone.querySelector('.property-type').textContent = auction.type || 'Sin tipo';
+        clone.querySelector('.property-address').textContent = auction.propertyAddress || 'Sin dirección';
+        clone.querySelector('.location-text').textContent = `${auction.city || ''}, ${auction.province || ''}`.replace(', ', '').trim() || 'No disponible';
+      }
       
       clone.querySelector('.auction-value').textContent = auction.auctionValue;
       clone.querySelector('.deposit-amount').textContent = auction.depositAmount;
@@ -127,8 +137,6 @@ import AuctionListLots from './AuctionListLots.astro';
       const lotsComponent = clone.querySelector('auction-list-lots');
       const auctionDetails = clone.querySelector('.auction-details');
       
-      const isMultiLot = auction.lots && auction.lots.length > 1;
-
       if (lotsComponent) {
         // @ts-ignore
         lotsComponent.lots = auction.lots;

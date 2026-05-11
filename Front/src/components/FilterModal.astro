@@ -56,9 +56,19 @@ import auctionTypes from '../data/auctionTypes.json';
           <label for="status">Estado</label>
           <select id="status" name="status">
             <option value="">Cualquier estado</option>
-            <option value="ACTIVE">En curso</option>
+            <option value="ACTIVE" selected>En curso</option>
             <option value="UPCOMING">Próximamente</option>
             <option value="EXPIRED">Finalizada</option>
+          </select>
+        </div>
+
+        <!-- Multilote -->
+        <div class="form-group">
+          <label for="isMultiLot">Multilote</label>
+          <select id="isMultiLot" name="isMultiLot">
+            <option value="">Indiferente</option>
+            <option value="false">No</option>
+            <option value="true">Sí</option>
           </select>
         </div>
 
@@ -302,7 +312,39 @@ import auctionTypes from '../data/auctionTypes.json';
       grid-template-columns: 1fr;
     }
     .modal-content {
-      padding: 1.5rem;
+      width: 95%;
+      max-height: 90vh;
+      padding: 1.25rem;
+      overflow-y: auto;
+    }
+    .modal-header {
+      margin-bottom: 1rem;
+      padding-bottom: 0.75rem;
+    }
+    .modal-header h2 {
+      font-size: 1.25rem;
+    }
+    .checkbox-group {
+      grid-template-columns: repeat(2, 1fr);
+      max-height: 150px;
+    }
+    .modal-footer {
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+    .modal-footer .actions {
+      width: 100%;
+      justify-content: stretch;
+    }
+    .modal-footer .actions button {
+      flex: 1;
+    }
+    .btn-secondary {
+      width: 100%;
+    }
+    .form-group input,
+    .form-group select {
+      font-size: 16px;
     }
   }
 </style>

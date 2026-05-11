@@ -21,7 +21,8 @@
       provinces: params.getAll('provinces'),
       isVisitable: params.get('isVisitable'),
       hasBids: params.has('hasBids') ? params.get('hasBids') === 'true' : null,
-      status: params.get('status')
+      status: params.get('status'),
+      isMultiLot: params.has('isMultiLot') ? params.get('isMultiLot') === 'true' : null
     };
 
     const page = params.get('page') || '0';

@@ -35,11 +35,13 @@ if (!user || user.role !== 'admin') {
           </button>
         </div>
         <nav class="sidebar-actions">
-          <button type="button" id="btn-purge" class="btn-backend-action">Purge Queue</button>
-          <button type="button" id="btn-delete-consumer" class="btn-backend-action">Delete Consumer</button>
+          <button type="button" id="btn-purge" class="btn-backend-action">Purgado de Colas</button>
+          <button type="button" id="btn-delete-consumer" class="btn-backend-action">Eliminar Consumidor</button>
           <button type="button" id="btn-scheduler" class="btn-backend-action">Lanzar AuctionScheduler</button>
-          <button type="button" id="btn-get-auctions" class="btn-backend-action">Get Auctions</button>
-          <button type="button" id="btn-process" class="btn-backend-action">Process Auctions</button>
+          <button type="button" id="btn-property-scheduler" class="btn-backend-action">Lanzar PropertyScheduler</button>
+          <button type="button" id="btn-get-auctions" class="btn-backend-action">Obtener Subastas</button>
+          <button type="button" id="btn-process" class="btn-backend-action">Procesar Subastas</button>
+          <button type="button" id="btn-province-notifications" class="btn-backend-action">Notificaciones por Provincia</button>
         </nav>
       </div>
     </aside>
@@ -699,6 +701,12 @@ if (!user || user.role !== 'admin') {
     callOrchestrator('scheduler');
   });
 
+  // PropertyScheduler
+  document.getElementById('btn-property-scheduler')?.addEventListener('click', () => {
+    if (!confirm('¿Lanzar el PropertyScheduler ahora?')) return;
+    callOrchestrator('propertyScheduler');
+  });
+
   // Get Auctions
   document.getElementById('btn-get-auctions')?.addEventListener('click', () => {
     openModal('modal-get-auctions');
@@ -718,6 +726,12 @@ if (!user || user.role !== 'admin') {
   document.getElementById('btn-process')?.addEventListener('click', () => {
     if (!confirm('¿Procesar subastas ahora? (auctionsPayload vacío)')) return;
     callOrchestrator('processAuctions');
+  });
+
+  // Province Notifications
+  document.getElementById('btn-province-notifications')?.addEventListener('click', () => {
+    if (!confirm('¿Enviar notificaciones de subastas por provincia?')) return;
+    callOrchestrator('provinceNotifications');
   });
 
 // Cerrar modales al clicar fuera

@@ -1,0 +1,90 @@
+---
+/**
+ * Lógica de búsqueda de propiedades
+ * Se encarga de leer los parámetros de la URL y obtener los datos del servidor.
+ */
+---
+
+<div id="property-search-logic" class="hidden"></div>
+
+<script>
+  const performSearch = async () => {
+    document.dispatchEvent(new CustomEvent('properties:loading', { bubbles: true }));
+
+    const params = new URLSearchParams(window.location.search);
+    const filters = {
+      propertyId: params.get('propertyId'),
+      city: params.get('city'),
+      province: params.get('province'),
+      contractType: params.get('contractType'),
+      propertyType: params.get('propertyType')
+    };
+
+    const page = params.get('page') || '0';
+    const size = params.get('size') || '12';
+
+    console.log('[PropertySearch] Fetching from API with filters:', filters, { page, size });
+
+    try {
+      let response;
+      
+      // Build query string from filters
+      const filterParams = new URLSearchParams();
+      if (filters.propertyId) filterParams.set('id', filters.propertyId);
+      if (filters.city) filterParams.set('city', filters.city);
+      if (filters.province) filterParams.set('province', filters.province);
+      if (filters.contractType) filterParams.set('contractType', filters.contractType);
+      if (filters.propertyType) filterParams.set('propertyType', filters.propertyType);
+      
+      const queryParams = new URLSearchParams({ page, size }).toString();
+      const allParams = filterParams.toString() ? `${filterParams}&${queryParams}` : queryParams;
+
+      response = await fetch(`/api/properties?${allParams}`, {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`Error en la respuesta: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      console.log('[PropertySearch] API Response Data:', data);
+      
+      const results = Array.isArray(data) ? data : (data.content || []);
+      
+      const pagination = {
+        page: Number(page),
+        size: Number(size),
+        totalElements: results.length,
+        totalPages: Math.ceil(results.length / size)
+      };
+
+      document.dispatchEvent(new CustomEvent('properties:fetched', {
+        detail: { 
+          results, 
+          filters,
+          pagination
+        },
+        bubbles: true
+      }));
+      
+    } catch (error) {
+      console.error('[PropertySearch] Error fetching properties:', error);
+      document.dispatchEvent(new CustomEvent('properties:error', {
+        detail: { message: 'Ha ocurrido un error al obtener los datos' },
+        bubbles: true
+      }));
+    }
+  };
+
+  document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(performSearch, 50);
+  });
+</script>
+
+<style>
+  .hidden { display: none; }
+</style>

@@ -26,6 +26,7 @@ export async function POST({ request, locals }) {
 
   // mapeo de acciones a rutas del gateway
   let targetUrl;
+  let method = "GET";
   switch (action) {
     case "purge":
       targetUrl = `${backendBase}/orchestrator/queue-management/purge`;
@@ -39,6 +40,10 @@ export async function POST({ request, locals }) {
     case "scheduler":
       targetUrl = `${backendBase}/orchestrator/auctions/scheduler`;
       break;
+    case "propertyScheduler":
+      targetUrl = `${backendBase}/orchestrator/properties/scrape/all`;
+      method = "POST";
+      break;
     case "getAuctions": {
       const payload = params.auctionsPayload ?? "";
       targetUrl = `${backendBase}/orchestrator/auctions/get?auctionsPayload=${encodeURIComponent(payload)}`;
@@ -47,13 +52,17 @@ export async function POST({ request, locals }) {
     case "processAuctions":
       targetUrl = `${backendBase}/orchestrator/auctions/process?auctionsPayload=`;
       break;
+    case "provinceNotifications":
+      targetUrl = `${backendBase}/orchestrator/notification/province-auctions-flow`;
+      method = "POST";
+      break;
     default:
       return json({ error: `Acción desconocida: ${action}` }, 400);
   }
 
   try {
     const response = await fetch(targetUrl, {
-      method: "GET",
+      method,
       headers: {
         "Authorization": `Bearer ${token}`,
         "Accept": "application/json"

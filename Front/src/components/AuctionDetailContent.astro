@@ -279,9 +279,18 @@
       badge.dataset.status = auction.status;
     }
 
-    setT(".property-type", auction.type);
-    setT(".property-address", auction.propertyAddress);
-    setT(".location-text", `${auction.city}, ${auction.province}`);
+    // Determinar si es multilote
+    const isMultiLot = auction.lots && auction.lots.length > 1;
+    
+    if (isMultiLot) {
+      setT(".property-type", "Multilote");
+      setT(".property-address", "Subasta Multilote");
+      setT(".location-text", "No disponible");
+    } else {
+      setT(".property-type", auction.type || "Sin tipo");
+      setT(".property-address", auction.propertyAddress || "Sin dirección");
+      setT(".location-text", `${auction.city || ''}, ${auction.province || ''}`.replace(', ', '').trim() || "No disponible");
+    }
 
     // rellenar info económica
     setT(".auction-value", auction.auctionValue);
@@ -391,11 +400,14 @@
     const descSection = document.getElementById("desc-section");
     const locSection = document.getElementById("loc-section");
 
-    if (auction.lots && auction.lots.length > 0) {
-      const isMultiLot = auction.lots.length > 1;
-      
+    // Determinar si es multilote usando el número de lotes del campo o la longitud del array
+    const lotsCount = parseInt(auction.lotsNumber) || (auction.lots ? auction.lots.length : 0);
+    const hasLots = lotsCount > 0;
+    const isMultiLot = lotsCount > 1;
+
+    if (hasLots) {
       lotsSection.classList.remove("hidden");
-      lotsCountEl.textContent = auction.lots.length;
+      lotsCountEl.textContent = lotsCount.toString();
       lotsContainer.innerHTML = "";
 
       // Ocultar secciones redundantes SOLO si es multilote (varios lotes)
