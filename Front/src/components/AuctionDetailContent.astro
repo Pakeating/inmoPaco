@@ -403,7 +403,7 @@
     // Determinar si es multilote usando el número de lotes del campo o la longitud del array
     const lotsCount = parseInt(auction.lotsNumber) || (auction.lots ? auction.lots.length : 0);
     const hasLots = lotsCount > 0;
-    const isMultiLot = lotsCount > 1;
+    const isMultiLotByCount = lotsCount > 1;
 
     if (hasLots) {
       lotsSection.classList.remove("hidden");
@@ -411,7 +411,7 @@
       lotsContainer.innerHTML = "";
 
       // Ocultar secciones redundantes SOLO si es multilote (varios lotes)
-      if (isMultiLot) {
+      if (isMultiLotByCount) {
         econSection?.classList.add("hidden");
         descSection?.classList.add("hidden");
         locSection?.classList.add("hidden");

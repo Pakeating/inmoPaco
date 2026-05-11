@@ -64,7 +64,7 @@ import ErrorState from './ErrorState.astro';
   const errorView = document.getElementById('error-view');
   const errorMessage = document.getElementById('error-message');
   const noResultsView = document.getElementById('no-results-view');
-  const template = document.getElementById('property-card-template');
+  const template = document.getElementById('property-card-template') as HTMLTemplateElement;
 
   const resetViews = () => {
     container.classList.add('hidden');
@@ -78,13 +78,13 @@ import ErrorState from './ErrorState.astro';
     loadingView.classList.remove('hidden');
   });
 
-  document.addEventListener('properties:error', (event) => {
+  document.addEventListener('properties:error', (event: CustomEvent) => {
     resetViews();
     errorMessage.textContent = event.detail.message || 'Ha ocurrido un error al obtener los datos.';
     errorView.classList.remove('hidden');
   });
 
-  document.addEventListener('properties:fetched', (event) => {
+  document.addEventListener('properties:fetched', (event: CustomEvent) => {
     const { results } = event.detail;
     
     resetViews();

@@ -59,7 +59,7 @@
         page: Number(page),
         size: Number(size),
         totalElements: results.length,
-        totalPages: Math.ceil(results.length / size)
+        totalPages: Math.ceil(results.length / Number(size))
       };
 
       document.dispatchEvent(new CustomEvent('properties:fetched', {
