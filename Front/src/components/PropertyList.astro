@@ -99,7 +99,7 @@ import ErrorState from './ErrorState.astro';
 
     results.forEach(property => {
       const templateContent = template.content;
-      const clone = templateContent.cloneNode(true);
+      const clone = templateContent.cloneNode(true) as DocumentFragment;
       
       clone.querySelector('.property-type').textContent = property.propertyType || 'Propiedad';
       
