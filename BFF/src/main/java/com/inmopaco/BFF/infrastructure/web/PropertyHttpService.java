@@ -27,7 +27,7 @@ public class PropertyHttpService {
     public ResponseEntity<Page<PropertyDTO>> searchProperties(
             @RequestBody PropertyQueryDTO filter,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "12") int size,
+            @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "+createdAt") String sortBy) {
 
         Pageable pageable = getPaginationAndSorting(page, size, sortBy);

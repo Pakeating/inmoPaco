@@ -230,6 +230,18 @@ import auctionTypes from '../data/auctionTypes.json';
     background: var(--color-bg-page);
     font-family: inherit;
     font-size: 0.95rem;
+    appearance: auto;
+    -webkit-appearance: auto;
+    box-sizing: border-box;
+    width: 100%;
+  }
+
+  .form-group input[type="checkbox"] {
+    width: auto;
+  }
+
+  .filter-form .form-grid {
+    min-width: 0;
   }
 
   .modal-footer {
@@ -273,11 +285,11 @@ import auctionTypes from '../data/auctionTypes.json';
 
   .checkbox-group {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-    gap: 0.75rem;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 0.5rem;
     max-height: 200px;
     overflow-y: auto;
-    padding: 1rem;
+    padding: 0.75rem;
     border: 1px solid var(--border-color);
     border-radius: var(--radius-md);
     background: var(--color-bg-page);
@@ -290,6 +302,7 @@ import auctionTypes from '../data/auctionTypes.json';
     font-size: 0.85rem;
     cursor: pointer;
     transition: color 0.2s;
+    min-width: 0;
   }
 
   .checkbox-item:hover {
@@ -298,7 +311,12 @@ import auctionTypes from '../data/auctionTypes.json';
 
   .checkbox-item input {
     width: auto !important;
+    flex-shrink: 0;
     cursor: pointer;
+  }
+
+  .checkbox-item span {
+    word-break: break-word;
   }
 
   .hidden {
@@ -316,6 +334,7 @@ import auctionTypes from '../data/auctionTypes.json';
       max-height: 90vh;
       padding: 1.25rem;
       overflow-y: auto;
+      box-sizing: border-box;
     }
     .modal-header {
       margin-bottom: 1rem;
@@ -325,8 +344,9 @@ import auctionTypes from '../data/auctionTypes.json';
       font-size: 1.25rem;
     }
     .checkbox-group {
-      grid-template-columns: repeat(2, 1fr);
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
       max-height: 150px;
+      padding: 0.5rem;
     }
     .modal-footer {
       flex-direction: column;
@@ -347,4 +367,6 @@ import auctionTypes from '../data/auctionTypes.json';
       font-size: 16px;
     }
   }
+
+
 </style>

@@ -266,7 +266,46 @@
     notFound.classList.add("hidden");
     wrapper.classList.remove("hidden");
 
-    const setT = (selector, value) => {
+    function markdownToHtml(md: string): string {
+      let html = md
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        .replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>')
+        .replace(/`([^`]+)`/g, '<code>$1</code>')
+        .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank">$1</a>')
+        .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+        .replace(/\*([^*]+)\*/g, '<em>$1</em>')
+        .replace(/^### (.+)$/gm, '<h4>$1</h4>')
+        .replace(/^## (.+)$/gm, '<h3>$1</h3>')
+        .replace(/^# (.+)$/gm, '<h2>$1</h2>');
+
+      const tableRegex = /^\|(.+)\|\n\|[-| :]+\|\n((?:\|.+\|\n?)*)/gm;
+      html = html.replace(tableRegex, (_, headerRow, bodyRows) => {
+        const headers = headerRow.split('|').map((h: string) => h.trim()).filter(Boolean);
+        const rows = bodyRows.trim().split('\n').map((r: string) =>
+          '<tr>' + r.split('|').map((c: string) => c.trim()).filter(Boolean).map((c: string) => `<td style="border:1px solid #ddd;padding:0.4rem 0.6rem">${c}</td>`).join('') + '</tr>'
+        ).join('');
+        return `<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:0.85rem;margin:0.5rem 0"><thead><tr>${headers.map((h: string) => `<th style="border:1px solid #ddd;padding:0.4rem 0.6rem;background:#f8fafc;font-weight:700;text-align:left">${h}</th>`).join('')}</tr></thead><tbody>${rows}</tbody></table></div>`;
+      });
+
+      const lines = html.split('\n');
+      const result: string[] = [];
+      let inList = false;
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
+        const listMatch = line.match(/^(\s*)[-*]\s+(.+)/);
+        if (listMatch) {
+          if (!inList) { result.push('<ul style="padding-left:1.2rem;margin:0.25rem 0;list-style:disc">'); inList = true; }
+          result.push(`<li style="margin:0;word-break:break-word">${listMatch[2]}</li>`);
+        } else {
+          if (inList) { result.push('</ul>'); inList = false; }
+          if (line.trim()) result.push(`<p style="margin:0.25rem 0;word-break:break-word">${line.trim()}</p>`);
+        }
+      }
+      if (inList) result.push('</ul>');
+      return result.join('\n');
+    }
+
+    const setT = (selector: string, value: string) => {
       if (!wrapper) return;
       const el = wrapper.querySelector(selector);
       if (el) el.textContent = value || "No disponible";
@@ -363,7 +402,7 @@
     if (aiSummaries.length > 0 && aiDocsSection && aiSummariesList) {
       aiDocsSection.classList.remove("hidden");
       aiSummariesList.innerHTML = aiSummaries.map(item => 
-        `<div style="font-size: 0.9rem; color: var(--color-text-main); line-height: 1.5; background: white; padding: 0.75rem; border-radius: 0.5rem; box-shadow: var(--shadow-sm);"><strong style="display:block; margin-bottom: 0.25rem; font-size: 0.8rem; color: var(--color-primary);">${item.title}</strong>${item.summary}</div>`
+        `<div style="font-size: 0.9rem; color: var(--color-text-main); line-height: 1.5; background: white; padding: 0.75rem; border-radius: 0.5rem; box-shadow: var(--shadow-sm);"><strong style="display:block; margin-bottom: 0.25rem; font-size: 0.8rem; color: var(--color-primary);">${item.title}</strong>${markdownToHtml(item.summary)}</div>`
       ).join('');
     } else if (aiDocsSection) {
       aiDocsSection.classList.add("hidden");
@@ -382,7 +421,7 @@
           li.innerHTML = `<a href="${doc.documentUrl}" target="_blank" class="doc-link">
             <span class="doc-icon"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></svg></span> Ver documento adjunto
           </a>
-          ${doc.docAiAnalysis ? `<div class="doc-ai-analysis" style="font-size: 0.85rem; margin-top: 0.5rem; color: var(--color-text-muted); background: #f8fafc; padding: 0.5rem; border-radius: 0.5rem; border-left: 3px solid var(--color-accent);">${doc.docAiAnalysis}</div>` : ''}`;
+          ${doc.docAiAnalysis ? `<div class="doc-ai-analysis" style="font-size: 0.85rem; margin-top: 0.5rem; color: var(--color-text-muted); background: #f8fafc; padding: 0.5rem; border-radius: 0.5rem; border-left: 3px solid var(--color-accent);">${markdownToHtml(doc.docAiAnalysis)}</div>` : ''}`;
           docsList.appendChild(li);
         });
       } else {

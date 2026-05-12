@@ -17,7 +17,7 @@
 
   <div class="nav-controls">
     <button class="btn-pagination prev-page" disabled>
-      <span class="icon">←</span> Anterior
+      <span class="icon">←</span> <span class="btn-label">Anterior</span>
     </button>
     <div class="page-info">
       <span class="current current-page-text">1</span>
@@ -25,7 +25,7 @@
       <span class="total total-pages-text">1</span>
     </div>
     <button class="btn-pagination next-page" disabled>
-      Siguiente <span class="icon">→</span>
+      <span class="btn-label">Siguiente</span> <span class="icon">→</span>
     </button>
   </div>
 </div>
@@ -34,7 +34,7 @@
   function updateAllPaginations() {
     const wrappers = document.querySelectorAll('.pagination-wrapper');
     const params = new URLSearchParams(window.location.search);
-    const currentSize = params.get('size') || '12';
+    const currentSize = params.get('size') || '10';
 
     wrappers.forEach(wrapper => {
       const sizeSelect = wrapper.querySelector('.page-size-select') as HTMLSelectElement;
@@ -196,6 +196,9 @@
       flex-direction: column;
       gap: 1.5rem;
       padding: 1.5rem;
+    }
+    .btn-label {
+      display: none;
     }
   }
 </style>
