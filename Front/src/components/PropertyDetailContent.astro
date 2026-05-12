@@ -131,7 +131,7 @@
     "BUILDING": "Edificio"
   };
 
-  document.addEventListener("properties:fetched", (event) => {
+  document.addEventListener("properties:fetched", (event: CustomEvent) => {
     const { results } = event.detail;
 
     loading.classList.add("hidden");
@@ -146,16 +146,16 @@
     notFound.classList.add("hidden");
     wrapper.classList.remove("hidden");
 
-    const setT = (selector, value) => {
+    const setT = (selector: string, value: string) => {
       if (!wrapper) return;
       const el = wrapper.querySelector(selector);
       if (el) el.textContent = value || "No disponible";
     };
 
-    const setConditionalField = (selector, value, formatter) => {
+    const setConditionalField = (selector: string, value: any, formatter?: (v: any) => string) => {
       const el = wrapper.querySelector(selector);
       if (!el) return;
-      const parent = el.closest('.feature-item');
+      const parent = el.closest('.feature-item') as HTMLElement | null;
       if (value === null || value === undefined || value === '' || value === 0) {
         if (parent) parent.classList.add('hidden');
         el.textContent = '';
@@ -165,10 +165,10 @@
       }
     };
 
-    const setConditionalFieldWithBadge = (selector, value, badgeFn) => {
+    const setConditionalFieldWithBadge = (selector: string, value: any, badgeFn: (el: Element, v: any) => void) => {
       const el = wrapper.querySelector(selector);
       if (!el) return;
-      const parent = el.closest('.feature-item');
+      const parent = el.closest('.feature-item') as HTMLElement | null;
       if (value === null || value === undefined || value === '' || value === 0) {
         if (parent) parent.classList.add('hidden');
         el.textContent = '';
@@ -185,7 +185,7 @@
     setT(".location-text", provincePart && cityPart ? `${provincePart}, ${cityPart}` : (provincePart || cityPart || "No disponible"));
 
     const autoCommEl = wrapper.querySelector(".autonomous-community-text");
-    const autoCommParent = wrapper.querySelector(".autonomous-community");
+    const autoCommParent = wrapper.querySelector(".autonomous-community") as HTMLElement | null;
     if (autoCommEl && autoCommParent) {
       autoCommEl.textContent = property.autonomousCommunity || '';
       autoCommParent.style.display = property.autonomousCommunity ? '' : 'none';
@@ -219,7 +219,7 @@
     setT(".sidebar-type", propertyTypeMap[property.propertyType] || property.propertyType || "Propiedad");
     setT(".property-id-display", property.propertyId || "-");
 
-    const originalLink = wrapper.querySelector(".original-link");
+    const originalLink = wrapper.querySelector(".original-link") as HTMLAnchorElement | null;
     const btnSection = wrapper.querySelector(".btn-section");
     if (originalLink && btnSection) {
       if (property.url) {
@@ -234,7 +234,7 @@
 if (typeof window !== 'undefined') {
     const savedSearch = sessionStorage.getItem('last_property_search');
     if (savedSearch) {
-      const backBtn = document.getElementById('back-to-list-bottom');
+      const backBtn = document.getElementById('back-to-list-bottom') as HTMLAnchorElement | null;
       if (backBtn) {
         backBtn.href = `/propertiesList${savedSearch}`;
       }

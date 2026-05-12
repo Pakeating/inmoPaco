@@ -21,7 +21,7 @@ import PropertyDetailContent from "../components/PropertyDetailContent.astro";
   if (typeof window !== 'undefined') {
     const savedSearch = sessionStorage.getItem('last_property_search');
     if (savedSearch) {
-      const backLink = document.getElementById('back-to-list-top');
+      const backLink = document.getElementById('back-to-list-top') as HTMLAnchorElement | null;
       if (backLink) {
         backLink.href = `/propertiesList${savedSearch}`;
       }

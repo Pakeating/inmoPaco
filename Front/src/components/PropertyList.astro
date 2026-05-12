@@ -97,48 +97,48 @@ import ErrorState from './ErrorState.astro';
     container.innerHTML = '';
     container.classList.remove('hidden');
 
-    results.forEach(property => {
+    results.forEach((property: any) => {
       const templateContent = template.content;
       const clone = templateContent.cloneNode(true) as DocumentFragment;
       
       clone.querySelector('.property-type').textContent = property.propertyType || 'Propiedad';
       
-      const contractBadge = clone.querySelector('.contract-badge');
+      const contractBadge = clone.querySelector('.contract-badge') as HTMLElement;
       contractBadge.textContent = property.contractType === 'SALE' ? 'Venta' : 'Alquiler';
       contractBadge.classList.add(property.contractType === 'SALE' ? 'sale' : 'rent');
       
       clone.querySelector('.property-address').textContent = property.title || property.street || property.city || 'Sin título';
 
-      const locParts = [];
+      const locParts: string[] = [];
       if (property.province) locParts.push(property.province);
       if (property.city) locParts.push(property.city);
       clone.querySelector('.location-text').textContent = locParts.length ? locParts.join(', ') : 'No disponible';
 
-      const detailsContainer = clone.querySelector('.property-details');
+      const detailsContainer = clone.querySelector('.property-details') as HTMLElement | null;
 
-      const bedroomsEl = clone.querySelector('.bedrooms');
+      const bedroomsEl = clone.querySelector('.bedrooms') as HTMLElement | null;
       if (property.bedrooms != null && property.bedrooms !== 0) {
         bedroomsEl.textContent = `${property.bedrooms}`;
       } else {
-        bedroomsEl.closest('.detail').style.display = 'none';
+        (bedroomsEl?.closest('.detail') as HTMLElement | null)!.style.display = 'none';
       }
 
-      const bathroomsEl = clone.querySelector('.bathrooms');
+      const bathroomsEl = clone.querySelector('.bathrooms') as HTMLElement | null;
       if (property.bathrooms != null && property.bathrooms !== 0) {
         bathroomsEl.textContent = `${property.bathrooms}`;
       } else {
-        bathroomsEl.closest('.detail').style.display = 'none';
+        (bathroomsEl?.closest('.detail') as HTMLElement | null)!.style.display = 'none';
       }
 
-      const surfaceEl = clone.querySelector('.surface');
+      const surfaceEl = clone.querySelector('.surface') as HTMLElement | null;
       if (property.surface != null && property.surface !== 0) {
         surfaceEl.textContent = `${property.surface} m²`;
       } else {
-        surfaceEl.closest('.detail').style.display = 'none';
+        (surfaceEl?.closest('.detail') as HTMLElement | null)!.style.display = 'none';
       }
 
-      const visibleDetails = detailsContainer.querySelectorAll('.detail:not([style*="display: none"])');
-      if (visibleDetails.length === 0) {
+      const visibleDetails = detailsContainer?.querySelectorAll('.detail:not([style*="display: none"])');
+      if (visibleDetails && visibleDetails.length === 0 && detailsContainer) {
         detailsContainer.style.display = 'none';
       }
       
