@@ -12,6 +12,8 @@ public interface RestService {
 
     ResponseEntity<Object> executeGetProperties(@RequestParam String propertiesPayload);
 
+    ResponseEntity<Object> executeScrapeProperties();
+
     ResponseEntity<Object> purgueQueues() throws Exception;
 
     ResponseEntity<Object> deleteConsumer(String stream, String subject) throws Exception;

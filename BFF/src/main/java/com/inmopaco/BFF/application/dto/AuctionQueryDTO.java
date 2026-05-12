@@ -24,4 +24,6 @@ public class AuctionQueryDTO {
     private Boolean hasBids; // ¿Ha recibido pujas?
 
     private String status;
+    
+    private Boolean isMultiLot; // ¿Es multilote?
 }

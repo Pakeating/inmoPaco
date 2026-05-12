@@ -13,7 +13,7 @@
 
     const params = new URLSearchParams(window.location.search);
     const filters = {
-      propertyId: params.get('propertyId'),
+      propertyId: params.get('propertyId') || params.get('id'),
       city: params.get('city'),
       province: params.get('province'),
       contractType: params.get('contractType'),
@@ -22,29 +22,32 @@
 
     const page = params.get('page') || '0';
     const size = params.get('size') || '12';
+    const sortBy = params.get('sortBy') || '+createdAt';
 
-    console.log('[PropertySearch] Fetching from API with filters:', filters, { page, size });
+    console.log('[PropertySearch] Fetching from API with filters:', filters, { page, size, sortBy });
 
     try {
+      const queryParams = new URLSearchParams({ page, size, sortBy }).toString();
       let response;
-      
-      // Build query string from filters
-      const filterParams = new URLSearchParams();
-      if (filters.propertyId) filterParams.set('id', filters.propertyId);
-      if (filters.city) filterParams.set('city', filters.city);
-      if (filters.province) filterParams.set('province', filters.province);
-      if (filters.contractType) filterParams.set('contractType', filters.contractType);
-      if (filters.propertyType) filterParams.set('propertyType', filters.propertyType);
-      
-      const queryParams = new URLSearchParams({ page, size }).toString();
-      const allParams = filterParams.toString() ? `${filterParams}&${queryParams}` : queryParams;
 
-      response = await fetch(`/api/properties?${allParams}`, {
-        method: 'GET',
-        headers: {
-          'Accept': 'application/json'
-        }
-      });
+      const hasOnlyId = filters.propertyId && !filters.city && !filters.province && !filters.contractType && !filters.propertyType;
+
+      if (hasOnlyId) {
+        response = await fetch(`/api/properties?id=${filters.propertyId}&${queryParams}`, {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/json'
+          }
+        });
+      } else {
+        response = await fetch(`/api/properties?${queryParams}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(filters)
+        });
+      }
 
       if (!response.ok) {
         throw new Error(`Error en la respuesta: ${response.status}`);
@@ -52,14 +55,16 @@
       
       const data = await response.json();
       console.log('[PropertySearch] API Response Data:', data);
-      
-      const results = Array.isArray(data) ? data : (data.content || []);
-      
+
+      const results = data.content || [];
+      const p = data.page || data;
       const pagination = {
-        page: Number(page),
-        size: Number(size),
-        totalElements: results.length,
-        totalPages: Math.ceil(results.length / Number(size))
+        page: Number(p.number ?? 0),
+        size: Number(p.size ?? 12),
+        totalPages: Number(p.totalPages ?? 1),
+        totalElements: Number(p.totalElements ?? 0),
+        isLast: Boolean(p.last),
+        isFirst: Boolean(p.first)
       };
 
       document.dispatchEvent(new CustomEvent('properties:fetched', {

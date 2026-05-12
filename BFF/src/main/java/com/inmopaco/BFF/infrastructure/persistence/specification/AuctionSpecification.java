@@ -53,6 +53,17 @@ public class AuctionSpecification {
                 predicates.add(cb.equal(root.get("status"), dto.getStatus()));
             }
 
+            // Multilote: filtrar por número de lotes usando la relación real
+            if (dto.getIsMultiLot() != null) {
+                if (dto.getIsMultiLot()) {
+                    // Es multilote: más de 1 lote relacionado
+                    predicates.add(cb.greaterThan(cb.size(root.get("lots")), 1));
+                } else {
+                    // No es multilote: 0 o 1 lote relacionado
+                    predicates.add(cb.lessThanOrEqualTo(cb.size(root.get("lots")), 1));
+                }
+            }
+
             return cb.and(predicates.toArray(new Predicate[0]));
         };
     }

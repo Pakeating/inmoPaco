@@ -84,8 +84,19 @@ spring:
                 - name: CircuitBreaker
                   args:
                     name: Orchestrator
+            - id: BFF-Swagger
+              uri: http://BFF:8083
+              predicates:
+                - name: Path
+                  args:
+                    patterns: /bff/swagger-ui/**, /bff/v3/api-docs/**
+              filters:
+                - name: RewritePath
+                  args:
+                    regexp: /bff/(?<segment>.*)
+                    replacement: /${segment}
             - id: BFF
-              uri: http://bff:8083
+              uri: http://BFF:8083
               predicates:
                 - name: Path
                   args:
@@ -139,3 +150,6 @@ server:
 
 jwt:
   secret: ${JWT_SECRET:dev-secret-please-change-in-production}
+
+app:
+  environment: ${APP_ENVIRONMENT:production}

@@ -62,6 +62,13 @@ public class RestServiceImpl implements RestService {
         return ResponseEntity.accepted().build();
     }
 
+    @PostMapping("/properties/scrape/all")
+    @Override
+    public ResponseEntity<Object> executeScrapeProperties() {
+        propertiesUsecaseService.scrapeProperties();
+        return ResponseEntity.accepted().build();
+    }
+
     @GetMapping("/queue-management/purge")
     @Override
     public ResponseEntity<Object> purgueQueues() throws Exception {

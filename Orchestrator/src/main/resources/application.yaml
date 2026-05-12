@@ -47,6 +47,9 @@ schedules:
   auctions:
     get-auctions:
       cron: "0 0 11 * * *" #las 11 del mediodia #"0 0 0 * * ?" # las doce de la noche
+  properties:
+    get-properties:
+      cron: "0 0 9 * * ?" # las 9 de la mañana
 
 server:
   port: 8082

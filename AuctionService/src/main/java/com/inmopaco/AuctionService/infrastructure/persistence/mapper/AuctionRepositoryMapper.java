@@ -18,11 +18,32 @@ public abstract class AuctionRepositoryMapper {
     @Autowired
     private LotRepositoryMapper lotMapper;
 
-    public abstract AuctionEntity toEntity(AuctionDetailsDTO auction);
+    public AuctionEntity toEntity(AuctionDetailsDTO auction) {
+        if (auction == null) return null;
+        
+        AuctionEntity entity = toEntityInternal(auction);
+        processLotsForNewEntity(auction, entity);
+        return entity;
+    }
+
+    protected abstract AuctionEntity toEntityInternal(AuctionDetailsDTO auction);
+
+    private void processLotsForNewEntity(AuctionDetailsDTO dto, AuctionEntity entity) {
+        if (dto.getLots() == null || dto.getLots().isEmpty()) return;
+
+        if (entity.getLots() == null) {
+            entity.setLots(new HashSet<>());
+        }
+
+        dto.getLots().forEach(lotDTO -> {
+            LotEntity lot = lotMapper.toEntity(lotDTO);
+            lot.setAuction(entity);
+            entity.getLots().add(lot);
+        });
+    }
 
     public abstract AuctionDetailsDTO toDTO(AuctionEntity auctionEntity);
 
-    @Mapping(target = "lots", ignore = true)
     @Mapping(target = "documents", ignore = true)
     public abstract void updateEntityFromDTO(AuctionDetailsDTO dto, @MappingTarget AuctionEntity entity);
 

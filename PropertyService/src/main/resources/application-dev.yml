@@ -47,8 +47,23 @@ management:
       show-values: always
       post:
         enabled: true
+property:
+  scraper:
+    enabled: true
+    delay:
+      min: 100
+      max: 500
+    timeout: 30000
+    user-agent: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36"
+    provider:
+      tecnocasa:
+        enabled: true
+      idealista:
+        enabled: false
+
 nats:
   url: nats://localhost:4222
+
 server:
   port: 7084
 

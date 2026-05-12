@@ -34,7 +34,7 @@
   function updateAllPaginations() {
     const wrappers = document.querySelectorAll('.pagination-wrapper');
     const params = new URLSearchParams(window.location.search);
-    const currentSize = params.get('size') || '10';
+    const currentSize = params.get('size') || '12';
 
     wrappers.forEach(wrapper => {
       const sizeSelect = wrapper.querySelector('.page-size-select') as HTMLSelectElement;
@@ -42,8 +42,7 @@
     });
   }
 
-  // Escuchar cuando se cargan nuevas subastas para actualizar el estado de la paginación
-  document.addEventListener('auctions:fetched', (event) => {
+  function onFetched(event: CustomEvent) {
     // @ts-ignore
     const { pagination } = event.detail;
     const wrappers = document.querySelectorAll('.pagination-wrapper');
@@ -77,7 +76,10 @@
         nextBtn.onclick = () => changePage(page + 1);
       }
     });
-  });
+  }
+
+  document.addEventListener('auctions:fetched', onFetched);
+  document.addEventListener('properties:fetched', onFetched);
 
   // Gestionar cambios en el selector de tamaño de página
   document.addEventListener('change', (e) => {

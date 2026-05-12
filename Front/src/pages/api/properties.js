@@ -19,8 +19,8 @@ export async function POST ({ request, locals }) {
 
   const url = new URL(request.url);
   const queryParams = url.searchParams.toString();
-  
-  const backendUrl = `${backendBase}/bff/properties${queryParams ? '?' + queryParams : ''}`;
+
+  const backendUrl = `${backendBase}/bff/properties/search${queryParams ? '?' + queryParams : ''}`;
 
   try {
     const backendHeaders = { 
@@ -63,30 +63,20 @@ export async function GET ({ request, locals }) {
 
   const url = new URL(request.url);
   const idValue = url.searchParams.get('id');
-  const city = url.searchParams.get('city');
-  const province = url.searchParams.get('province');
-  const contractType = url.searchParams.get('contractType');
-  const propertyType = url.searchParams.get('propertyType');
-  
-  const page = url.searchParams.get('page') || '0';
-  const size = url.searchParams.get('size') || '10';
-  
-  let backendUrl;
-  const queryParams = new URLSearchParams({ page, size }).toString();
 
-  if (idValue) {
-    backendUrl = `${backendBase}/bff/properties/${idValue}?${queryParams}`;
-  } else if (city) {
-    backendUrl = `${backendBase}/bff/properties/city/${city}?${queryParams}`;
-  } else if (province) {
-    backendUrl = `${backendBase}/bff/properties/province/${province}?${queryParams}`;
-  } else if (contractType) {
-    backendUrl = `${backendBase}/bff/properties/contract/${contractType}?${queryParams}`;
-  } else if (propertyType) {
-    backendUrl = `${backendBase}/bff/properties/type/${propertyType}?${queryParams}`;
-  } else {
-    backendUrl = `${backendBase}/bff/properties?${queryParams}`;
+  if (!idValue) {
+    return new Response(JSON.stringify({ error: 'Missing property ID' }), {
+      status: 400,
+      headers: { "Content-Type": "application/json" }
+    });
   }
+
+  const page = url.searchParams.get('page') || '0';
+  const size = url.searchParams.get('size') || '12';
+  const sortBy = url.searchParams.get('sortBy') || '+createdAt';
+  const queryParams = new URLSearchParams({ page, size, sortBy }).toString();
+
+  const backendUrl = `${backendBase}/bff/properties/search/${idValue}?${queryParams}`;
 
   try {
     const backendHeaders = { 
@@ -108,8 +98,21 @@ export async function GET ({ request, locals }) {
     }
 
     const data = await response.json();
-    
-    return new Response(JSON.stringify(data), {
+
+    let PageData = data;
+    if (!data.content && !Array.isArray(data)) {
+      PageData = {
+        content: [data],
+        page: {
+          number: 0,
+          size: 1,
+          totalElements: 1,
+          totalPages: 1
+        }
+      };
+    }
+
+    return new Response(JSON.stringify(PageData), {
       status: 200,
       headers: { "Content-Type": "application/json" }
     });

@@ -35,5 +35,20 @@ logging:
 
 nats:
   url: nats://nats-server:4222
+
+property:
+  scraper:
+    enabled: true
+    delay:
+      min: 100
+      max: 500
+    timeout: 30000
+    user-agent: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36"
+    provider:
+      tecnocasa:
+        enabled: true
+      idealista:
+        enabled: false
+
 server:
   port: 8084

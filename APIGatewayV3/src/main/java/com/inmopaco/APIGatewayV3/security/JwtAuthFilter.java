@@ -28,9 +28,18 @@ public class JwtAuthFilter implements GlobalFilter, Ordered {
     @Value("${jwt.secret:dev-secret-please-change-in-production}")
     private String jwtSecret;
 
+    @Value("${app.environment:production}")
+    private String appEnvironment;
+
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         String path = exchange.getRequest().getURI().getPath();
+
+        if ("local".equals(appEnvironment)) {
+            log.info("[filter] Modo LOCAL detectado. Saltando validación JWT para path: {}", path);
+            return chain.filter(exchange);
+        }
+
         log.info("[filter] New Gateway Call");
         log.info("[filter] Requested path: {}", path);
 
