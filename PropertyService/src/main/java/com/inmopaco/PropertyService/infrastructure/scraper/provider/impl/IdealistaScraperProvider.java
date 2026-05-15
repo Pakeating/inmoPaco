@@ -50,16 +50,6 @@ public class IdealistaScraperProvider implements PropertyScraperProvider {
 
         log.info("Starting Idealista scraping for city: {}", city);
         // TODO: Implementar lógica de scraping para Idealista
-        // 1. Construir URL de búsqueda: https://www.idealista.com/venta/inmuebles/{city}/
-        // 2. Fetch de la página
-        // 3. Extracción de datos (puede usar JSON embebido como Tecnocasa o HTML directo)
-        // 4. Mapear a PropertyDTO y persistir
-
-        // Ejemplo de estructura a implementar:
-        // String searchUrl = BASE_URL + "/venta/inmuebles/" + city.toLowerCase().replace(" ", "-");
-        // Document doc = scraperClient.fetchUrl(searchUrl);
-        // Elements items = doc.select("div.listing-item");
-        // for (Element item : items) { ... }
 
         log.warn("Idealista provider not fully implemented");
         return List.of();

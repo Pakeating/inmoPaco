@@ -92,9 +92,9 @@ public class TecnocasaScraperProvider implements PropertyScraperProvider {
             final Document firstDoc = scraperClient.fetchUrl(buildSearchUrl(city));
             final int totalInmuebles = extractTotalInmueblesFromDoc(firstDoc);
 
-            log.info("{} Inmuebles encontrados para Tecnocasa - {}", totalInmuebles, city);
+            log.info("{} offers found for Tecnocasa - {}", totalInmuebles, city);
             if (totalInmuebles == 0) {
-                log.info("No hay inmuebles para {}", city);
+                log.info("No offers found for {}", city);
                 return List.of();
             }
 
@@ -163,7 +163,7 @@ public class TecnocasaScraperProvider implements PropertyScraperProvider {
                 final List<PropertyDTO> properties = scrapeByCity(province);
                 final SaveResult result = savePropertiesBatch(properties);
                 totalSaved += result.saved();
-                log.info("Completed {} - Found: {}, Saved: {}, Updated: {}",
+                log.info("Completed {}, Found: {}, Saved: {}, Updated: {}",
                     province, properties.size(), result.saved(), result.updated());
             } catch (Exception e) {
                 log.error("Failed to scrape province {}: {}", province, e.getMessage());
